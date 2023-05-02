@@ -1,5 +1,5 @@
 import ScreepsApi from "./api.js";
-import GetRooms from "./getRooms.js";
+import RoomRequests from "./roomRequests.js";
 
 function wait(ms) {
   // eslint-disable-next-line no-promise-executor-return
@@ -11,19 +11,22 @@ export default class DataRequestBroker {
 
   dataResults = [];
 
-  getRooms = null;
+  roomRequests = null;
 
   constructor(rooms = {}) {
-    this.getRooms = new GetRooms(rooms, this);
+    this.roomRequests = new RoomRequests(rooms, this);
 
-    this.getRooms.sync();
+    this.roomRequests.sync();
     this.executeSingle();
   }
 
   forceUpdateRooms(rooms) {
-    this.getRooms.forceUpdateRooms(rooms);
+    this.roomRequests.forceUpdateRooms(rooms);
   }
-    
+
+  getRooms() {
+    return this.roomRequests.getRooms();
+  }
 
   addDataRequests(dataRequests) {
     this.dataRequests = this.dataRequests.concat(dataRequests);
@@ -41,10 +44,14 @@ export default class DataRequestBroker {
     this.dataResults.push(dataResult);
   }
 
-  getDataResults() {
-    const dataResults = [...this.dataResults];
-    this.dataResults = [];
-    return dataResults;
+  getDataResults(reset = true) {
+    if (reset) {
+      const dataResults = [...this.dataResults];
+      this.dataResults = [];
+      return dataResults;
+    }
+
+    return this.dataResults
   }
 
   async executeSingle() {
@@ -55,7 +62,9 @@ export default class DataRequestBroker {
     }
 
     const dataResult = await ScreepsApi.roomHistory(dataRequest);
-    this.addDataResult(dataResult);
+    if (dataResult) this.addDataResult(dataResult);
+    else this.addDataRequests([dataRequest])
+
     return this.executeSingle();
   }
 }

@@ -23,6 +23,10 @@ export default class RoomRequests {
     this.rooms = rooms;
   }
 
+  getRooms() {
+    return this.rooms;
+  }
+
   async getCurrentTick(shard) {
     const tick = await ScreepsApi.gameTime({ shard });
     if (tick) {
@@ -41,10 +45,10 @@ export default class RoomRequests {
       const currentTick = await this.getCurrentTick(shard);
       let requestTick = currentTick - (currentTick % 100) - 500;
 
+      const rooms = this.rooms[shard];
       if (requestTick - 100 > this.lastTickTimes[shard]) {
         requestTick = this.lastTickTimes[shard] + 100;
-      } else if (requestTick > this.lastTickTimes[shard]) {
-        const rooms = this.rooms[shard] || [];
+      } else if (rooms && (requestTick > this.lastTickTimes[shard] || !this.lastTickTimes[shard])) {
         rooms.forEach((room) => {
           const dataRequest = {
             room,
@@ -58,7 +62,7 @@ export default class RoomRequests {
       }
     }
 
-    await wait(1000 * 1);
+    await wait(1000 * 5);
     return this.sync();
   }
 }
