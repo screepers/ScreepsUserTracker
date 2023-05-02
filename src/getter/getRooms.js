@@ -19,6 +19,10 @@ export default class RoomRequests {
     this.DataRequestBroker = DataRequestBroker;
   }
 
+  forceUpdateRooms(rooms) {
+    this.rooms = rooms;
+  }
+
   async getCurrentTick(shard) {
     const tick = await ScreepsApi.gameTime({ shard });
     if (tick) {

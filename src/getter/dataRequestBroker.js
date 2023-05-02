@@ -11,10 +11,19 @@ export default class DataRequestBroker {
 
   dataResults = [];
 
-  constructor(rooms) {
-    new GetRooms(rooms, this).sync();
+  getRooms = null;
+
+  constructor(rooms = {}) {
+    this.getRooms = new GetRooms(rooms, this);
+
+    this.getRooms.sync();
     this.executeSingle();
   }
+
+  forceUpdateRooms(rooms) {
+    this.getRooms.forceUpdateRooms(rooms);
+  }
+    
 
   addDataRequests(dataRequests) {
     this.dataRequests = this.dataRequests.concat(dataRequests);
