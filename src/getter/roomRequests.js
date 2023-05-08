@@ -41,14 +41,16 @@ export default class RoomRequests {
       const shard = this.shards[i];
 
       const dataRequests = [];
-      // eslint-disable-next-line no-await-in-loop
       const currentTick = await this.getCurrentTick(shard);
       let requestTick = currentTick - (currentTick % 100) - 500;
 
       const rooms = this.rooms[shard];
       if (requestTick - 100 > this.lastTickTimes[shard]) {
         requestTick = this.lastTickTimes[shard] + 100;
-      } else if (rooms && (requestTick > this.lastTickTimes[shard] || !this.lastTickTimes[shard])) {
+      } else if (
+        rooms &&
+        (requestTick > this.lastTickTimes[shard] || !this.lastTickTimes[shard])
+      ) {
         rooms.forEach((room) => {
           const dataRequest = {
             room,

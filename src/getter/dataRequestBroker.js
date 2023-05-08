@@ -1,5 +1,26 @@
+import winston from "winston";
 import ScreepsApi from "./api.js";
 import RoomRequests from "./roomRequests.js";
+
+const logger = winston.createLogger({
+  level: "info",
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+  defaultMeta: { service: "data-request-broker" },
+  transports: [
+    new winston.transports.File({ filename: "logs/error.log", level: "error" }),
+    new winston.transports.File({ filename: "logs/combined.log" }),
+  ],
+});
+if (process.env.NODE_ENV !== "production") {
+  logger.add(
+    new winston.transports.Console({
+      format: winston.format.simple(),
+    })
+  );
+}
 
 function wait(ms) {
   // eslint-disable-next-line no-promise-executor-return
@@ -40,8 +61,8 @@ export default class DataRequestBroker {
     return [...this.dataRequests];
   }
 
-  addDataResult(dataResult) {
-    this.dataResults.push(dataResult);
+  addDataResult(dataResult, dataRequest) {
+    this.dataResults.push({ dataResult, dataRequest });
   }
 
   getDataResults(reset = true) {
@@ -51,7 +72,7 @@ export default class DataRequestBroker {
       return dataResults;
     }
 
-    return this.dataResults
+    return this.dataResults;
   }
 
   async executeSingle() {
@@ -62,9 +83,24 @@ export default class DataRequestBroker {
     }
 
     const dataResult = await ScreepsApi.roomHistory(dataRequest);
-    if (dataResult) this.addDataResult(dataResult);
-    else this.addDataRequests([dataRequest])
+    logger.info(
+      dataResult
+        ? `Got data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick}`
+        : `Failed to get data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick}`
+    );
 
+    if (dataResult !== null) this.addDataResult(dataResult, dataRequest);
+    else {
+      dataRequest.retries = dataRequest.retries
+        ? (dataRequest.retries += 1)
+        : 1;
+
+      if (dataRequest.retries < 3) this.addDataRequests([dataRequest]);
+      else
+        logger.error(
+          `Failed to get data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick} after 3 retries`
+        );
+    }
     return this.executeSingle();
   }
 }

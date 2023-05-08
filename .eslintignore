@@ -9,3 +9,4 @@ bots/
 **/*.md
 **/*.yml
 .eslintrc.cjs
+**/*.env

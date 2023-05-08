@@ -21,6 +21,7 @@ module.exports = {
         "no-underscore-dangle":"off",
         "no-param-reassign": ["error", { "props": false }],
         'import/no-unresolved': 'off',
+        "no-await-in-loop": "off",
         "prettier/prettier": [
             "error",
             {
