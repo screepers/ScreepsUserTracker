@@ -12,15 +12,17 @@ import { CreateAction, ActionType } from "./helper.js";
 export default function handleObjects(
   objects,
   previousObjects = {},
-  firstTickObjects = {}
+  firstTickObjects = {},
+  username
 ) {
   const objectKeys = Object.keys(objects);
-  for (let o = 0; o < objectKeys.length; o++) {
+  for (let o = objectKeys.length - 1; o >= 0; o--) {
     const object = objects[objectKeys[o]];
     if (object === null) continue;
 
     prepareObject(object);
     modifyObject(object);
+    if (object.username && object.username !== username) delete objects[objectKeys[o]];
   }
 
   const creeps = findAllByType(objects, "creep");
@@ -66,18 +68,21 @@ export default function handleObjects(
     actions.push(CreateAction(`countByType.structures.${type}`, structuresByType[type].length, ActionType.FirstTickOnly))
   })
 
-  const constructionSitesByType = groupBy(constructionSites, "structureType")
+  const constructionSitesByType = constructionSites.reduce((acc, obj) => {
+    if (!acc[obj.structureType]) acc[obj.structureType] = 0;
+    acc[obj.structureType] += 1;
+    return acc;
+  }, {})
   const constructionSitesByTypeKeys = Object.keys(constructionSitesByType)
   constructionSitesByTypeKeys.forEach((type) => {
     actions.push(CreateAction(`countByType.constructionSites.${type}`, constructionSitesByType[type].length, ActionType.FirstTickOnly))
   })
 
-  const intentsByType = creeps.reduce((acc, creep) => {
-    const actionLogKeys = Object.keys(creep._actionLog || [])
+  const intentsByType = intents.reduce((acc, obj) => {
+    const actionLogKeys = Object.keys(obj._actionLog || [])
     actionLogKeys.forEach((action) => {
-      const count = creep._actionLog[action].length
       if (!acc[action]) acc[action] = 0;
-      acc[action] += count;
+      acc[action] += 1;
     })
     return acc;
   }, {})
@@ -125,20 +130,20 @@ export default function handleObjects(
     },
   };
   for (let c = 0; c < intents.length; c++) {
-    const creep = intents[c];
+    const obj = intents[c];
 
-    const firstTickObject = findOriginalObject(creep._id, firstTickObjects);
+    const firstTickObject = findOriginalObject(obj._id, firstTickObjects);
     if (!firstTickObject) continue;
-    Object.keys(creep._actionLog || []).forEach((action) => {
+    Object.keys(obj._actionLog || []).forEach((action) => {
       const intentEffect = getIntentEffect(action, firstTickObject);
       if (intentEffect) {
-        if (intentsCategories.income[action]) {
+        if (intentsCategories.income[action] !== undefined) {
           intentsCategories.income[action] += intentEffect.energy;
         }
-        else if (intentsCategories.outcome[action]) {
+        else if (intentsCategories.outcome[action] !== undefined) {
           intentsCategories.outcome[action] += intentEffect.energy;
         }
-        if (intentsCategories.offensive[action]) {
+        if (intentsCategories.offensive[action] !== undefined) {
           intentsCategories.offensive[action] += intentEffect.damage;
         }
       }

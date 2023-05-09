@@ -114,7 +114,7 @@ export default function UploadData(dataList) {
         handleObjects(
           ticks[tick],
           ticks[tickKeys[t - 1]],
-          dataResult.ticks[dataRequest.tick] 
+          dataResult.ticks[dataRequest.tick] , username
         )
       );
     }

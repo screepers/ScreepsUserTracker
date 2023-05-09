@@ -130,14 +130,15 @@ const requestRoomUpdaterJob = new CronJob(
     const roomsPerIp = 4 * 100 * 2;
     const roomsPerCycle = roomsPerIp * ipCount;
 
-    const usernames = GetUsernames();
+    const usernames = ["MarvinTMB"];
+    // const usernames = GetUsernames();
     let roomCount = 0;
     const shardRooms = {};
 
     for (let i = 0; i < usernames.length; i += 1) {
       const username = usernames[i];
       const userRooms = GetRooms(username);
-      if (userRooms.total + roomCount < roomsPerCycle) {
+      if (userRooms.total + roomCount <= roomsPerCycle) {
         roomCount += userRooms.total;
         Object.entries(userRooms.rooms).forEach(([shard, data]) => {
           if (!shardRooms[shard]) {
