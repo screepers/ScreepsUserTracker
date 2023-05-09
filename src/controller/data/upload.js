@@ -109,11 +109,12 @@ export default function UploadData(dataList) {
       if (ticks[tick] === null) {
         continue;
       }
+
       actionsArray = actionsArray.concat(
         handleObjects(
           ticks[tick],
-          t > 0 ? ticks[tickKeys[t - 1]] : {},
-          dataResult.ticks[dataRequest.tick]
+          ticks[tickKeys[t - 1]],
+          dataResult.ticks[dataRequest.tick] 
         )
       );
     }
@@ -122,7 +123,6 @@ export default function UploadData(dataList) {
       stats.users[username].shards[dataRequest.shard] = {};
     }
     stats.users[username].shards[dataRequest.shard][dataRequest.room] = getStats(actionsArray);
-    console.log(username)
   }
 
   Send(stats, timestamp);

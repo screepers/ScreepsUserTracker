@@ -11,8 +11,8 @@ import { CreateAction, ActionType } from "./helper.js";
 
 export default function handleObjects(
   objects,
-  previousObjects,
-  firstTickObjects
+  previousObjects = {},
+  firstTickObjects = {}
 ) {
   const objectKeys = Object.keys(objects);
   for (let o = 0; o < objectKeys.length; o++) {

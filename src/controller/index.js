@@ -153,7 +153,7 @@ const requestRoomUpdaterJob = new CronJob(
     const splittedRooms = [];
     Object.entries(shardRooms).forEach(([shard, rooms]) => {
       for (let i = 0; i < rooms.length; i += 1) {
-        if (roomNumber < roomsPerIp) {
+        if (roomNumber <= roomsPerIp) {
           if (!splittedRooms[splittedRoomsIndex]) {
             splittedRooms[splittedRoomsIndex] = {};
           }
