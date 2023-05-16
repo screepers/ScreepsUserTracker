@@ -4,9 +4,8 @@ import axios from "axios";
 import fs from "fs";
 import Cron from "cron";
 import winston from "winston";
+import { spawn, Worker } from "threads";
 import GetRooms, { GetUsernames } from "./rooms/userHelper.js";
-import { spawn, Thread, Worker } from "threads"
-import { expose } from "threads/worker"
 
 const { CronJob } = Cron;
 const DEBUG = true;
@@ -64,34 +63,34 @@ function removeIp(ip) {
 
 app.post("/ip", async (req, res) => {
   try {
-  const ips = getIps();
-  const { ip } = req.body;
-  const ipOnline = await ipIsOnline(ip);
-  if (!ipOnline) {
-    logger.info(`${req.ip}: Failed to register with controller! ${ip}`);
-    res.status(400).json("Failed to register with controller!");
-    return;
-  }
-  
-  if (ips.includes(ip)) {
-    logger.info(`${req.ip}: Already added! ${ip}`);
-    res.json("Already added");
-    return;
-  }
-  
-  logger.info(`${req.ip}: Added! ${ip}`);
-  ips.push(ip);
-  fs.writeFileSync("./files/ips.json", JSON.stringify(ips));
-  res.json("Success");
-} catch (error) {
+    const ips = getIps();
+    const { ip } = req.body;
+    const ipOnline = await ipIsOnline(ip);
+    if (!ipOnline) {
+      logger.info(`${req.ip}: Failed to register with controller! ${ip}`);
+      res.status(400).json("Failed to register with controller!");
+      return;
+    }
+
+    if (ips.includes(ip)) {
+      logger.info(`${req.ip}: Already added! ${ip}`);
+      res.json("Already added");
+      return;
+    }
+
+    logger.info(`${req.ip}: Added! ${ip}`);
+    ips.push(ip);
+    fs.writeFileSync("./files/ips.json", JSON.stringify(ips));
+    res.json("Success");
+  } catch (error) {
     logger.error(error);
     res.status(500).json("Failed to register with controller!");
-}
+  }
 });
 
 app.delete("/ip", async (req, res) => {
   try {
-  const { ip } = req.body;
+    const { ip } = req.body;
     removeIp(ip);
     logger.info(`${req.ip}: Deleted! ${ip}`);
     res.json("Success");
@@ -101,23 +100,26 @@ app.delete("/ip", async (req, res) => {
   }
 });
 
-const exposeFunction = (func) => expose(func);
-
 const dataGetterJob = new CronJob(
   !DEBUG ? "*/4 * * * *" : "* * * * *",
   async () => {
     const ips = getIps();
 
     let data = [];
-    let status = {};
+    const status = {};
     for (let i = 0; i < ips.length; i += 1) {
       const ip = ips[i];
       try {
         const result = await axios.get(`${ip}/data`);
         data = [...data, ...result.data.results];
 
-        const simpleIp = ip.replace(/http:\/\/|https:\/\//g, "").replace(/\/|:/g, "");
-        status[simpleIp] = {activeRequestsCount: result.data.activeRequestsCount, dataCount: result.data.results.length};
+        const simpleIp = ip
+          .replace(/http:\/\/|https:\/\//g, "")
+          .replace(/\/|:/g, "");
+        status[simpleIp] = {
+          activeRequestsCount: result.data.activeRequestsCount,
+          dataCount: result.data.results.length,
+        };
       } catch (error) {
         logger.error(error);
 
@@ -128,8 +130,8 @@ const dataGetterJob = new CronJob(
     }
 
     logger.info(`Got ${data.length} results from ${ips.length} ips`);
-    const worker = await spawn(new Worker("./data/upload.js"))
-    await worker.UploadData(data, status)
+    const worker = await spawn(new Worker("./data/upload.js"));
+    await worker.UploadData(data, status);
   },
   null,
   false,
@@ -140,8 +142,8 @@ dataGetterJob.start();
 const requestRoomUpdaterJob = new CronJob(
   !DEBUG ? "*/4 * * * *" : "* * * * *",
   async () => {
-    const worker = await spawn(new Worker("./rooms/updateRooms.js"))
-    await worker.UpdateRooms()
+    const worker = await spawn(new Worker("./rooms/updateRooms.js"));
+    await worker.UpdateRooms();
 
     const ips = getIps();
     const ipCount = ips.length;
@@ -167,8 +169,7 @@ const requestRoomUpdaterJob = new CronJob(
           }
           shardRooms[shard].push(...data.owned);
         });
-      }
-      else break;
+      } else break;
     }
 
     let splittedRoomsIndex = 0;
@@ -203,7 +204,7 @@ const requestRoomUpdaterJob = new CronJob(
         await axios.put(`${ip}/rooms`, { rooms: splittedRooms[y] });
       } catch (error) {
         logger.error(error);
-        
+
         if (error.message.includes("ECONNREFUSED")) {
           removeIp(ip);
         }

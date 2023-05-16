@@ -56,25 +56,46 @@ app.use(bodyParser.json());
 
 app.get("/ping", (req, res) => {
   logger.info(`${req.ip}: Received ping`);
-  res.send("pong");
+  return res.send("pong");
 });
 
 app.put("/rooms", (req, res) => {
-  logger.info(
-    `${req.ip}: Updating rooms, received ${JSON.stringify(req.body)}`
-  );
+  try {
+    const roomCount = Object.entries(req.body.rooms).reduce(
+      // eslint-disable-next-line no-unused-vars
+      (acc, [_, value]) => acc + value.length,
+      0
+    );
+    logger.info(`${req.ip}: Updating rooms, received ${roomCount} rooms`);
 
-  const { rooms } = req.body;
-  dataRequestBroker.forceUpdateRooms(rooms);
-  res.json("Success");
+    const { rooms } = req.body;
+    dataRequestBroker.forceUpdateRooms(rooms);
+    return res.json("Success");
+  } catch (e) {
+    logger.error(
+      `${req.ip}: Failed to update rooms with ${JSON.stringify(
+        req.body
+      )} and error ${e}`
+    );
+    return res.status(500).json("Failed to update rooms");
+  }
 });
 app.get("/data", (req, res) => {
-  logger.info(`${req.ip}: Received data request`);
+  try {
+    logger.info(`${req.ip}: Received data request`);
 
-  const results = dataRequestBroker.getDataResults();
-  const activeRequests = dataRequestBroker.getDataRequests();
-  const rooms = dataRequestBroker.getRooms();
-  return res.json({ results, activeRequestsCount: activeRequests.length, rooms });
+    const results = dataRequestBroker.getDataResults();
+    const activeRequests = dataRequestBroker.getDataRequests();
+    const rooms = dataRequestBroker.getRooms();
+    return res.json({
+      results,
+      activeRequestsCount: activeRequests.length,
+      rooms,
+    });
+  } catch (e) {
+    logger.error(`${req.ip}: Failed to get data with ${e}`);
+    return res.status(500).json("Failed to get data");
+  }
 });
 
 async function connectToController() {

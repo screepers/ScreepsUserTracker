@@ -103,33 +103,34 @@ export function ActionListDefaultValuesFiller(actions) {
 }
 
 function groupBy(original, value) {
-    const typeofValue = typeof value
-    if (Array.isArray(value)) {
-        for (const element of value) {
-          original[element] = groupBy(original[element], value[element]).original;
-        }
-    } else if (typeofValue === 'object') {
-        for (const key of Object.keys(value)) {
-          original[key] = groupBy(original[key], value[key]).original;
-        }
-    }
-    else if (typeofValue === 'number') {
-        original += value;
-    }
-    return { original, value }
+  const typeofValue = typeof value;
+  if (Array.isArray(value)) {
+    value.forEach((index) => {
+      original[index] = groupBy(original[index], value[index]).original;
+    });
+  } else if (typeofValue === "object") {
+    Object.keys(value).forEach((key) => {
+      original[key] = groupBy(original[key], value[key]).original;
+    });
+  } else if (typeofValue === "number") {
+    // eslint-disable-next-line no-param-reassign
+    original += value;
+  }
+  return { original, value };
 }
 
 export function handleCombinedRoomStats(shards) {
   const stats = {};
   BaseShards.forEach((shard) => {
     stats[shard] = getStats(getDefaultActions());
-  })
+  });
 
   Object.entries(shards).forEach(([shard, rooms]) => {
-    Object.entries(rooms).forEach(([room, roomStats]) => {
+    // eslint-disable-next-line no-unused-vars
+    Object.entries(rooms).forEach(([_, roomStats]) => {
       stats[shard] = groupBy(stats[shard], roomStats).original;
-    })
-  })
+    });
+  });
 
-  return stats
+  return stats;
 }

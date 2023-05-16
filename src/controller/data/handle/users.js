@@ -1,5 +1,5 @@
 import GetRooms from "../../rooms/userHelper.js";
-import { BaseShards }from "./helper.js";
+import { BaseShards } from "./helper.js";
 
 function handleUser(username) {
   const user = GetRooms(username);
@@ -14,14 +14,12 @@ function handleUser(username) {
         owned: owned.length,
         reserved: reserved.length,
       };
-    }
-    else {
+    } else {
       stats[shard] = {
         total: 0,
         owned: 0,
         reserved: 0,
-      }
-      
+      };
     }
   });
   stats.ownedTotal = total;

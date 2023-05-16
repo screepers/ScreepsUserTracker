@@ -1,14 +1,16 @@
 import graphite from "graphite";
 import winston from "winston";
+import * as dotenv from "dotenv";
+import { expose } from "threads/worker";
 import { GetUsernames, GetUsername } from "../rooms/userHelper.js";
 import handleUsers from "./handle/users.js";
 import handleObjects from "./handle/objects.js";
 import { getStats, handleCombinedRoomStats } from "./handle/helper.js";
-import * as dotenv from "dotenv";
-import { expose } from "threads/worker"
 
 dotenv.config();
-const client = graphite.createClient(`plaintext://localhost:${process.env.GRAPHITE_PORT}/`);
+const client = graphite.createClient(
+  `plaintext://localhost:${process.env.GRAPHITE_PORT}/`
+);
 
 const logger = winston.createLogger({
   level: "info",
@@ -40,7 +42,7 @@ function UploadData(dataList, status) {
   const usernames = GetUsernames();
   const usersStats = handleUsers(usernames);
   Object.entries(usersStats).forEach(([username, userStats]) => {
-    stats[username] = { overview: {roomCounts:userStats}, shards: {} };
+    stats[username] = { overview: { roomCounts: userStats }, shards: {} };
   });
 
   if (dataList.length === 0) {
@@ -84,14 +86,18 @@ function UploadData(dataList, status) {
     stats[username].overview.shards = handleCombinedRoomStats(userStats.shards);
   });
 
-  logger.info(`Sending ${dataList.length} room's data to graphite, took ${Math.round((Date.now() - startTime) / 1000)} seconds to process the data`);
-  Send({ status: status }, Date.now());
+  logger.info(
+    `Sending ${dataList.length} room's data to graphite, took ${Math.round(
+      (Date.now() - startTime) / 1000
+    )} seconds to process the data`
+  );
+  Send({ status }, Date.now());
   setTimeout(() => {
     Send({ users: stats }, timestamp);
   }, 2000);
 }
 
 expose({
-  UploadData
+  UploadData,
 });
 export default UploadData;

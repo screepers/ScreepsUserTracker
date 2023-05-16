@@ -17,11 +17,6 @@ const logger = winston.createLogger({
   ],
 });
 
-function wait(ms) {
-  // eslint-disable-next-line no-promise-executor-return
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 export default class ScreepsApi {
   static async execute(options) {
     const errorOr = { error: null, result: null };
@@ -41,10 +36,9 @@ export default class ScreepsApi {
       if (response) {
         const { status } = response;
         if (status !== 404 && status !== 429) {
-          logger.error(error)
+          logger.error(error);
         }
-      }
-      else logger.error(error)
+      } else logger.error(error);
     }
     return errorOr;
   }

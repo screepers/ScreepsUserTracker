@@ -21,7 +21,7 @@ export default function handleObjects(
   firstTickObjects
 ) {
   if (!previousObjects) previousObjects = {};
-  if (!firstTickObjects) firstTickObjects = {}; 
+  if (!firstTickObjects) firstTickObjects = {};
 
   const objectKeys = Object.keys(objects);
   for (let o = objectKeys.length - 1; o >= 0; o -= 1) {

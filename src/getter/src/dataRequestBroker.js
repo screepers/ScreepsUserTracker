@@ -83,8 +83,14 @@ export default class DataRequestBroker {
     }
 
     const dataResult = await ScreepsApi.roomHistory(dataRequest);
-    if (dataResult) logger.debug(`Got data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick}`)
-    else logger.info(`Failed to get data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick}`);
+    if (dataResult)
+      logger.debug(
+        `Got data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick}`
+      );
+    else
+      logger.info(
+        `Failed to get data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick}`
+      );
 
     if (dataResult !== null) this.addDataResult(dataResult, dataRequest);
     else {
@@ -93,10 +99,10 @@ export default class DataRequestBroker {
         : 1;
 
       if (dataRequest.retries < 3) this.addDataRequests([dataRequest]);
-      else
-        logger.error(
-          `Failed to get data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick} after 3 retries`
-        );
+      // else
+      //   logger.error(
+      //     `Failed to get data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick} after 3 retries`
+      //   );
     }
     return this.executeSingle();
   }
