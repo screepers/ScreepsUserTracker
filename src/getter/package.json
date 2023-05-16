@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
-    "start-always": "node fs.js"
+    "start-always": "node fm.js"
   },
   "author": "",
   "license": "ISC",
