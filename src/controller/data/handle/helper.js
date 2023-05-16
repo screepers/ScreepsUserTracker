@@ -110,10 +110,10 @@ function groupBy(original, value) {
         }
     } else if (typeofValue === 'object') {
         for (const key of Object.keys(value)) {
-          original[key] = groupBy(original[element], value[key]).original;
+          original[key] = groupBy(original[key], value[key]).original;
         }
     }
-    else if (typeofCurrent === 'number') {
+    else if (typeofValue === 'number') {
         original += value;
     }
     return { original, value }
@@ -125,5 +125,11 @@ export function handleCombinedRoomStats(shards) {
     stats[shard] = getStats(getDefaultActions());
   })
 
-  return groupBy(stats, shards);
+  Object.entries(shards).forEach(([shard, rooms]) => {
+    Object.entries(rooms).forEach(([room, roomStats]) => {
+      stats[shard] = groupBy(stats[shard], roomStats).original;
+    })
+  })
+
+  return stats
 }
