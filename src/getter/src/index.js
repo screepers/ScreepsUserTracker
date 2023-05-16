@@ -8,7 +8,8 @@ import DataRequestBroker from "./dataRequestBroker.js";
 const { CronJob } = Cron;
 
 const controllerIp = "http://localhost:5000";
-const ip = "http://localhost:4000";
+const port = 4000;
+const ip = `http://localhost:${port}`;
 const DEBUG = true;
 
 // terminate process on exit
@@ -49,14 +50,18 @@ if (process.env.NODE_ENV !== "production") {
 
 const dataRequestBroker = new DataRequestBroker();
 const app = express();
-const port = 4000;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+app.get("/ping", (req, res) => {
+  logger.info(`${req.ip}: Received ping`);
+  res.send("pong");
+});
+
 app.put("/rooms", (req, res) => {
   logger.info(
-    ` ${req.ip}: Updating rooms, received ${JSON.stringify(req.body)}`
+    `${req.ip}: Updating rooms, received ${JSON.stringify(req.body)}`
   );
 
   const { rooms } = req.body;
@@ -69,7 +74,7 @@ app.get("/data", (req, res) => {
   const results = dataRequestBroker.getDataResults();
   const activeRequests = dataRequestBroker.getDataRequests();
   const rooms = dataRequestBroker.getRooms();
-  return res.json({ results, activeRequests, rooms });
+  return res.json({ results, activeRequestsCount: activeRequests.length, rooms });
 });
 
 async function connectToController() {
@@ -79,8 +84,10 @@ async function connectToController() {
       logger.info(`Connected to controller at ${controllerIp}`);
       return;
     }
-  } catch (error) {}
-  logger.error(`Failed to connect to controller, trying again in 60 seconds`);
+  } catch (e) {
+    logger.error(`Failed to connect to controller, trying again in 60 seconds`);
+  }
+  // eslint-disable-next-line no-promise-executor-return
   await new Promise((resolve) => setTimeout(resolve, 60 * 1000));
   connectToController();
 }
@@ -101,6 +108,8 @@ const job = new CronJob(
     backlogLogger.info(
       `Room count: ${roomCount}, Active request count: ${activeRequestCount}, Result count: ${resultCount}`
     );
+
+    if (resultCount > 5000) dataRequestBroker.getDataResults();
   },
   null,
   false,

@@ -3,9 +3,12 @@ import winston from "winston";
 import { GetUsernames, GetUsername } from "../rooms/userHelper.js";
 import handleUsers from "./handle/users.js";
 import handleObjects from "./handle/objects.js";
-import {getStats} from "./handle/helper.js";
-const graphitePort = 8080;
-const client = graphite.createClient(`plaintext://localhost:${graphitePort}/`);
+import { getStats, handleCombinedRoomStats } from "./handle/helper.js";
+import * as dotenv from "dotenv";
+import { expose } from "threads/worker"
+
+dotenv.config();
+const client = graphite.createClient(`plaintext://localhost:${process.env.GRAPHITE_PORT}/`);
 
 const logger = winston.createLogger({
   level: "info",
@@ -13,7 +16,16 @@ const logger = winston.createLogger({
   transports: [new winston.transports.File({ filename: "logs/graphite.log" })],
 });
 
+if (process.env.NODE_ENV !== "production") {
+  logger.add(
+    new winston.transports.Console({
+      format: winston.format.simple(),
+    })
+  );
+}
+
 function Send(data, timestamp) {
+  if (process.env.GRAPHITE_ONLINE === "FALSE") return;
   client.write(data, timestamp, (err) => {
     if (err) {
       logger.error(err);
@@ -21,109 +33,65 @@ function Send(data, timestamp) {
   });
 }
 
-function group(previous, current) {
-  if (Array.isArray(current)) {
-    for (let i = 0; i < current.length; i++) {
-      const currentElement = current[i];
-      const previousElement = previous[i];
-      if (!previousElement) {
-        previous[i] = currentElement;
-        continue;
-      }
-      group(previousElement, currentElement);
-    }
-  } else if (typeof current === "object") {
-    const keys = Object.keys(current);
-    for (let i = 0; i < keys.length; i++) {
-      const key = keys[i];
-      const currentElement = current[key];
-      const previousElement = previous[key];
-      if (!previousElement) {
-        previous[key] = currentElement;
-        continue;
-      }
-      group(previousElement, currentElement);
-    }
-  } else {
-    previous += current;
-  }
-}
-
-function divide100(current) {
-  if (Array.isArray(current)) {
-    for (let i = 0; i < current.length; i++) {
-      const currentElement = current[i];
-      divide100(currentElement);
-    }
-  } else if (typeof current === "object") {
-    const keys = Object.keys(current);
-    for (let i = 0; i < keys.length; i++) {
-      const key = keys[i];
-      const currentElement = current[key];
-      divide100(currentElement);
-    }
-  } else {
-    current /= 100;
-  }
-}
-
-function groupObjects(objectsArray) {
-  let grouped = {};
-  for (let i = 0; i < objectsArray.length; i++) {
-    group(grouped, objectsArray[i]);
-  }
-  return grouped;
-}
-
-export default function UploadData(dataList) {
-  const stats = {
-    users: {},
-  };
+function UploadData(dataList, status) {
+  const startTime = Date.now();
+  const stats = {};
 
   const usernames = GetUsernames();
-  const userStats = handleUsers(usernames);
-  Object.entries(userStats).forEach(([username, userStats]) => {
-    stats.users[username] = { overview: userStats, shards: {} };
+  const usersStats = handleUsers(usernames);
+  Object.entries(usersStats).forEach(([username, userStats]) => {
+    stats[username] = { overview: {roomCounts:userStats}, shards: {} };
   });
 
   if (dataList.length === 0) {
     return;
   }
   let timestamp;
-  for (let i = 0; i < dataList.length; i++) {
+  for (let i = 0; i < dataList.length; i += 1) {
     const { dataResult, dataRequest } = dataList[i];
     if (!timestamp) {
       timestamp = dataResult.timestamp;
     }
 
     const username = GetUsername(dataRequest.room, dataRequest.shard);
-    if (!username) {
-      continue;
-    }
-
-    let actionsArray = [];
-    const { ticks } = dataResult;
-    const tickKeys = Object.keys(ticks);
-    for (let t = 0; t < tickKeys.length; t++) {
-      const tick = tickKeys[t];
-      if (ticks[tick] === null) {
-        continue;
+    if (username) {
+      let actionsArray = [];
+      const { ticks } = dataResult;
+      const tickKeys = Object.keys(ticks);
+      for (let t = 0; t < tickKeys.length; t += 1) {
+        const tick = tickKeys[t];
+        if (ticks[tick]) {
+          actionsArray = actionsArray.concat(
+            handleObjects(
+              username,
+              ticks[tick],
+              ticks[tickKeys[t - 1]],
+              dataResult.ticks[dataRequest.tick]
+            )
+          );
+        }
       }
 
-      actionsArray = actionsArray.concat(
-        handleObjects(
-          ticks[tick],
-          ticks[tickKeys[t - 1]],
-          dataResult.ticks[dataRequest.tick] , username
-        )
-      );
+      if (!stats[username].shards[dataRequest.shard]) {
+        stats[username].shards[dataRequest.shard] = {};
+      }
+      stats[username].shards[dataRequest.shard][dataRequest.room] =
+        getStats(actionsArray);
     }
-
-    if (!stats.users[username].shards[dataRequest.shard]) {
-      stats.users[username].shards[dataRequest.shard] = {};
-    }
-    stats.users[username].shards[dataRequest.shard][dataRequest.room] = getStats(actionsArray);
   }
 
-  Send(stats, timestamp);
+  Object.entries(stats).forEach(([username, userStats]) => {
+    stats[username].overview.shards = handleCombinedRoomStats(userStats.shards);
+  });
+
+  logger.info(`Sending ${dataList.length} room's data to graphite, took ${Math.round((Date.now() - startTime) / 1000)} seconds to process the data`);
+  Send({ status: status }, Date.now());
+  setTimeout(() => {
+    Send({ users: stats }, timestamp);
+  }, 2000);
 }
+
+expose({
+  UploadData
+});
+export default UploadData;

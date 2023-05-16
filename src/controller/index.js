@@ -4,9 +4,9 @@ import axios from "axios";
 import fs from "fs";
 import Cron from "cron";
 import winston from "winston";
-import UpdateRooms from "./rooms/updateRooms.js";
 import GetRooms, { GetUsernames } from "./rooms/userHelper.js";
-import UploadData from "./data/upload.js";
+import { spawn, Thread, Worker } from "threads"
+import { expose } from "threads/worker"
 
 const { CronJob } = Cron;
 const DEBUG = true;
@@ -39,12 +39,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 const getIps = () =>
-  fs.existsSync("./ips.json") ? JSON.parse(fs.readFileSync("./ips.json")) : [];
+  fs.existsSync("./files/ips.json")
+    ? JSON.parse(fs.readFileSync("./files/ips.json"))
+    : [];
 
 async function ipIsOnline(ip) {
   try {
-    const getData = await axios.get(`${ip}/data`);
-    if (!getData.data.rooms) {
+    const pong = await axios.get(`${ip}/ping`);
+    if (pong.data !== "pong") {
       return false;
     }
   } catch (error) {
@@ -57,10 +59,11 @@ async function ipIsOnline(ip) {
 function removeIp(ip) {
   const ips = getIps();
   ips.splice(ips.indexOf(ip), 1);
-  fs.writeFileSync("./ips.json", JSON.stringify(ips));
+  fs.writeFileSync("./files/ips.json", JSON.stringify(ips));
 }
 
 app.post("/ip", async (req, res) => {
+  try {
   const ips = getIps();
   const { ip } = req.body;
   const ipOnline = await ipIsOnline(ip);
@@ -69,49 +72,64 @@ app.post("/ip", async (req, res) => {
     res.status(400).json("Failed to register with controller!");
     return;
   }
-
+  
   if (ips.includes(ip)) {
     logger.info(`${req.ip}: Already added! ${ip}`);
     res.json("Already added");
     return;
   }
-
+  
   logger.info(`${req.ip}: Added! ${ip}`);
   ips.push(ip);
-  fs.writeFileSync("./ips.json", JSON.stringify(ips));
+  fs.writeFileSync("./files/ips.json", JSON.stringify(ips));
   res.json("Success");
+} catch (error) {
+    logger.error(error);
+    res.status(500).json("Failed to register with controller!");
+}
 });
 
 app.delete("/ip", async (req, res) => {
-  const { ip } = req.body;
   try {
-    removeIp();
+  const { ip } = req.body;
+    removeIp(ip);
     logger.info(`${req.ip}: Deleted! ${ip}`);
     res.json("Success");
   } catch (error) {
-    logger.info(`${req.ip}: Failed to delete ip! ${ip}`);
+    logger.info(error);
     res.json("Failed to delete ip!");
   }
 });
+
+const exposeFunction = (func) => expose(func);
 
 const dataGetterJob = new CronJob(
   !DEBUG ? "*/4 * * * *" : "* * * * *",
   async () => {
     const ips = getIps();
+
     let data = [];
+    let status = {};
     for (let i = 0; i < ips.length; i += 1) {
       const ip = ips[i];
       try {
         const result = await axios.get(`${ip}/data`);
         data = [...data, ...result.data.results];
+
+        const simpleIp = ip.replace(/http:\/\/|https:\/\//g, "").replace(/\/|:/g, "");
+        status[simpleIp] = {activeRequestsCount: result.data.activeRequestsCount, dataCount: result.data.results.length};
       } catch (error) {
-        logger.error(`Failed to get data from ${ip}, ${error}`);
-        console.log(`Failed to get data from ${ip}`);
+        logger.error(error);
+
+        if (error.message.includes("ECONNREFUSED")) {
+          removeIp(ip);
+        }
       }
     }
 
     logger.info(`Got ${data.length} results from ${ips.length} ips`);
-    UploadData(data);
+    const worker = await spawn(new Worker("./data/upload.js"))
+    await worker.UploadData(data, status)
   },
   null,
   false,
@@ -122,23 +140,26 @@ dataGetterJob.start();
 const requestRoomUpdaterJob = new CronJob(
   !DEBUG ? "*/4 * * * *" : "* * * * *",
   async () => {
-    await UpdateRooms();
+    const worker = await spawn(new Worker("./rooms/updateRooms.js"))
+    await worker.UpdateRooms()
+
     const ips = getIps();
     const ipCount = ips.length;
 
-    // tickSpeed * ticksPerCall * callsPerMinute * ips
-    const roomsPerIp = 4 * 100 * 2;
+    // tickSpeed * ticksPerCall * callsPerSecond
+    const roomsPerIp = 4.5 * 100 * 2;
     const roomsPerCycle = roomsPerIp * ipCount;
 
-    const usernames = ["MarvinTMB"];
-    // const usernames = GetUsernames();
+    const usernames = GetUsernames();
     let roomCount = 0;
     const shardRooms = {};
 
+    // const addedUsernames = [];
     for (let i = 0; i < usernames.length; i += 1) {
       const username = usernames[i];
       const userRooms = GetRooms(username);
       if (userRooms.total + roomCount <= roomsPerCycle) {
+        // addedUsernames.push(username);
         roomCount += userRooms.total;
         Object.entries(userRooms.rooms).forEach(([shard, data]) => {
           if (!shardRooms[shard]) {
@@ -147,6 +168,7 @@ const requestRoomUpdaterJob = new CronJob(
           shardRooms[shard].push(...data.owned);
         });
       }
+      else break;
     }
 
     let splittedRoomsIndex = 0;
@@ -173,14 +195,18 @@ const requestRoomUpdaterJob = new CronJob(
     for (let y = 0; y < ips.length; y += 1) {
       const ip = ips[y];
       try {
-        const roomCount = Object.values(splittedRooms[y]).reduce(
+        const ipRoomCount = Object.values(splittedRooms[y]).reduce(
           (acc, curr) => acc + curr.length,
           0
         );
-        logger.info(`Updating rooms for ${ip} with ${roomCount} rooms`);
-        axios.put(`${ip}/rooms`, { rooms: splittedRooms[y] });
+        logger.info(`Updating rooms for ${ip} with ${ipRoomCount} rooms`);
+        await axios.put(`${ip}/rooms`, { rooms: splittedRooms[y] });
       } catch (error) {
-        logger.error(`Failed to update rooms for ${ip}, ${error}`);
+        logger.error(error);
+        
+        if (error.message.includes("ECONNREFUSED")) {
+          removeIp(ip);
+        }
       }
     }
   },
@@ -192,7 +218,7 @@ requestRoomUpdaterJob.start();
 
 app.listen(port, async () => {
   const ips = getIps();
-  for (let i = 0; i < ips.length; i++) {
+  for (let i = 0; i < ips.length; i += 1) {
     const ip = ips[i];
     const isOnline = await ipIsOnline(ip);
     if (!isOnline) {

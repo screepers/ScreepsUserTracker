@@ -1,11 +1,14 @@
 import fs from "fs";
 
 export default function GetRooms(username) {
-  if (!fs.existsSync(`./users.json`) || !fs.existsSync(`./userRoomsCount.json`))
+  if (
+    !fs.existsSync(`files/users.json`) ||
+    !fs.existsSync(`files/userRoomsCount.json`)
+  )
     return {};
 
-  const rooms = fs.readFileSync(`./users.json`);
-  const userRoomsCount = fs.readFileSync(`./userRoomsCount.json`);
+  const rooms = fs.readFileSync(`files/users.json`);
+  const userRoomsCount = fs.readFileSync(`files/userRoomsCount.json`);
 
   const parsedRooms = JSON.parse(rooms);
   const parsedUserRoomsCount = JSON.parse(userRoomsCount);
@@ -17,13 +20,13 @@ export default function GetRooms(username) {
 }
 
 export function GetUsername(room, shard) {
-  if (!fs.existsSync(`./users.json`)) return null;
+  if (!fs.existsSync(`files/users.json`)) return null;
 
-  const rooms = fs.readFileSync(`./users.json`);
+  const rooms = fs.readFileSync(`files/users.json`);
   const parsedRooms = JSON.parse(rooms);
 
   const usernames = Object.keys(parsedRooms);
-  for (let u = 0; u < usernames.length; u++) {
+  for (let u = 0; u < usernames.length; u += 1) {
     const username = usernames[u];
     const data = parsedRooms[username];
     if (
@@ -37,13 +40,13 @@ export function GetUsername(room, shard) {
 }
 
 export function GetUsernameById(id) {
-  if (!fs.existsSync(`./users.json`)) return null;
+  if (!fs.existsSync(`files/users.json`)) return null;
 
-  const rooms = fs.readFileSync(`./users.json`);
+  const rooms = fs.readFileSync(`files/users.json`);
   const parsedRooms = JSON.parse(rooms);
 
   const usernames = Object.keys(parsedRooms);
-  for (let u = 0; u < usernames.length; u++) {
+  for (let u = 0; u < usernames.length; u += 1) {
     const username = usernames[u];
     const data = parsedRooms[username];
     if (data.id === id) {
@@ -53,10 +56,13 @@ export function GetUsernameById(id) {
 }
 
 export function GetUsernames() {
-  if (!fs.existsSync(`./users.json`) || !fs.existsSync(`./userRoomsCount.json`))
+  if (
+    !fs.existsSync(`files/users.json`) ||
+    !fs.existsSync(`files/userRoomsCount.json`)
+  )
     return [];
 
-  const userRoomsCount = fs.readFileSync(`./userRoomsCount.json`);
+  const userRoomsCount = fs.readFileSync(`files/userRoomsCount.json`);
 
   const parsedUserRoomsCount = JSON.parse(userRoomsCount);
 

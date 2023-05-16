@@ -34,8 +34,17 @@ export default class ScreepsApi {
         statusText: response.statusText,
       });
     } catch (error) {
-      logger.error(error);
       errorOr.error = error;
+
+      // only log other status codes then 404, 429
+      const { response } = error;
+      if (response) {
+        const { status } = response;
+        if (status !== 404 && status !== 429) {
+          logger.error(error)
+        }
+      }
+      else logger.error(error)
     }
     return errorOr;
   }
@@ -59,7 +68,6 @@ export default class ScreepsApi {
       url: `https://screeps.com/room-history/${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick}.json`,
     };
 
-    await wait(500);
     const response = await this.execute(options);
     if (response.result) {
       return response.result;

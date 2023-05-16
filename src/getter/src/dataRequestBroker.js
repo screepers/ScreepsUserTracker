@@ -83,11 +83,8 @@ export default class DataRequestBroker {
     }
 
     const dataResult = await ScreepsApi.roomHistory(dataRequest);
-    logger.info(
-      dataResult
-        ? `Got data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick}`
-        : `Failed to get data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick}`
-    );
+    if (dataResult) logger.debug(`Got data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick}`)
+    else logger.info(`Failed to get data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick}`);
 
     if (dataResult !== null) this.addDataResult(dataResult, dataRequest);
     else {

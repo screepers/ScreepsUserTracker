@@ -1,5 +1,8 @@
 node_modules
 logs
 .env
+
+# Files
+ips.json
 users.json
 userRoomsCount.json

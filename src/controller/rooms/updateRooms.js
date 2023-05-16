@@ -1,6 +1,7 @@
 import fs from "fs";
 import { ScreepsAPI } from "screeps-api";
 import * as dotenv from "dotenv";
+import { expose } from "threads/worker"
 
 dotenv.config();
 
@@ -52,7 +53,7 @@ async function getUsers(shard, rooms) {
   return roomsByUsername;
 }
 
-export default async function Update() {
+async function UpdateRooms() {
   try {
     const users = {};
 
@@ -84,11 +85,14 @@ export default async function Update() {
       .sort((a, b) => b[1] - a[1])
       .filter((u) => u[0] !== "Invader");
 
-    fs.writeFileSync("users.json", JSON.stringify(users));
-    fs.writeFileSync("userRoomsCount.json", JSON.stringify(userCounts));
+    fs.writeFileSync("./files/users.json", JSON.stringify(users));
+    fs.writeFileSync("./files/userRoomsCount.json", JSON.stringify(userCounts));
   } catch (error) {
     if (error.message && error.message.startsWith("Rate limit exceeded"))
       return;
     console.log(error);
   }
 }
+
+expose({ UpdateRooms })
+export default UpdateRooms; 

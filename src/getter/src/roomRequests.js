@@ -42,7 +42,7 @@ export default class RoomRequests {
 
       const dataRequests = [];
       const currentTick = await this.getCurrentTick(shard);
-      let requestTick = currentTick - (currentTick % 100) - 500;
+      let requestTick = currentTick - (currentTick % 100) - 1000;
 
       const rooms = this.rooms[shard];
       if (requestTick - 100 > this.lastTickTimes[shard]) {

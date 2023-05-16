@@ -17,6 +17,7 @@
     "express": "^4.18.2",
     "graphite": "^0.1.5",
     "screeps-api": "^1.16.0",
+    "threads": "^1.7.0",
     "winston": "^3.8.2"
   }
 }
