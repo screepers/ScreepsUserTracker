@@ -88,7 +88,7 @@ export default class DataRequestBroker {
         `Got data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick}`
       );
     else
-      logger.info(
+      logger.debug(
         `Failed to get data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick}`
       );
 
@@ -99,10 +99,10 @@ export default class DataRequestBroker {
         : 1;
 
       if (dataRequest.retries < 3) this.addDataRequests([dataRequest]);
-      // else
-      //   logger.error(
-      //     `Failed to get data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick} after 3 retries`
-      //   );
+      else
+        logger.debug(
+          `Failed to get data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick} after 3 retries`
+        );
     }
     return this.executeSingle();
   }
