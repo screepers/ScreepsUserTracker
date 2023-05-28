@@ -1,7 +1,6 @@
 import graphite from "graphite";
 import winston from "winston";
 import * as dotenv from "dotenv";
-import { expose } from "threads/worker";
 import { GetUsernames, GetUsername } from "../rooms/userHelper.js";
 import handleUsers from "./handle/users.js";
 import handleObjects from "./handle/objects.js";
@@ -9,7 +8,7 @@ import { getStats, handleCombinedRoomStats } from "./handle/helper.js";
 
 dotenv.config();
 const client = graphite.createClient(
-  `plaintext://localhost:${process.env.GRAPHITE_PORT}/`
+  `plaintext://${process.env.GRAPHITE_HOST}/`
 );
 
 const logger = winston.createLogger({
@@ -77,13 +76,47 @@ function UploadData(dataList, status) {
       if (!stats[username].shards[dataRequest.shard]) {
         stats[username].shards[dataRequest.shard] = {};
       }
-      stats[username].shards[dataRequest.shard][dataRequest.room] =
-        getStats(actionsArray);
+      if (!stats[username].shards[dataRequest.shard][dataRequest.tick]) {
+        stats[username].shards[dataRequest.shard][dataRequest.tick] = {};
+      }
+      stats[username].shards[dataRequest.shard][dataRequest.tick][
+        dataRequest.room
+      ] = getStats(actionsArray);
     }
   }
 
+  const tickStats = [];
   Object.entries(stats).forEach(([username, userStats]) => {
-    stats[username].overview.shards = handleCombinedRoomStats(userStats.shards);
+    const shardKeys = Object.keys(userStats.shards);
+    for (let i = 0; i < shardKeys.length; i += 1) {
+      const shard = shardKeys[i];
+      const ticks = Object.keys(userStats.shards[shard]);
+
+      for (let t = 0; t < ticks.length; t += 1) {
+        if (!tickStats[t]) {
+          tickStats[t] = {};
+        }
+        if (!tickStats[t][username]) {
+          tickStats[t] = {
+            [username]: {
+              shards: {
+                [shard]: userStats.shards[shard][ticks[t]],
+              },
+              overview: {
+                shards: {},
+              },
+            },
+          };
+        } else if (!tickStats[t][username].shards[shard]) {
+          tickStats[t][username].shards[shard] =
+            userStats.shards[shard][ticks[t]];
+        }
+
+        tickStats[t][username].overview.shards = handleCombinedRoomStats(
+          tickStats[t][username].shards
+        );
+      }
+    }
   });
 
   logger.info(
@@ -91,13 +124,12 @@ function UploadData(dataList, status) {
       (Date.now() - startTime) / 1000
     )} seconds to process the data`
   );
-  Send({ status }, Date.now());
+  tickStats.forEach((stats) => {
+    Send(stats, timestamp);
+  });
   setTimeout(() => {
     Send({ users: stats }, timestamp);
   }, 2000);
 }
 
-expose({
-  UploadData,
-});
 export default UploadData;

@@ -60,6 +60,7 @@ app.get("/ping", (req, res) => {
 });
 
 app.put("/rooms", (req, res) => {
+  const start = Date.now();
   try {
     const roomCount = Object.entries(req.body.rooms).reduce(
       // eslint-disable-next-line no-unused-vars
@@ -70,6 +71,8 @@ app.put("/rooms", (req, res) => {
 
     const { rooms } = req.body;
     dataRequestBroker.forceUpdateRooms(rooms);
+
+    logger.info(`Room:put took ${((Date.now() - start) / 1000).toFixed(2)}s`);
     return res.json("Success");
   } catch (e) {
     logger.error(
@@ -81,12 +84,15 @@ app.put("/rooms", (req, res) => {
   }
 });
 app.get("/data", (req, res) => {
+  const start = Date.now();
   try {
     logger.info(`${req.ip}: Received data request`);
 
-    const results = dataRequestBroker.getDataResults();
+    const results = dataRequestBroker.getDataResultsToSend();
     const activeRequests = dataRequestBroker.getDataRequests();
     const rooms = dataRequestBroker.getRooms();
+
+    logger.info(`Data:get took ${((Date.now() - start) / 1000).toFixed(2)}s`);
     return res.json({
       results,
       activeRequestsCount: activeRequests.length,
@@ -125,12 +131,12 @@ const job = new CronJob(
       .map((x) => x.length)
       .reduce((a, b) => a + b, 0);
     const activeRequestCount = dataRequestBroker.getDataRequests().length;
-    const resultCount = dataRequestBroker.getDataResults(false).length;
+    const resultCount = dataRequestBroker.getTotalDataResults();
     backlogLogger.info(
       `Room count: ${roomCount}, Active request count: ${activeRequestCount}, Result count: ${resultCount}`
     );
 
-    if (resultCount > 5000) dataRequestBroker.getDataResults();
+    if (resultCount > 5000) dataRequestBroker.resetDataResults();
   },
   null,
   false,

@@ -23,9 +23,11 @@ export function findOriginalObject(id, firstTickObjects) {
 }
 
 export function findAllByType(objects, type) {
-  let _type = type;
-  if (_type === "structure") _type = STRUCTURE_TYPES;
-  const list = Object.values(objects).filter((o) => o && o.type === _type);
+  let possibleTypes = [type];
+  if (type === "structure") possibleTypes = STRUCTURE_TYPES;
+  const list = Object.values(objects).filter(
+    (o) => o && o.type && possibleTypes.includes(o.type)
+  );
   return list;
 }
 

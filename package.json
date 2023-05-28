@@ -4,9 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint src/**/*.js",
-    "lint:fix": "eslint src/**/*.js --fix",
-    "start:getter": "node src/getter/src/index.js"
+    "lint": "eslint controller/**/*.js && eslint getter/**/*.js",
+    "lint:fix": "eslint controller/**/*.js --fix && eslint getter/**/*.js --fix"
   },
   "author": "",
   "license": "ISC",

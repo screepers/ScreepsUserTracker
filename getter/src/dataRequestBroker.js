@@ -2,6 +2,7 @@ import winston from "winston";
 import ScreepsApi from "./api.js";
 import RoomRequests from "./roomRequests.js";
 
+let resultId = 0;
 const logger = winston.createLogger({
   level: "info",
   format: winston.format.combine(
@@ -50,6 +51,15 @@ export default class DataRequestBroker {
   }
 
   addDataRequests(dataRequests) {
+    if (dataRequests.length > 1) {
+      const requestsCount = this.dataRequests.length;
+      if (requestsCount > 2500) {
+        logger.info(
+          `Dropping ${requestsCount} requests to add ${dataRequests.length} requests`
+        );
+        this.dataRequests = [];
+      }
+    }
     this.dataRequests = this.dataRequests.concat(dataRequests);
   }
 
@@ -62,17 +72,64 @@ export default class DataRequestBroker {
   }
 
   addDataResult(dataResult, dataRequest) {
-    this.dataResults.push({ dataResult, dataRequest });
+    this.dataResults.push({ dataResult, dataRequest, id: (resultId += 1) });
   }
 
-  getDataResults(reset = true) {
-    if (reset) {
-      const dataResults = [...this.dataResults];
-      this.dataResults = [];
-      return dataResults;
-    }
+  removeDataResults(ids) {
+    this.dataResults = this.dataResults.filter(
+      (dataResult) => !ids.includes(dataResult.id)
+    );
+  }
 
-    return this.dataResults;
+  getDataResultsToSend() {
+    const { dataResults } = this;
+    const { dataRequests } = this;
+
+    const perTickResults = {};
+    dataResults.forEach(({ dataResult, dataRequest, id }) => {
+      if (!perTickResults[dataRequest.shard])
+        perTickResults[dataRequest.shard] = {};
+      if (!perTickResults[dataRequest.shard][dataRequest.tick])
+        perTickResults[dataRequest.shard][dataRequest.tick] = [];
+      perTickResults[dataRequest.shard][dataRequest.tick].push({
+        dataResult,
+        dataRequest,
+        id,
+      });
+    });
+
+    const perTickRequests = {};
+    dataRequests.forEach((dataRequest) => {
+      if (!perTickRequests[dataRequest.shard])
+        perTickRequests[dataRequest.shard] = {};
+      if (!perTickRequests[dataRequest.shard][dataRequest.tick])
+        perTickRequests[dataRequest.shard][dataRequest.tick] = [];
+      perTickRequests[dataRequest.shard][dataRequest.tick].push(dataRequest);
+    });
+
+    let dataResultsToSend = [];
+    Object.entries(perTickResults).forEach(([shard, perTick]) => {
+      Object.entries(perTick).forEach(([tick, data]) => {
+        if (!perTickRequests[shard] || perTickRequests[shard][tick])
+          dataResultsToSend = dataResultsToSend.concat(data);
+      });
+    });
+
+    const dataResultsIdsToRemove = [];
+    dataResultsToSend.forEach(({ id }) => {
+      dataResultsIdsToRemove.push(id);
+    });
+    this.removeDataResults(dataResultsIdsToRemove);
+
+    return dataResultsToSend;
+  }
+
+  resetDataResults() {
+    this.dataResults = [];
+  }
+
+  getTotalDataResults() {
+    return this.dataResults.length;
   }
 
   async executeSingle() {

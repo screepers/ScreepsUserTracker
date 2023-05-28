@@ -4,11 +4,14 @@ import axios from "axios";
 import fs from "fs";
 import Cron from "cron";
 import winston from "winston";
-import { spawn, Worker } from "threads";
 import GetRooms, { GetUsernames } from "./rooms/userHelper.js";
+import UploadData from "./data/upload.js";
+import UpdateRooms from "./rooms/updateRooms.js";
+import DataBroker from " ./data/broker.js"
+import { GetUsername } from "../rooms/userHelper.js";
 
 const { CronJob } = Cron;
-const DEBUG = true;
+const DEBUG = process.env.DEBUG === "TRUE";
 
 const logger = winston.createLogger({
   level: "info",
@@ -101,8 +104,9 @@ app.delete("/ip", async (req, res) => {
 });
 
 const dataGetterJob = new CronJob(
-  !DEBUG ? "*/4 * * * *" : "* * * * *",
+  !DEBUG ? "*/5 * * * *" : "* * * * *",
   async () => {
+    const start = Date.now();
     const ips = getIps();
 
     let data = [];
@@ -129,9 +133,22 @@ const dataGetterJob = new CronJob(
       }
     }
 
-    logger.info(`Got ${data.length} results from ${ips.length} ips`);
-    const worker = await spawn(new Worker("./data/upload.js"));
-    await worker.UploadData(data, status);
+    logger.info(
+      `Got ${data.length} results from ${ips.length} ips in ${(
+        (Date.now() - start) /
+        1000
+      ).toFixed(2)}s`
+    );
+
+    DataBroker.UploadStatus(status);
+    for (let i = 0; i < data.length; i += 1) {
+      const { dataRequest } = data[i];
+      const username = GetUsername(dataRequest.room, dataRequest.shard);
+      DataBroker.AddRoomData(username, dataRequest.shard, dataRequest.room, data[i]);
+    }
+
+    DataBroker.CheckUsers()
+    // UploadData(data, status);
   },
   null,
   false,
@@ -140,10 +157,10 @@ const dataGetterJob = new CronJob(
 dataGetterJob.start();
 
 const requestRoomUpdaterJob = new CronJob(
-  !DEBUG ? "*/4 * * * *" : "* * * * *",
+  !DEBUG ? "*/10 * * * *" : "* * * * *",
   async () => {
-    const worker = await spawn(new Worker("./rooms/updateRooms.js"));
-    await worker.UpdateRooms();
+    const start = Date.now();
+    UpdateRooms();
 
     const ips = getIps();
     const ipCount = ips.length;
@@ -168,6 +185,7 @@ const requestRoomUpdaterJob = new CronJob(
             shardRooms[shard] = [];
           }
           shardRooms[shard].push(...data.owned);
+          DataBroker.AddRooms(username, shard, data.owned);
         });
       } else break;
     }
@@ -210,6 +228,13 @@ const requestRoomUpdaterJob = new CronJob(
         }
       }
     }
+
+    logger.info(
+      `Updated rooms for ${ips.length} ips with ${roomCount} in ${(
+        (Date.now() - start) /
+        1000
+      ).toFixed(2)}s`
+    );
   },
   null,
   false,

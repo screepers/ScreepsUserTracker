@@ -1,6 +1,7 @@
 import fs from "fs";
 
 export const BaseShards = ["shard0", "shard1", "shard2", "shard3"];
+let defaultActions;
 
 export const ActionType = Object.freeze({
   Divide100: 0,
@@ -63,11 +64,14 @@ export function getStats(actions) {
   return stats;
 }
 
-function getDefaultActions() {
+export function getDefaultActions() {
+  if (defaultActions) return defaultActions;
   if (fs.existsSync("./files/defaultActions.json")) {
-    return JSON.parse(fs.readFileSync("./files/defaultActions.json"));
+    defaultActions = JSON.parse(fs.readFileSync("./files/defaultActions.json"));
+    return defaultActions;
   }
   fs.writeFileSync("./files/defaultActions.json", JSON.stringify([]));
+
   return [];
 }
 
@@ -81,9 +85,7 @@ function addNewDefaultAction(action) {
 }
 
 export function ActionListDefaultValuesFiller(actions) {
-  const defaultActions = getDefaultActions();
-
-  defaultActions.forEach((defaultAction) => {
+  getDefaultActions().forEach((defaultAction) => {
     const action = actions.find((a) => a.path === defaultAction.path);
     if (!action) {
       actions.push(defaultAction);
@@ -91,7 +93,7 @@ export function ActionListDefaultValuesFiller(actions) {
   });
 
   actions.forEach((action) => {
-    const defaultAction = defaultActions.find(
+    const defaultAction = getDefaultActions().find(
       (a) => a.path === action.path && a.action === action.action
     );
     if (!defaultAction) {
@@ -120,12 +122,12 @@ function groupBy(original, value) {
 }
 
 export function handleCombinedRoomStats(shards) {
+  const defaultStats = getStats(getDefaultActions());
   const stats = {};
-  BaseShards.forEach((shard) => {
-    stats[shard] = getStats(getDefaultActions());
-  });
 
   Object.entries(shards).forEach(([shard, rooms]) => {
+    if (!stats[shard]) stats[shard] = JSON.parse(JSON.stringify(defaultStats));
+
     // eslint-disable-next-line no-unused-vars
     Object.entries(rooms).forEach(([_, roomStats]) => {
       stats[shard] = groupBy(stats[shard], roomStats).original;

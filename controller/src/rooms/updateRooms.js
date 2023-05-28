@@ -1,7 +1,6 @@
 import fs from "fs";
 import { ScreepsAPI } from "screeps-api";
 import * as dotenv from "dotenv";
-import { expose } from "threads/worker";
 
 dotenv.config();
 
@@ -94,5 +93,4 @@ async function UpdateRooms() {
   }
 }
 
-expose({ UpdateRooms });
 export default UpdateRooms;
