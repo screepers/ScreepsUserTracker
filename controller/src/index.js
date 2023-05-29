@@ -5,10 +5,9 @@ import fs from "fs";
 import Cron from "cron";
 import winston from "winston";
 import GetRooms, { GetUsernames } from "./rooms/userHelper.js";
-import UploadData from "./data/upload.js";
 import UpdateRooms from "./rooms/updateRooms.js";
-import DataBroker from " ./data/broker.js"
-import { GetUsername } from "../rooms/userHelper.js";
+import DataBroker from "./data/broker.js"
+import { GetUsername } from "./rooms/userHelper.js";
 
 const { CronJob } = Cron;
 const DEBUG = process.env.DEBUG === "TRUE";
@@ -148,7 +147,6 @@ const dataGetterJob = new CronJob(
     }
 
     DataBroker.CheckUsers()
-    // UploadData(data, status);
   },
   null,
   false,
@@ -173,12 +171,10 @@ const requestRoomUpdaterJob = new CronJob(
     let roomCount = 0;
     const shardRooms = {};
 
-    // const addedUsernames = [];
     for (let i = 0; i < usernames.length; i += 1) {
       const username = usernames[i];
       const userRooms = GetRooms(username);
       if (userRooms.total + roomCount <= roomsPerCycle) {
-        // addedUsernames.push(username);
         roomCount += userRooms.total;
         Object.entries(userRooms.rooms).forEach(([shard, data]) => {
           if (!shardRooms[shard]) {
