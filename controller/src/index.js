@@ -4,10 +4,9 @@ import axios from "axios";
 import fs from "fs";
 import Cron from "cron";
 import winston from "winston";
-import GetRooms, { GetUsernames } from "./rooms/userHelper.js";
+import GetRooms, { GetUsernames, GetUsername } from "./rooms/userHelper.js";
 import UpdateRooms from "./rooms/updateRooms.js";
-import DataBroker from "./data/broker.js"
-import { GetUsername } from "./rooms/userHelper.js";
+import DataBroker from "./data/broker.js";
 
 const { CronJob } = Cron;
 const DEBUG = process.env.DEBUG === "TRUE";
@@ -143,10 +142,15 @@ const dataGetterJob = new CronJob(
     for (let i = 0; i < data.length; i += 1) {
       const { dataRequest } = data[i];
       const username = GetUsername(dataRequest.room, dataRequest.shard);
-      DataBroker.AddRoomData(username, dataRequest.shard, dataRequest.room, data[i]);
+      DataBroker.AddRoomData(
+        username,
+        dataRequest.shard,
+        dataRequest.room,
+        data[i]
+      );
     }
 
-    DataBroker.CheckUsers()
+    DataBroker.CheckUsers();
   },
   null,
   false,

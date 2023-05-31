@@ -85,9 +85,9 @@ export default class DataBroker {
     let timestamp;
 
     const stats = {
-      shards:{},
+      shards: {},
       overview: {
-        shards:{}
+        shards: {}
       }
     }
     const userStats = this._users[username];
@@ -134,7 +134,7 @@ export default class DataBroker {
     const _timestamp = timestamp || Date.now();
 
     if (process.env.GRAPHITE_ONLINE === "FALSE") return;
-    client.write(data, _timestamp, (err) => {
+    client.write({ screeps: { userTracker: data } }, _timestamp, (err) => {
       if (err) {
         logger.error(err);
       }
