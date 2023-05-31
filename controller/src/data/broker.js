@@ -4,6 +4,7 @@ import { GetUsernames } from "../rooms/userHelper.js";
 import handleUsers from "./handle/users.js";
 import handleObjects from "./handle/objects.js";
 import { getStats, handleCombinedRoomStats } from "./handle/helper.js";
+import * as dotenv from "dotenv"
 
 dotenv.config();
 const client = graphite.createClient(
