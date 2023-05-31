@@ -28,8 +28,8 @@ async function handleUser(username) {
     }
   });
 
-  stats.gcl = await GetGclObject(username)
-  stats.leaderboard = await GetLeaderboardRank(username)
+  // stats.gcl = await GetGclObject(username)
+  // stats.leaderboard = await GetLeaderboardRank(username)
   stats.overview.ownedTotal = total;
 
   return stats;

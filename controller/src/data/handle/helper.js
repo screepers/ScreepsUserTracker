@@ -149,26 +149,16 @@ export function handleCombinedRoomStats(shards) {
 }
 
 export async function GetGclObject(username) {
-  const targetGclValue = await api.raw.user.find(username).user.gcl;
-  const level = 1;
-  const levelCap = 0;
-  const progress = 0;
+  const totalGCLPoints = (await api.raw.user.find(username)).user.gcl;
+  const level = Math.floor(Math.pow((totalGCLPoints ?? 0) / 1000000, 1/2.4)) + 1;
 
-  let last = 0;
-  let current = Math.pow(level, 2.4) * 100000;
-  while (current < targetGclValue) {
-    last = current
-    level += 1
-    current = Math.pow(level, 2.4) * 100000;
-
-    progress = Math.abs(current-gclValue);
-    levelCap = current - last;
-  }
+  let previousTotal = Math.round(level > 1 ? Math.pow(level-1, 2.4) * 100000 : 0);
+  let currentTotal = Math.round(Math.pow(level, 2.4) * 100000)
 
   return {
     level,
-    levelCap,
-    progress
+    levelCap: currentTotal-previousTotal,
+    progress:totalGCLPoints-previousTotal
   }
 }
 
@@ -176,7 +166,9 @@ export async function GetGclObject(username) {
 
 export async function GetLeaderboardRank(username) {
   const mode = 'world'
-  const season = `${new Date.getFullYear()}-${new Date.getMonth() + 1}`; 
+
+  const month = new Date().getMonth() 
+  const season = `${new Date().getFullYear()}-${month < 10 ? `0${month}` :month}`; 
   const rank = await api.raw.leaderboard.find(username, mode, season)
 
   return {
