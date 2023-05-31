@@ -5,12 +5,10 @@ dotenv.config();
 
 let path;
 switch (process.env.SERVER_TYPE) {
-  case "mmo":
-    path = "/";
-    break;
   case "season":
     path = "/season/";
     break;
+  case "mmo":
   default:
     path = "/";
     break;
