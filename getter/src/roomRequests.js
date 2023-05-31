@@ -1,5 +1,5 @@
-import ScreepsApi from "./api.js";
 import * as dotenv from "dotenv";
+import ScreepsApi from "./api.js";
 
 dotenv.config();
 
@@ -11,7 +11,7 @@ function wait(ms) {
 export default class RoomRequests {
   lastTickTimes = {};
 
-  shards =  process.env.SHARDS.split(' ');
+  shards = process.env.SHARDS.split(" ");
 
   rooms = {};
 

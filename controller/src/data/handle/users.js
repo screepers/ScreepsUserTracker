@@ -1,18 +1,10 @@
 import GetRooms from "../../rooms/userHelper.js";
 import { GetShards } from "../helper.js";
-import { ScreepsAPI } from "screeps-api";
+import {GetLeaderboardRank, GetGclObject} from "./helper.js"
 import * as dotenv from "dotenv";
 
 dotenv.config();
 const shards = GetShards();
-
-const api = new ScreepsAPI({
-  token: process.env.SCREEPS_TOKEN,
-  protocol: "https",
-  hostname: "screeps.com",
-  port: 443,
-  path: "/", // Do no include '/api', it will be added automatically
-});
 
 async function handleUser(username) {
   const user = GetRooms(username);
@@ -36,8 +28,8 @@ async function handleUser(username) {
     }
   });
 
-  const totalGclProgress = await api.raw.user.find(username)
-  stats.gcl = getGclObject(totalGclProgress)
+  stats.gcl = await GetGclObject(username)
+  stats.leaderboard = await GetLeaderboardRank(username)
   stats.overview.ownedTotal = total;
 
   return stats;

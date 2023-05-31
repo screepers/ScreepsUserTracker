@@ -1,4 +1,16 @@
 import fs from "fs";
+import { ScreepsAPI } from "screeps-api";
+import * as dotenv from "dotenv";
+
+dotenv.config();
+
+const api = new ScreepsAPI({
+  token: process.env.SCREEPS_TOKEN,
+  protocol: "https",
+  hostname: "screeps.com",
+  port: 443,
+  path: "/", // Do no include '/api', it will be added automatically
+});
 
 let defaultActions;
 
@@ -136,14 +148,8 @@ export function handleCombinedRoomStats(shards) {
   return stats;
 }
 
-function getGclLevel(targetGclValue) {
-  
-  let level = 1;
-  let previousAmount = 0
-
-}
-
-export function getGclObject(gclValue) {
+export async function getGclObject(username) {
+  const targetGclValue = await api.raw.user.find(username).user.gcl;
   const level = 1;
   const levelCap = 0;
   const progress = 0;
@@ -163,5 +169,18 @@ export function getGclObject(gclValue) {
     level,
     levelCap,
     progress
+  }
+}
+
+
+
+export async function getLeaderboardRank(username) {
+  const mode = 'world'
+  const season = `${new Date.getFullYear()}-${new Date.getMonth() + 1}`; 
+  const rank = await api.raw.leaderboard.find(username, mode, season)
+
+  return {
+    rank: rank.rank+1,
+    score: rank.score
   }
 }
