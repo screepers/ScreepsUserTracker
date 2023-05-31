@@ -1,6 +1,5 @@
 import fs from "fs";
 
-export const BaseShards = ["shard0", "shard1", "shard2", "shard3"];
 let defaultActions;
 
 export const ActionType = Object.freeze({
@@ -135,4 +134,34 @@ export function handleCombinedRoomStats(shards) {
   });
 
   return stats;
+}
+
+function getGclLevel(targetGclValue) {
+  
+  let level = 1;
+  let previousAmount = 0
+
+}
+
+export function getGclObject(gclValue) {
+  const level = 1;
+  const levelCap = 0;
+  const progress = 0;
+
+  let last = 0;
+  let current = Math.pow(level, 2.4) * 100000;
+  while (current < targetGclValue) {
+    last = current
+    level += 1
+    current = Math.pow(level, 2.4) * 100000;
+
+    progress = Math.abs(current-gclValue);
+    levelCap = current - last;
+  }
+
+  return {
+    level,
+    levelCap,
+    progress
+  }
 }

@@ -1,10 +1,11 @@
 import fs from "fs";
 import { ScreepsAPI } from "screeps-api";
 import * as dotenv from "dotenv";
+import { GetShards } from "../data/helper.js";
 
 dotenv.config();
 
-const shards = ["shard0", "shard1", "shard2", "shard3"];
+const shards = GetShards();
 
 const api = new ScreepsAPI({
   token: process.env.SCREEPS_TOKEN,

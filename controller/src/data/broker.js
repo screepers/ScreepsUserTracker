@@ -1,6 +1,5 @@
 import graphite from "graphite";
 import winston from "winston";
-import * as dotenv from "dotenv";
 import { GetUsernames } from "../rooms/userHelper.js";
 import handleUsers from "./handle/users.js";
 import handleObjects from "./handle/objects.js";
@@ -71,11 +70,12 @@ export default class DataBroker {
 
 
   }
-  static UploadStatus(ipStatus) {
+   static async UploadStatus(ipStatus) {
     const usernames = GetUsernames();
 
     const stats = {}
-    Object.entries(handleUsers(usernames)).forEach(([username, userStats]) => {
+    let handledUsernames = await handleUsers(usernames);
+    Object.entries(handledUsernames).forEach(([username, userStats]) => {
       stats[username] = { overview: { roomCounts: userStats } };
     });
 

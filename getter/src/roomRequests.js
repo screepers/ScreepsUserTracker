@@ -1,4 +1,7 @@
 import ScreepsApi from "./api.js";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 function wait(ms) {
   // eslint-disable-next-line no-promise-executor-return
@@ -8,7 +11,7 @@ function wait(ms) {
 export default class RoomRequests {
   lastTickTimes = {};
 
-  shards = ["shard0", "shard1", "shard2", "shard3"];
+  shards =  process.env.SHARDS.split(' ');
 
   rooms = {};
 
