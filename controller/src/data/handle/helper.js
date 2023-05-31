@@ -174,7 +174,7 @@ export async function GetGclObject(username) {
 
 
 
-export async function getLeaderboardRank(username) {
+export async function GetLeaderboardRank(username) {
   const mode = 'world'
   const season = `${new Date.getFullYear()}-${new Date.getMonth() + 1}`; 
   const rank = await api.raw.leaderboard.find(username, mode, season)
