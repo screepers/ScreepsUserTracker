@@ -148,7 +148,7 @@ export function handleCombinedRoomStats(shards) {
   return stats;
 }
 
-export async function getGclObject(username) {
+export async function GetGclObject(username) {
   const targetGclValue = await api.raw.user.find(username).user.gcl;
   const level = 1;
   const levelCap = 0;
