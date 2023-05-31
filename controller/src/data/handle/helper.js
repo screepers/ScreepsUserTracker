@@ -1,16 +1,5 @@
 import fs from "fs";
-import { ScreepsAPI } from "screeps-api";
-import * as dotenv from "dotenv";
-
-dotenv.config();
-
-const api = new ScreepsAPI({
-  token: process.env.SCREEPS_TOKEN,
-  protocol: "https",
-  hostname: "screeps.com",
-  port: 443,
-  path: "/", // Do no include '/api', it will be added automatically
-});
+import { GetGclOfUser } from "../screepsApi.js";
 
 let defaultActions;
 
@@ -149,30 +138,16 @@ export function handleCombinedRoomStats(shards) {
 }
 
 export async function GetGclObject(username) {
-  const totalGCLPoints = (await api.raw.user.find(username)).user.gcl;
-  const level = Math.floor(Math.pow((totalGCLPoints ?? 0) / 1000000, 1/2.4)) + 1;
+  const totalGCLPoints = await GetGclOfUser(username).gcl;
+  if (totalGCLPoints === 0) return {};
+  const level = Math.floor(((totalGCLPoints ?? 0) / 1000000) ** (1 / 2.4)) + 1;
 
-  let previousTotal = Math.round(level > 1 ? Math.pow(level-1, 2.4) * 100000 : 0);
-  let currentTotal = Math.round(Math.pow(level, 2.4) * 100000)
+  const previousTotal = Math.round(level > 1 ? (level - 1) ** 2.4 * 100000 : 0);
+  const currentTotal = Math.round(level ** 2.4 * 100000);
 
   return {
     level,
-    levelCap: currentTotal-previousTotal,
-    progress:totalGCLPoints-previousTotal
-  }
-}
-
-
-
-export async function GetLeaderboardRank(username) {
-  const mode = 'world'
-
-  const month = new Date().getMonth() 
-  const season = `${new Date().getFullYear()}-${month < 10 ? `0${month}` :month}`; 
-  const rank = await api.raw.leaderboard.find(username, mode, season)
-
-  return {
-    rank: rank.rank+1,
-    score: rank.score
-  }
+    levelCap: currentTotal - previousTotal,
+    progress: totalGCLPoints - previousTotal,
+  };
 }

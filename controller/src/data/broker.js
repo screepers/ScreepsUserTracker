@@ -1,10 +1,10 @@
 import graphite from "graphite";
 import winston from "winston";
+import * as dotenv from "dotenv";
 import { GetUsernames } from "../rooms/userHelper.js";
 import handleUsers from "./handle/users.js";
 import handleObjects from "./handle/objects.js";
 import { getStats, handleCombinedRoomStats } from "./handle/helper.js";
-import * as dotenv from "dotenv"
 
 dotenv.config();
 const client = graphite.createClient(
@@ -68,29 +68,29 @@ export default class DataBroker {
         this.UploadUser(username);
       }
     });
-
-
   }
-   static async UploadStatus(ipStatus) {
+
+  static async UploadStatus(ipStatus) {
     const usernames = GetUsernames();
 
-    const stats = {}
-    let handledUsernames = await handleUsers(usernames);
+    const stats = {};
+    const handledUsernames = await handleUsers(usernames);
     Object.entries(handledUsernames).forEach(([username, userStats]) => {
       stats[username] = { overview: { roomCounts: userStats } };
     });
 
     this.Upload({ status: ipStatus, stats });
   }
+
   static UploadUser(username) {
     let timestamp;
 
     const stats = {
       shards: {},
       overview: {
-        shards: {}
-      }
-    }
+        shards: {},
+      },
+    };
     const userStats = this._users[username];
     Object.values(userStats).forEach((shardData) => {
       Object.values(shardData).forEach((roomData) => {
@@ -119,14 +119,11 @@ export default class DataBroker {
         if (!stats.shards[dataRequest.shard]) {
           stats.shards[dataRequest.shard] = {};
         }
-        stats.shards[dataRequest.shard][
-          dataRequest.room
-        ] = getStats(actionsArray);
-        stats.overview.shards = handleCombinedRoomStats(
-          stats.shards
-        );
-      })
-    })
+        stats.shards[dataRequest.shard][dataRequest.room] =
+          getStats(actionsArray);
+        stats.overview.shards = handleCombinedRoomStats(stats.shards);
+      });
+    });
 
     this.Upload({ stats: { [username]: stats } });
   }

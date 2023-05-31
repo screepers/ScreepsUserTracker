@@ -1,23 +1,12 @@
 import fs from "fs";
-import { ScreepsAPI } from "screeps-api";
-import * as dotenv from "dotenv";
 import { GetShards } from "../data/helper.js";
-
-dotenv.config();
+import { GetWorldSize, GetMapStats } from "../data/screepsApi.js";
 
 const shards = GetShards();
 
-const api = new ScreepsAPI({
-  token: process.env.SCREEPS_TOKEN,
-  protocol: "https",
-  hostname: "screeps.com",
-  port: 443,
-  path: "/", // Do no include '/api', it will be added automatically
-});
-
 async function getRoomNames(shard) {
   const rooms = [];
-  const size = await api.raw.game.worldSize(shard);
+  const size = await GetWorldSize(shard);
   for (let x = 0; x < size.width / 2; x += 1) {
     for (let y = 0; y < size.height; y += 1) {
       rooms.push(`E${x}N${y}`);
@@ -31,7 +20,9 @@ async function getRoomNames(shard) {
 }
 
 async function getUsers(shard, rooms) {
-  const mapStats = await api.raw.game.mapStats(rooms, "owner0", shard);
+  const mapStats = await GetMapStats(shard, rooms);
+  if (!mapStats) return [];
+
   const { stats, users } = mapStats;
 
   const roomsByUsername = {};

@@ -1,14 +1,15 @@
+import * as dotenv from "dotenv";
 import GetRooms from "../../rooms/userHelper.js";
 import { GetShards } from "../helper.js";
-import {GetLeaderboardRank, GetGclObject} from "./helper.js"
-import * as dotenv from "dotenv";
+// import { GetLeaderboardRankObject } from "../screepsApi.js"
+// import { GetGclObject} from "./helper.js"
 
 dotenv.config();
 const shards = GetShards();
 
 async function handleUser(username) {
   const user = GetRooms(username);
-  const stats = {shards:{}, overview:{}};
+  const stats = { shards: {}, overview: {} };
 
   const { rooms, total } = user;
   shards.forEach((shard) => {
@@ -29,7 +30,7 @@ async function handleUser(username) {
   });
 
   // stats.gcl = await GetGclObject(username)
-  // stats.leaderboard = await GetLeaderboardRank(username)
+  // stats.leaderboard = await GetLeaderboardRankObject(username)
   stats.overview.ownedTotal = total;
 
   return stats;
@@ -39,7 +40,7 @@ export default async function handleUsers(usernames) {
   const stats = {};
   for (let u = 0; u < usernames.length; u += 1) {
     const username = usernames[u];
-    stats[username] =await handleUser(username);
+    stats[username] = await handleUser(username);
   }
 
   return stats;

@@ -3,7 +3,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 export function GetShards() {
-  return process.env.SHARDS.split(' ')
+  return process.env.SHARDS.split(" ");
 }
 
 export const STRUCTURE_TYPES = [
