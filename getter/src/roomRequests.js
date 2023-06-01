@@ -20,6 +20,12 @@ export default class RoomRequests {
   constructor(rooms, DataRequestBroker) {
     this.rooms = rooms;
     this.DataRequestBroker = DataRequestBroker;
+
+    if (process.env.START_FROM_TICK_ZERO === "TRUE") {
+      this.shards.forEach((shard)=>{
+        lastTickTimes[shard] = -100;
+      })
+    }
   }
 
   forceUpdateRooms(rooms) {
@@ -47,8 +53,6 @@ export default class RoomRequests {
       const currentTick = await this.getCurrentTick(shard);
       let requestTick = currentTick - (currentTick % 100) - 1000;
 
-      if (requestTick < 100) return;
-
       const rooms = this.rooms[shard];
       if (requestTick - 100 > this.lastTickTimes[shard]) {
         requestTick = this.lastTickTimes[shard] + 100;
@@ -70,6 +74,6 @@ export default class RoomRequests {
     }
 
     await wait(1000 * 5);
-    return this.sync();
+    this.sync();
   }
 }

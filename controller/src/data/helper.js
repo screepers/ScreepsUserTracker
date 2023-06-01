@@ -21,6 +21,7 @@ export const STRUCTURE_TYPES = [
   "terminal",
   "container",
   "nuker",
+  "controller"
 ];
 export function findOriginalObject(id, firstTickObjects) {
   const object = Object.values(firstTickObjects).find((o) => o && o._id === id);
@@ -47,8 +48,8 @@ export function findAllIntents(objects) {
 export function groupBy(obj, key) {
   const result = {};
   obj.forEach((o) => {
-    if (!result[key]) result[key] = [];
-    result[key].push(o);
+    if (!result[o[key]]) result[o[key]] = [];
+    result[o[key]].push(o);
   });
   return result;
 }
@@ -63,8 +64,8 @@ export function getIntentEffect(action, originalObject) {
       if (originalObject.type === "tower") {
         return { energy: 10 };
       }
-      else if (!originalObject.body) return 0;
-      
+      if (!originalObject.body) return 0;
+
       return { energy: originalObject.body.work * 1 };
     case "upgradeController":
       return { energy: originalObject.body.work * 1 };

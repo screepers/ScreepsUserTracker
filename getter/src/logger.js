@@ -1,7 +1,6 @@
 import { createLogger, format, transports } from "winston";
 
-const { simple, combine, timestamp, prettyPrint, colorize, errors, json } =
-  format;
+const { simple, combine, timestamp, prettyPrint, colorize, errors } = format;
 
 const baseFormat = () =>
   combine(

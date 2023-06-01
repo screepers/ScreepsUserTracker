@@ -1,6 +1,10 @@
 import fs from "fs";
 import { GetShards } from "../data/helper.js";
-import { GetWorldSize, GetMapStats } from "../data/screepsApi.js";
+import {
+  GetWorldSize,
+  GetMapStats,
+  GetGclOfUsers,
+} from "../data/screepsApi.js";
 import { mainLogger as logger } from "../logger.js";
 
 const shards = GetShards();
@@ -48,20 +52,30 @@ async function getUsers(shard, rooms) {
 async function UpdateRooms() {
   try {
     const users = {};
+    const gcls = await GetGclOfUsers();
 
     for (let s = 0; s < shards.length; s += 1) {
       const shard = shards[s];
       const rooms = await getRoomNames(shard);
       const usersPerShard = await getUsers(shard, rooms);
-      Object.entries(usersPerShard).forEach(([username, userData]) => {
+
+      const usernames = Object.keys(usersPerShard);
+      for (let u = 0; u < usernames.length; u += 1) {
+        const username = usernames[u];
+        const userData = usersPerShard[username];
+
         if (!users[username]) {
-          users[username] = { shards: {}, id: userData.id };
+          users[username] = {
+            shards: {},
+            id: userData.id,
+            gcl: gcls[username],
+          };
         }
         users[username].shards[shard] = {
           owned: userData.owned,
           reserved: userData.reserved,
         };
-      });
+      }
     }
 
     let userCounts = {};

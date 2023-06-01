@@ -137,8 +137,10 @@ const dataGetterJob = new CronJob(
 );
 dataGetterJob.start();
 
+UpdateRooms();
+
 const requestRoomUpdaterJob = new CronJob(
-  !DEBUG ? "*/10 * * * *" : "*/2 * * * *",
+  !DEBUG ? "*/15 * * * *" : "*/5 * * * *",
   async () => {
     const start = Date.now();
     await UpdateRooms();

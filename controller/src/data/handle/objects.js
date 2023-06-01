@@ -280,6 +280,51 @@ export default function handleObjects(
   );
   // #endregion
 
+  // #region Controller
+  const controllers = structuresByType['controller'];
+  if (controllers && controllers.length > 0) {
+    const controller = controllers[0];
+    actions.push(
+      CreateAction(
+        `controller.level`,
+        controller.level,
+        ActionType.FirstTickOnly
+      )
+    );
+
+    if (controller.level < 8) {
+    actions.push(
+      CreateAction(
+        `controller.progress`,
+        controller.progress,
+        ActionType.FirstTickOnly
+      )
+    );
+    actions.push(
+      CreateAction(
+        `controller.progressTotal`,
+        controller.progressTotal,
+        ActionType.FirstTickOnly
+      )
+    );
+    } 
+    
+    actions.push(
+      CreateAction(
+        `controller.ticksToDowngrade`,
+        controller.ticksToDowngrade,
+        ActionType.FirstTickOnly
+      )
+    );
+    actions.push(
+      CreateAction(
+        `controller.safeModeAvailable`,
+        controller.safeModeAvailable,
+        ActionType.FirstTickOnly
+      )
+    );
+  }
+
   actions = actions.concat(ActionListDefaultValuesFiller(actions));
   return actions;
 }

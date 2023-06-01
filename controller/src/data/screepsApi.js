@@ -1,5 +1,6 @@
 import { ScreepsAPI } from "screeps-api";
 import * as dotenv from "dotenv";
+import { apiLogger as logger }from "../logger.js"
 
 dotenv.config();
 
@@ -22,11 +23,17 @@ const api = new ScreepsAPI({
   path,
 });
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export async function GetGclOfUser(username) {
   try {
     const response = await api.raw.user.find(username);
+    logger.debug(response)
     return response.user.gcl;
   } catch (error) {
+    logger.error(error)
     return 0;
   }
 }
@@ -36,31 +43,53 @@ export async function GetLeaderboardRankObject(username) {
     const mode = "world";
     const rank = await api.raw.leaderboard.find(username, mode);
 
+    logger.debug(rank)
     return {
       rank: rank.rank + 1,
       score: rank.score,
     };
-  } catch {
+  } catch  (error) {
+    logger.error(error)
     return {};
   }
 }
 
-export async function GetGclOfUsers(usernames) {
-  const gcls = {}
+export async function GetGclOfUsers() {
+  try {
+    const gcls = {};
 
-  for (let u = 0; u < usernames.length; u++) {
-    const username = usernames[u];
-    
-    
+    let offset = 0;
+    const mode = "world";
+    let hasUsersLeft = true;
+
+    while (hasUsersLeft) {
+      const leaderboard = await api.raw.leaderboard.list(20, mode, offset);
+      logger.debug(leaderboard)
+      offset += 20;
+
+      const users = Object.values(leaderboard.users);
+      users.forEach((user) => {
+        gcls[user.username] = user.gcl;
+      });
+
+      if (users.length === 0) hasUsersLeft = false;
+      sleep(250)
+    }
+
+    return gcls;
+  } catch (error) {
+    logger.error(error)
+    return {};
   }
-
 }
 
 export async function GetWorldSize(shard) {
   try {
     const size = await api.raw.game.worldSize(shard);
+    logger.debug(size)
     return size;
-  } catch {
+  } catch (error){
+    logger.error(error)
     return 0;
   }
 }
@@ -68,8 +97,10 @@ export async function GetWorldSize(shard) {
 export async function GetMapStats(shard, rooms) {
   try {
     const mapStats = await api.raw.game.mapStats(rooms, "owner0", shard);
+    logger.debug(mapStats)
     return mapStats;
-  } catch {
+  } catch (error){
+    logger.error(error)
     return undefined;
   }
 }

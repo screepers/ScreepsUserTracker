@@ -1,7 +1,5 @@
-import axios from "axios";
 import * as dotenv from "dotenv";
 import { ScreepsAPI } from "screeps-api";
-import { apiLogger as logger } from "./logger.js";
 
 dotenv.config();
 
@@ -37,6 +35,12 @@ export async function GetGameTime(shard) {
 export async function GetRoomHistory(shard, room, tick) {
   try {
     const history = await api.raw.history(room, tick, shard);
+
+    if (tick === 0) {
+      history.ticks["0"] = history.ticks["1"];
+      history.ticks["1"] = {};
+    }
+
     return history;
   } catch {
     return undefined;
