@@ -312,7 +312,7 @@ export default function handleObjects(
     actions.push(
       CreateAction(
         `controller.ticksToDowngrade`,
-        controller.ticksToDowngrade || 0,
+        controller.ticksToDowngrade || -1,
         ActionType.FirstTickOnly
       )
     );
