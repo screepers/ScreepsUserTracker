@@ -6,7 +6,7 @@ dotenv.config();
 let path;
 switch (process.env.SERVER_TYPE) {
   case "seasonal":
-    path = "/seasonal/";
+    path = "/season/";
     break;
   case "mmo":
   default:
@@ -22,6 +22,14 @@ const api = new ScreepsAPI({
   path,
 });
 
+const historyApi = new ScreepsAPI({
+  token: process.env.SCREEPS_TOKEN,
+  protocol: "https",
+  hostname: "screeps.com",
+  port: 443,
+  path: "/",
+});
+
 export async function GetGameTime(shard) {
   try {
     const time = await api.raw.game.time(shard);
@@ -34,7 +42,7 @@ export async function GetGameTime(shard) {
 
 export async function GetRoomHistory(shard, room, tick) {
   try {
-    const history = await api.raw.history(room, tick, shard);
+    const history = await historyApi.raw.history(room, tick, shard);
 
     if (tick === 0) {
       history.ticks["0"] = history.ticks["1"];

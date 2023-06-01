@@ -95,7 +95,7 @@ app.listen(port, async () => {
 });
 
 const job = new CronJob(
-  !DEBUG ? "*/5 * * * *" : "* * * * *",
+  !DEBUG ? "0 * * * *" : "* * * * *",
   () => {
     const roomCount = Object.values(dataRequestBroker.getRooms())
       .map((x) => x.length)
