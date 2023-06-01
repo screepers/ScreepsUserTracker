@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
-    "start:always": "node fm.js",
-    "start:docker": "docker-compose build --no-cache && docker-compose up -d"
+    "start:always": "node src/fm.js"
   },
   "author": "",
   "license": "ISC",
