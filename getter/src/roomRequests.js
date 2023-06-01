@@ -23,7 +23,7 @@ export default class RoomRequests {
 
     if (process.env.START_FROM_TICK_ZERO === "TRUE") {
       this.shards.forEach((shard)=>{
-        lastTickTimes[shard] = -100;
+        this.lastTickTimes[shard] = -100;
       })
     }
   }
