@@ -51,7 +51,8 @@ export async function GetLeaderboardRankObject(username) {
 
 export async function GetWorldSize(shard) {
   try {
-    return api.raw.game.worldSize(shard);
+    const size = await api.raw.game.worldSize(shard);
+    return size;
   } catch {
     return 0;
   }
@@ -59,7 +60,8 @@ export async function GetWorldSize(shard) {
 
 export async function GetMapStats(shard, rooms) {
   try {
-    return api.raw.game.mapStats(rooms, "owner0", shard);
+    const mapStats = await api.raw.game.mapStats(rooms, "owner0", shard);
+    return mapStats;
   } catch {
     return undefined;
   }

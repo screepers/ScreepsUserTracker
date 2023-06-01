@@ -1,4 +1,4 @@
-import ScreepsApi from "./api.js";
+import { GetRoomHistory } from "./screepsApi.js";
 import RoomRequests from "./roomRequests.js";
 import { dataRequestBroker as logger } from "./logger.js";
 
@@ -120,17 +120,15 @@ export default class DataRequestBroker {
       return this.executeSingle();
     }
 
-    const dataResult = await ScreepsApi.roomHistory(dataRequest);
-    if (dataResult)
-      logger.debug(
-        `Got data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick}`
-      );
-    else
-      logger.debug(
-        `Failed to get data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick}`
-      );
+    const { shard } = dataRequest;
+    const { room } = dataRequest;
+    const { tick } = dataRequest;
 
-    if (dataResult !== null) this.addDataResult(dataResult, dataRequest);
+    const dataResult = await GetRoomHistory(shard, room, tick);
+    if (dataResult) logger.debug(`Got data for ${shard}/${room}/${tick}`);
+    else logger.debug(`Failed to get data for ${shard}/${room}/${tick}`);
+
+    if (dataResult) this.addDataResult(dataResult, dataRequest);
     else {
       dataRequest.retries = dataRequest.retries
         ? (dataRequest.retries += 1)

@@ -1,5 +1,5 @@
 import * as dotenv from "dotenv";
-import ScreepsApi from "./api.js";
+import { GetGameTime } from "./screepsApi.js";
 
 dotenv.config();
 
@@ -31,12 +31,12 @@ export default class RoomRequests {
   }
 
   async getCurrentTick(shard) {
-    const tick = await ScreepsApi.gameTime({ shard });
+    const tick = await GetGameTime(shard);
     if (tick) {
       return tick;
     }
 
-    return this.lastTickTimes[shard];
+    return this.lastTickTimes[shard] || 0;
   }
 
   async sync() {

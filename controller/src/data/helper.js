@@ -63,6 +63,8 @@ export function getIntentEffect(action, originalObject) {
       if (originalObject.type === "tower") {
         return { energy: 10 };
       }
+      else if (!originalObject.body) return 0;
+      
       return { energy: originalObject.body.work * 1 };
     case "upgradeController":
       return { energy: originalObject.body.work * 1 };
@@ -85,6 +87,6 @@ export function getIntentEffect(action, originalObject) {
     case "rangedHeal":
       return { damage: originalObject.body.heal * 4 };
     default:
-      return null;
+      return 0;
   }
 }
