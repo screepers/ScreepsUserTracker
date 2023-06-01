@@ -104,3 +104,15 @@ export async function GetMapStats(shard, rooms) {
     return undefined;
   }
 }
+
+export async function GetGameTime(shard) {
+  try {
+    const time = await api.raw.game.time(shard);
+    if (typeof time !== "object") throw time;
+    logger.debug(time)
+    return time.time;
+  } catch {
+    logger.error(error)
+    return undefined;
+  }
+}

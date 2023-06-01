@@ -105,7 +105,7 @@ export function ActionListDefaultValuesFiller(actions) {
 }
 
 function groupBy(original, value) {
-  if (!original) original = value
+  if (!original && original !== 0) original = value
     const typeofValue = typeof value;
 
   if (Array.isArray(value)) {

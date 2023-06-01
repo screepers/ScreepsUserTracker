@@ -129,7 +129,7 @@ const dataGetterJob = new CronJob(
       );
     }
 
-    DataBroker.CheckUsers();
+    await DataBroker.CheckUsers();
   },
   null,
   false,

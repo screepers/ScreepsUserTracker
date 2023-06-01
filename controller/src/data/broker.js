@@ -5,6 +5,8 @@ import handleUsers from "./handle/users.js";
 import handleObjects from "./handle/objects.js";
 import { getStats, handleCombinedRoomStats } from "./handle/helper.js";
 import { graphiteLogger as logger } from "../logger.js";
+import {GetShards} from "./helper.js";
+import {GetGameTime} from "./screepsApi.js";
 
 dotenv.config();
 const client = graphite.createClient(
@@ -40,7 +42,7 @@ export default class DataBroker {
     this._users[username][shard][roomName] = data;
   }
 
-  static CheckUsers() {
+  static async CheckUsers() {
     const usernamesToUpload = [];
 
     Object.entries(this._users).forEach(([username, shards]) => {
@@ -57,7 +59,7 @@ export default class DataBroker {
       }
     });
 
-    if (usernamesToUpload.length) this.UploadUsers(usernamesToUpload);
+    if (usernamesToUpload.length) await this.UploadUsers(usernamesToUpload);
   }
 
   static async UploadStatus(ipStatus) {
@@ -76,7 +78,7 @@ export default class DataBroker {
     });
   }
 
-  static UploadUsers(usernames) {
+  static async UploadUsers(usernames) {
     const start = Date.now();
     let timestamp;
 
@@ -128,7 +130,14 @@ export default class DataBroker {
       });
     });
 
-    this.Upload({ [process.env.SERVER_TYPE]: { stats } }, timestamp, {
+    const ticks = {}
+    const shards = GetShards();
+    for (let s = 0; s < shards.length; s++) {
+      const shard = shards[s];
+      ticks[shard] = await GetGameTime(shard);
+    }
+
+    this.Upload({ stats, ticks }, timestamp, {
       start,
       type: "Users",
     });
@@ -138,7 +147,7 @@ export default class DataBroker {
     const _timestamp = timestamp || Date.now();
 
     if (process.env.GRAPHITE_ONLINE === "FALSE") return;
-    client.write({ screeps: { userTracker: data } }, _timestamp, (err) => {
+    client.write({ screeps: { userTracker: { [process.env.SERVER_TYPE]: data } } }, _timestamp, (err) => {
       if (logInfo)
         logger.info(
           `Written data for ${logInfo.type}, took ${(

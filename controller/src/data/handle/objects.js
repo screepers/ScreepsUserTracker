@@ -158,9 +158,9 @@ export default function handleObjects(
       `constructionSites.progressPercentage`,
       constructionSites.length > 0
         ? constructionSites.reduce((acc, site) => {
-            acc += site.progress / site.progressTotal;
-            return acc;
-          }, 0) / constructionSites.length
+          acc += site.progress / site.progressTotal;
+          return acc;
+        }, 0) / constructionSites.length
         : 0,
       ActionType.FirstTickOnly
     )
@@ -293,26 +293,26 @@ export default function handleObjects(
     );
 
     if (controller.level < 8) {
-    actions.push(
-      CreateAction(
-        `controller.progress`,
-        controller.progress,
-        ActionType.FirstTickOnly
-      )
-    );
-    actions.push(
-      CreateAction(
-        `controller.progressTotal`,
-        controller.progressTotal,
-        ActionType.FirstTickOnly
-      )
-    );
-    } 
-    
+      actions.push(
+        CreateAction(
+          `controller.progress`,
+          controller.progress,
+          ActionType.FirstTickOnly
+        )
+      );
+      actions.push(
+        CreateAction(
+          `controller.progressTotal`,
+          controller.progressTotal,
+          ActionType.FirstTickOnly
+        )
+      );
+    }
+
     actions.push(
       CreateAction(
         `controller.ticksToDowngrade`,
-        controller.ticksToDowngrade,
+        controller.ticksToDowngrade || 0,
         ActionType.FirstTickOnly
       )
     );
