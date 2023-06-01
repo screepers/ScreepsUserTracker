@@ -34,11 +34,7 @@ export async function GetGclOfUser(username) {
 export async function GetLeaderboardRankObject(username) {
   try {
     const mode = "world";
-    const month = new Date().getMonth();
-    const season = `${new Date().getFullYear()}-${
-      month < 10 ? `0${month}` : month
-    }`;
-    const rank = await api.raw.leaderboard.find(username, mode, season);
+    const rank = await api.raw.leaderboard.find(username, mode);
 
     return {
       rank: rank.rank + 1,
@@ -47,6 +43,17 @@ export async function GetLeaderboardRankObject(username) {
   } catch {
     return {};
   }
+}
+
+export async function GetGclOfUsers(usernames) {
+  const gcls = {}
+
+  for (let u = 0; u < usernames.length; u++) {
+    const username = usernames[u];
+    
+    
+  }
+
 }
 
 export async function GetWorldSize(shard) {
