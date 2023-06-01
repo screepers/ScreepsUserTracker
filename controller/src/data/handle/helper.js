@@ -1,5 +1,4 @@
 import fs from "fs";
-import { GetGclOfUser } from "../screepsApi.js";
 
 let defaultActions;
 
@@ -105,8 +104,9 @@ export function ActionListDefaultValuesFiller(actions) {
 }
 
 function groupBy(original, value) {
-  if (!original && original !== 0) original = value
-    const typeofValue = typeof value;
+  // eslint-disable-next-line no-param-reassign
+  if (!original && original !== 0) original = value;
+  const typeofValue = typeof value;
 
   if (Array.isArray(value)) {
     value.forEach((index) => {
@@ -137,19 +137,4 @@ export function handleCombinedRoomStats(shards) {
   });
 
   return stats;
-}
-
-export async function GetGclObject(username) {
-  const totalGCLPoints = await GetGclOfUser(username).gcl;
-  if (totalGCLPoints === 0) return {};
-  const level = Math.floor(((totalGCLPoints ?? 0) / 1000000) ** (1 / 2.4)) + 1;
-
-  const previousTotal = Math.round(level > 1 ? (level - 1) ** 2.4 * 100000 : 0);
-  const currentTotal = Math.round(level ** 2.4 * 100000);
-
-  return {
-    level,
-    levelCap: currentTotal - previousTotal,
-    progress: totalGCLPoints - previousTotal,
-  };
 }

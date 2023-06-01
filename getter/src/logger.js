@@ -77,13 +77,13 @@ if (process.env.NODE_ENV !== "production") {
 
 export const apiLogger = {
   info(log) {
-    _apiLogger.info(typeof log === 'object' ? JSON.stringify(log) : log);
+    _apiLogger.info(log);
   },
   error(log) {
-    _apiLogger.error(typeof log === 'object' ? JSON.stringify(log) : log);
+    _apiLogger.error(log);
   },
   debug(log) {
-    _apiLogger.debug(typeof log === 'object' ? JSON.stringify(log) : log);
+    _apiLogger.debug(log);
   },
 };
 export const dataRequestBroker = {

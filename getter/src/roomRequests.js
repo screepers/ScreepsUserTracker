@@ -22,9 +22,9 @@ export default class RoomRequests {
     this.DataRequestBroker = DataRequestBroker;
 
     if (process.env.START_FROM_TICK_ZERO === "TRUE") {
-      this.shards.forEach((shard)=>{
+      this.shards.forEach((shard) => {
         this.lastTickTimes[shard] = -100;
-      })
+      });
     }
   }
 

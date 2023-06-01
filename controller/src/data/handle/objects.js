@@ -158,9 +158,9 @@ export default function handleObjects(
       `constructionSites.progressPercentage`,
       constructionSites.length > 0
         ? constructionSites.reduce((acc, site) => {
-          acc += site.progress / site.progressTotal;
-          return acc;
-        }, 0) / constructionSites.length
+            acc += site.progress / site.progressTotal;
+            return acc;
+          }, 0) / constructionSites.length
         : 0,
       ActionType.FirstTickOnly
     )
@@ -281,7 +281,7 @@ export default function handleObjects(
   // #endregion
 
   // #region Controller
-  const controllers = structuresByType['controller'];
+  const controllers = structuresByType.controller;
   if (controllers && controllers.length > 0) {
     const controller = controllers[0];
     actions.push(

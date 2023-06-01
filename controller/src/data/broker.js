@@ -5,8 +5,8 @@ import handleUsers from "./handle/users.js";
 import handleObjects from "./handle/objects.js";
 import { getStats, handleCombinedRoomStats } from "./handle/helper.js";
 import { graphiteLogger as logger } from "../logger.js";
-import {GetShards} from "./helper.js";
-import {GetGameTime} from "./screepsApi.js";
+import { GetShards } from "./helper.js";
+import { GetGameTime } from "./screepsApi.js";
 
 dotenv.config();
 const client = graphite.createClient(
@@ -130,9 +130,9 @@ export default class DataBroker {
       });
     });
 
-    const ticks = {}
+    const ticks = {};
     const shards = GetShards();
-    for (let s = 0; s < shards.length; s++) {
+    for (let s = 0; s < shards.length; s += 1) {
       const shard = shards[s];
       ticks[shard] = await GetGameTime(shard);
     }
@@ -147,17 +147,21 @@ export default class DataBroker {
     const _timestamp = timestamp || Date.now();
 
     if (process.env.GRAPHITE_ONLINE === "FALSE") return;
-    client.write({ screeps: { userTracker: { [process.env.SERVER_TYPE]: data } } }, _timestamp, (err) => {
-      if (logInfo)
-        logger.info(
-          `Written data for ${logInfo.type}, took ${(
-            (Date.now() - logInfo.start) /
-            1000
-          ).toFixed(2)}s`
-        );
-      if (err) {
-        logger.error(err);
+    client.write(
+      { screeps: { userTracker: { [process.env.SERVER_TYPE]: data } } },
+      _timestamp,
+      (err) => {
+        if (logInfo)
+          logger.info(
+            `Written data for ${logInfo.type}, took ${(
+              (Date.now() - logInfo.start) /
+              1000
+            ).toFixed(2)}s`
+          );
+        if (err) {
+          logger.error(err);
+        }
       }
-    });
+    );
   }
 }

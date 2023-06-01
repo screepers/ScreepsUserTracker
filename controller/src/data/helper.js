@@ -21,7 +21,7 @@ export const STRUCTURE_TYPES = [
   "terminal",
   "container",
   "nuker",
-  "controller"
+  "controller",
 ];
 export function findOriginalObject(id, firstTickObjects) {
   const object = Object.values(firstTickObjects).find((o) => o && o._id === id);

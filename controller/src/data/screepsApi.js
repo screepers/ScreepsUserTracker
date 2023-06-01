@@ -1,13 +1,13 @@
 import { ScreepsAPI } from "screeps-api";
 import * as dotenv from "dotenv";
-import { apiLogger as logger }from "../logger.js"
+import { apiLogger as logger } from "../logger.js";
 
 dotenv.config();
 
 let path;
 switch (process.env.SERVER_TYPE) {
   case "seasonal":
-    path = "/seasonal/";
+    path = "/season/";
     break;
   case "mmo":
   default:
@@ -24,34 +24,8 @@ const api = new ScreepsAPI({
 });
 
 function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-export async function GetGclOfUser(username) {
-  try {
-    const response = await api.raw.user.find(username);
-    logger.debug(response)
-    return response.user.gcl;
-  } catch (error) {
-    logger.error(error)
-    return 0;
-  }
-}
-
-export async function GetLeaderboardRankObject(username) {
-  try {
-    const mode = "world";
-    const rank = await api.raw.leaderboard.find(username, mode);
-
-    logger.debug(rank)
-    return {
-      rank: rank.rank + 1,
-      score: rank.score,
-    };
-  } catch  (error) {
-    logger.error(error)
-    return {};
-  }
+  // eslint-disable-next-line no-promise-executor-return
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export async function GetGclOfUsers() {
@@ -64,7 +38,8 @@ export async function GetGclOfUsers() {
 
     while (hasUsersLeft) {
       const leaderboard = await api.raw.leaderboard.list(20, mode, offset);
-      logger.debug(leaderboard)
+      if (!leaderboard.ok) throw new Error(JSON.stringify(leaderboard));
+      logger.debug(leaderboard);
       offset += 20;
 
       const users = Object.values(leaderboard.users);
@@ -73,12 +48,12 @@ export async function GetGclOfUsers() {
       });
 
       if (users.length === 0) hasUsersLeft = false;
-      sleep(250)
+      sleep(250);
     }
 
     return gcls;
   } catch (error) {
-    logger.error(error)
+    logger.error(error);
     return {};
   }
 }
@@ -86,10 +61,11 @@ export async function GetGclOfUsers() {
 export async function GetWorldSize(shard) {
   try {
     const size = await api.raw.game.worldSize(shard);
-    logger.debug(size)
+    if (!size.ok) throw new Error(JSON.stringify(size));
+    logger.debug(size);
     return size;
-  } catch (error){
-    logger.error(error)
+  } catch (error) {
+    logger.error(error);
     return 0;
   }
 }
@@ -97,10 +73,11 @@ export async function GetWorldSize(shard) {
 export async function GetMapStats(shard, rooms) {
   try {
     const mapStats = await api.raw.game.mapStats(rooms, "owner0", shard);
-    logger.debug(mapStats)
+    if (!mapStats.ok) throw new Error(JSON.stringify(mapStats));
+    logger.debug(mapStats);
     return mapStats;
-  } catch (error){
-    logger.error(error)
+  } catch (error) {
+    logger.error(error);
     return undefined;
   }
 }
@@ -108,11 +85,12 @@ export async function GetMapStats(shard, rooms) {
 export async function GetGameTime(shard) {
   try {
     const time = await api.raw.game.time(shard);
-    if (typeof time !== "object") throw time;
-    logger.debug(time)
+    if (typeof time !== "object" || !time.ok)
+      throw new Error(JSON.stringify(time));
+    logger.debug(time);
     return time.time;
-  } catch {
-    logger.error(error)
+  } catch (error) {
+    logger.error(error);
     return undefined;
   }
 }

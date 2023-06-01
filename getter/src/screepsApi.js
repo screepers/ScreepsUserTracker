@@ -25,7 +25,7 @@ const api = new ScreepsAPI({
 export async function GetGameTime(shard) {
   try {
     const time = await api.raw.game.time(shard);
-    if (typeof time !== "object") throw time;
+    if (typeof time !== "object" || !time.ok) throw time;
     return time.time;
   } catch {
     return undefined;

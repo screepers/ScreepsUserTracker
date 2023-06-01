@@ -63,19 +63,20 @@ export const mainLogger = {
     _mainLogger.info(log);
   },
   error(log) {
+    console.log(log, 2);
     _mainLogger.error(log);
   },
 };
 
 export const apiLogger = {
   info(log) {
-    _apiLogger.info(typeof log === 'object' ? JSON.stringify(log) : log);
+    _apiLogger.info(log);
   },
   error(log) {
-    _apiLogger.error(typeof log === 'object' ? JSON.stringify(log) : log);
+    _apiLogger.error(log);
   },
   debug(log) {
-    _apiLogger.debug(typeof log === 'object' ? JSON.stringify(log) : log);
+    _apiLogger.debug(log);
   },
 };
 
@@ -84,6 +85,7 @@ export const graphiteLogger = {
     _graphiteLogger.info(log);
   },
   error(log) {
+    console.log(log, 4);
     _graphiteLogger.error(log);
   },
 };
