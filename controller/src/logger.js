@@ -69,13 +69,13 @@ export const mainLogger = {
 
 export const apiLogger = {
   info(log) {
-    _apiLogger.info(JSON.stringify(log));
+    _apiLogger.info(typeof log === 'object' ? JSON.stringify(log) : log);
   },
   error(log) {
-    _apiLogger.error(JSON.stringify(log));
+    _apiLogger.error(typeof log === 'object' ? JSON.stringify(log) : log);
   },
   debug(log) {
-    _apiLogger.debug(JSON.stringify(log));
+    _apiLogger.debug(typeof log === 'object' ? JSON.stringify(log) : log);
   },
 };
 
