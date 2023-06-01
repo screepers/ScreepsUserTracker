@@ -1,5 +1,5 @@
 import axios from "axios";
-import { apiLogger as logger} from "./logger.js"
+import { apiLogger as logger } from "./logger.js";
 
 export default class ScreepsApi {
   static async execute(options) {

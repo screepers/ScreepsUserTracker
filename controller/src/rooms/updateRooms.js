@@ -1,6 +1,7 @@
 import fs from "fs";
 import { GetShards } from "../data/helper.js";
 import { GetWorldSize, GetMapStats } from "../data/screepsApi.js";
+import { mainLogger as logger } from "../logger.js";
 
 const shards = GetShards();
 

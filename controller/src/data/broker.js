@@ -4,7 +4,7 @@ import { GetUsernames } from "../rooms/userHelper.js";
 import handleUsers from "./handle/users.js";
 import handleObjects from "./handle/objects.js";
 import { getStats, handleCombinedRoomStats } from "./handle/helper.js";
-import {graphiteLogger as logger} from "../logger.js"
+import { graphiteLogger as logger } from "../logger.js";
 
 dotenv.config();
 const client = graphite.createClient(
@@ -57,6 +57,7 @@ export default class DataBroker {
   }
 
   static async UploadStatus(ipStatus) {
+    const start = Date.now();
     const usernames = GetUsernames();
 
     const stats = {};
@@ -65,10 +66,11 @@ export default class DataBroker {
       stats[username] = { overview: { roomCounts: userStats } };
     });
 
-    this.Upload({ status: ipStatus, stats });
+    this.Upload({ status: ipStatus, stats }, undefined, { start, type: "Status" });
   }
 
   static UploadUser(username) {
+    const start = Date.now();
     let timestamp;
 
     const stats = {
@@ -111,14 +113,21 @@ export default class DataBroker {
       });
     });
 
-    this.Upload({ stats: { [username]: stats } });
+    this.Upload({ stats: { [username]: stats } }, timestamp, { start, type: "Users" });
   }
 
-  static Upload(data, timestamp) {
+  static Upload(data, timestamp, logInfo) {
     const _timestamp = timestamp || Date.now();
 
     if (process.env.GRAPHITE_ONLINE === "FALSE") return;
     client.write({ screeps: { userTracker: data } }, _timestamp, (err) => {
+      if (logInfo)
+        logger.info(
+          `Written data for ${logInfo.type}, took ${(
+            (Date.now() - logInfo.start) /
+            1000
+          ).toFixed(2)}s`
+        );
       if (err) {
         logger.error(err);
       }

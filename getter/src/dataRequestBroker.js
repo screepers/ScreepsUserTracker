@@ -1,6 +1,6 @@
 import ScreepsApi from "./api.js";
 import RoomRequests from "./roomRequests.js";
-import { dataRequestBroker as logger } from "./logger.js"
+import { dataRequestBroker as logger } from "./logger.js";
 
 let resultId = 0;
 

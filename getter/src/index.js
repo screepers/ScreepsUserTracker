@@ -4,7 +4,7 @@ import axios from "axios";
 import winston from "winston";
 import Cron from "cron";
 import DataRequestBroker from "./dataRequestBroker.js";
-import {mainLogger as logger, backlogLogger} from "./logger.js"
+import { mainLogger as logger, backlogLogger } from "./logger.js";
 
 const { CronJob } = Cron;
 

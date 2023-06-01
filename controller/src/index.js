@@ -138,7 +138,7 @@ const dataGetterJob = new CronJob(
 dataGetterJob.start();
 
 const requestRoomUpdaterJob = new CronJob(
-  !DEBUG ? "*/10 * * * *" : "* * * * *",
+  !DEBUG ? "*/10 * * * *" : "*/2 * * * *",
   async () => {
     const start = Date.now();
     await UpdateRooms();
@@ -193,7 +193,7 @@ const requestRoomUpdaterJob = new CronJob(
     for (let y = 0; y < ips.length; y += 1) {
       const ip = ips[y];
       try {
-        if (!splittedRooms[y]) splittedRooms[y] = []
+        if (!splittedRooms[y]) splittedRooms[y] = [];
         const ipRoomCount = Object.values(splittedRooms[y]).reduce(
           (acc, curr) => acc + curr.length,
           0
