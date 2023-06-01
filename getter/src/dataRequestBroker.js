@@ -1,27 +1,8 @@
-import winston from "winston";
 import ScreepsApi from "./api.js";
 import RoomRequests from "./roomRequests.js";
+import { dataRequestBroker as logger } from "./logger.js"
 
 let resultId = 0;
-const logger = winston.createLogger({
-  level: "info",
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json()
-  ),
-  defaultMeta: { service: "data-request-broker" },
-  transports: [
-    new winston.transports.File({ filename: "logs/error.log", level: "error" }),
-    new winston.transports.File({ filename: "logs/combined.log" }),
-  ],
-});
-if (process.env.NODE_ENV !== "production") {
-  logger.add(
-    new winston.transports.Console({
-      format: winston.format.simple(),
-    })
-  );
-}
 
 function wait(ms) {
   // eslint-disable-next-line no-promise-executor-return

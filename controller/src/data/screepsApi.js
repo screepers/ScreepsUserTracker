@@ -59,7 +59,7 @@ export async function GetWorldSize(shard) {
 
 export async function GetMapStats(shard, rooms) {
   try {
-    return await api.raw.game.mapStats(rooms, "owner0", shard);
+    return api.raw.game.mapStats(rooms, "owner0", shard);
   } catch {
     return undefined;
   }

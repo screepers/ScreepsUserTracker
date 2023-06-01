@@ -81,7 +81,7 @@ async function UpdateRooms() {
   } catch (error) {
     if (error.message && error.message.startsWith("Rate limit exceeded"))
       return;
-    console.log(error);
+    logger.error(error);
   }
 }
 

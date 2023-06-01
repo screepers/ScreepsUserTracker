@@ -4,6 +4,7 @@ import axios from "axios";
 import winston from "winston";
 import Cron from "cron";
 import DataRequestBroker from "./dataRequestBroker.js";
+import {mainLogger as logger, backlogLogger} from "./logger.js"
 
 const { CronJob } = Cron;
 
@@ -17,36 +18,6 @@ process.once("SIGINT", async () => {
   await axios.delete(`${controllerIp}/ip`, { data: { ip } });
   process.exit(0);
 });
-
-const logger = winston.createLogger({
-  level: "info",
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json()
-  ),
-  defaultMeta: { service: "public-api" },
-  transports: [
-    new winston.transports.File({ filename: "logs/error.log", level: "error" }),
-    new winston.transports.File({ filename: "logs/combined.log" }),
-  ],
-});
-
-const backlogLogger = winston.createLogger({
-  level: "info",
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json()
-  ),
-  transports: [new winston.transports.File({ filename: "logs/backlog.log" })],
-});
-
-if (process.env.NODE_ENV !== "production") {
-  logger.add(
-    new winston.transports.Console({
-      format: winston.format.simple(),
-    })
-  );
-}
 
 const dataRequestBroker = new DataRequestBroker();
 const app = express();

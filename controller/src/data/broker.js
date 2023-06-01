@@ -1,29 +1,15 @@
 import graphite from "graphite";
-import winston from "winston";
 import * as dotenv from "dotenv";
 import { GetUsernames } from "../rooms/userHelper.js";
 import handleUsers from "./handle/users.js";
 import handleObjects from "./handle/objects.js";
 import { getStats, handleCombinedRoomStats } from "./handle/helper.js";
+import {graphiteLogger as logger} from "../logger.js"
 
 dotenv.config();
 const client = graphite.createClient(
   `plaintext://${process.env.GRAPHITE_HOST}/`
 );
-
-const logger = winston.createLogger({
-  level: "info",
-  format: winston.format.json(),
-  transports: [new winston.transports.File({ filename: "logs/graphite.log" })],
-});
-
-if (process.env.NODE_ENV !== "production") {
-  logger.add(
-    new winston.transports.Console({
-      format: winston.format.simple(),
-    })
-  );
-}
 
 export default class DataBroker {
   static _users = {};

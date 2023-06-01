@@ -3,34 +3,13 @@ import bodyParser from "body-parser";
 import axios from "axios";
 import fs from "fs";
 import Cron from "cron";
-import winston from "winston";
 import GetRooms, { GetUsernames, GetUsername } from "./rooms/userHelper.js";
 import UpdateRooms from "./rooms/updateRooms.js";
 import DataBroker from "./data/broker.js";
+import { mainLogger as logger } from "./logger.js";
 
 const { CronJob } = Cron;
 const DEBUG = process.env.DEBUG === "TRUE";
-
-const logger = winston.createLogger({
-  level: "info",
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json()
-  ),
-  defaultMeta: { service: "handler" },
-  transports: [
-    new winston.transports.File({ filename: "logs/error.log", level: "error" }),
-    new winston.transports.File({ filename: "logs/combined.log" }),
-  ],
-});
-
-if (process.env.NODE_ENV !== "production") {
-  logger.add(
-    new winston.transports.Console({
-      format: winston.format.simple(),
-    })
-  );
-}
 
 const app = express();
 const port = 5000;
@@ -162,7 +141,7 @@ const requestRoomUpdaterJob = new CronJob(
   !DEBUG ? "*/10 * * * *" : "* * * * *",
   async () => {
     const start = Date.now();
-    UpdateRooms();
+    await UpdateRooms();
 
     const ips = getIps();
     const ipCount = ips.length;
@@ -214,6 +193,7 @@ const requestRoomUpdaterJob = new CronJob(
     for (let y = 0; y < ips.length; y += 1) {
       const ip = ips[y];
       try {
+        if (!splittedRooms[y]) splittedRooms[y] = []
         const ipRoomCount = Object.values(splittedRooms[y]).reduce(
           (acc, curr) => acc + curr.length,
           0
