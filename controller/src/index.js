@@ -3,7 +3,7 @@ import bodyParser from "body-parser";
 import axios from "axios";
 import fs from "fs";
 import Cron from "cron";
-import GetRooms, { GetUsernames, GetUsername } from "./rooms/userHelper.js";
+import { GetUserData, GetUsernames, GetRoomTotal } from "./rooms/userHelper.js";
 import UpdateRooms from "./rooms/updateRooms.js";
 import DataBroker from "./data/broker.js";
 import { mainLogger as logger } from "./logger.js";
@@ -117,19 +117,8 @@ const dataGetterJob = new CronJob(
       ).toFixed(2)}s`
     );
 
-    DataBroker.UploadStatus(status);
-    for (let i = 0; i < data.length; i += 1) {
-      const { dataRequest } = data[i];
-      const username = GetUsername(dataRequest.room, dataRequest.shard);
-      DataBroker.AddRoomData(
-        username,
-        dataRequest.shard,
-        dataRequest.room,
-        data[i]
-      );
-    }
-
-    await DataBroker.CheckUsers();
+    await DataBroker.UploadStatus(status);
+    await DataBroker.AddRoomsData(data);
   },
   null,
   false,
@@ -158,10 +147,13 @@ const requestRoomUpdaterJob = new CronJob(
 
     for (let i = 0; i < usernames.length; i += 1) {
       const username = usernames[i];
-      const userRooms = GetRooms(username);
-      if (userRooms.total + roomCount <= roomsPerCycle) {
-        roomCount += userRooms.total;
-        Object.entries(userRooms.rooms).forEach(([shard, data]) => {
+      const userData = GetUserData(username);
+
+      userData.total = GetRoomTotal(userData.shards);
+
+      if (userData.total + roomCount <= roomsPerCycle) {
+        roomCount += userData.total;
+        Object.entries(userData.shards).forEach(([shard, data]) => {
           if (!shardRooms[shard]) {
             shardRooms[shard] = [];
           }

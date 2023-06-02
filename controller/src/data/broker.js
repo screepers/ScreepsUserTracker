@@ -1,12 +1,10 @@
 import graphite from "graphite";
 import * as dotenv from "dotenv";
-import { GetUsernames } from "../rooms/userHelper.js";
+import { GetUsernames, GetUsername } from "../rooms/userHelper.js";
 import handleUsers from "./handle/users.js";
 import handleObjects from "./handle/objects.js";
 import { getStats, handleCombinedRoomStats } from "./handle/helper.js";
 import { graphiteLogger as logger } from "../logger.js";
-import { GetShards } from "./helper.js";
-import { GetGameTime } from "./screepsApi.js";
 
 dotenv.config();
 const client = graphite.createClient(
@@ -20,7 +18,7 @@ export default class DataBroker {
     this._users = {};
   }
 
-  static AddRooms(username, shard, rooms) {
+  static AddRooms(username, shard, rooms, force = false) {
     if (!this._users[username]) {
       this._users[username] = {};
     }
@@ -29,9 +27,33 @@ export default class DataBroker {
     }
 
     rooms.forEach((roomName) => {
-      if (!this._users[username][shard][roomName])
+      if (!this._users[username][shard][roomName] || force)
         this._users[username][shard][roomName] = null;
     });
+  }
+
+  static async AddRoomsData(dataList) {
+    if (dataList.length === 0) return;
+
+    dataList.sort((a, b) => a.dataRequest.tick - b.dataRequest.tick);
+
+    let lastTick = dataList[0].dataRequest.tick;
+    for (let i = 0; i < dataList.length; i += 1) {
+      const { dataRequest } = dataList[i];
+      
+      if (lastTick !== dataRequest.tick) {
+        lastTick = dataRequest.tick;
+        await this.CheckUsers();
+      }
+      
+      const username = GetUsername(dataRequest.room, dataRequest.shard);
+      this.AddRoomData(
+        username,
+        dataRequest.shard,
+        dataRequest.room,
+        dataList[i]
+      );
+    }
   }
 
   static AddRoomData(username, shard, roomName, data) {
@@ -69,7 +91,7 @@ export default class DataBroker {
     const stats = {};
     const handledUsernames = await handleUsers(usernames);
     Object.entries(handledUsernames).forEach(([username, userStats]) => {
-      stats[username] = { overview: { roomCounts: userStats } };
+      stats[username] = { info: userStats };
     });
 
     this.Upload({ status: ipStatus, stats }, undefined, {
@@ -92,6 +114,8 @@ export default class DataBroker {
       };
     }
 
+    const shardTicks = {};
+
     usernames.forEach((username) => {
       const userStats = getStatsObject();
       Object.values(this._users[username]).forEach((shardData) => {
@@ -99,6 +123,8 @@ export default class DataBroker {
           const { dataResult, dataRequest } = roomData;
           if (!timestamp) {
             timestamp = dataResult.timestamp;
+          } else if (!shardTicks[dataRequest.shard]) {
+            shardTicks[dataRequest.shard] = dataRequest.tick;
           }
 
           let actionsArray = [];
@@ -128,16 +154,18 @@ export default class DataBroker {
 
         stats[username] = userStats;
       });
+
+      const shards = Object.keys(this._users[username])
+      for (let s = 0; s < shards.length; s++) {
+        const shard = shards[s];
+        const rooms = this._users[username][shard];
+
+        const roomNames = Object.keys(rooms);
+        this.AddRooms(username, shard, roomNames, true);
+      }
     });
 
-    const ticks = {};
-    const shards = GetShards();
-    for (let s = 0; s < shards.length; s += 1) {
-      const shard = shards[s];
-      ticks[shard] = await GetGameTime(shard);
-    }
-
-    this.Upload({ stats, ticks }, timestamp, {
+    this.Upload({ stats, shardTicks }, timestamp, {
       start,
       type: "Users",
     });

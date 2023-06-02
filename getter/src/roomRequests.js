@@ -56,25 +56,26 @@ export default class RoomRequests {
       const rooms = this.rooms[shard];
       if (rooms && rooms.length > 0) {
         if (
-          this.lastTickTimes[shard] &&
+          this.lastTickTimes[shard] !== undefined &&
           requestTick - 100 > this.lastTickTimes[shard]
         ) {
           requestTick = this.lastTickTimes[shard] + 100;
         }
 
-        rooms.forEach((room) => {
-          const dataRequest = {
-            room,
-            shard,
-            tick: requestTick,
-          };
-          dataRequests.push(dataRequest);
-        });
-        this.DataRequestBroker.addDataRequests(dataRequests);
-        this.lastTickTimes[shard] = requestTick;
+        if (this.lastTickTimes[shard] !== requestTick) {
+          rooms.forEach((room) => {
+            const dataRequest = {
+              room,
+              shard,
+              tick: requestTick,
+            };
+            dataRequests.push(dataRequest);
+          });
+          this.DataRequestBroker.addDataRequests(dataRequests);
+          this.lastTickTimes[shard] = requestTick;
+        }
       }
     }
-
     await wait(1000 * 5);
     this.sync();
   }

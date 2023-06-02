@@ -1,37 +1,38 @@
 import * as dotenv from "dotenv";
-import GetRooms from "../../rooms/userHelper.js";
+import { GetUserData } from "../../rooms/userHelper.js";
 import { GetShards } from "../helper.js";
 // import { GetLeaderboardRankObject } from "../screepsApi.js"
 // import { GetGclObject} from "./helper.js"
 
 dotenv.config();
-const shards = GetShards();
+const shardNames = GetShards();
 
 async function handleUser(username) {
-  const user = GetRooms(username);
-  const stats = { shards: {}, overview: {} };
+  const user = GetUserData(username);
+  const { shards, gcl } = user;
 
-  const { rooms, total } = user;
-  shards.forEach((shard) => {
-    if (rooms[shard]) {
-      const { owned, reserved } = rooms[shard];
+  const stats = { shards: {}, overview: { gcl } };
+
+  shardNames.forEach((shard) => {
+    if (shards[shard]) {
+      const { owned, reserved } = shards[shard];
       stats.shards[shard] = {
-        total: owned.length + reserved.length,
-        owned: owned.length,
-        reserved: reserved.length,
+        roomTotals: {
+          total: owned.length + reserved.length,
+          owned: owned.length,
+          reserved: reserved.length,
+        },
       };
     } else {
       stats.shards[shard] = {
-        total: 0,
-        owned: 0,
-        reserved: 0,
+        roomTotals: {
+          total: 0,
+          owned: 0,
+          reserved: 0,
+        },
       };
     }
   });
-
-  // stats.gcl = await GetGclObject(username)
-  // stats.leaderboard = await GetLeaderboardRankObject(username)
-  stats.overview.ownedTotal = total;
 
   return stats;
 }

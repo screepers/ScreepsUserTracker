@@ -32,15 +32,6 @@ export default class DataRequestBroker {
   }
 
   addDataRequests(dataRequests) {
-    if (dataRequests.length > 1) {
-      const requestsCount = this.dataRequests.length;
-      if (requestsCount > 2500) {
-        logger.info(
-          `Dropping ${requestsCount} requests to add ${dataRequests.length} requests`
-        );
-        this.dataRequests = [];
-      }
-    }
     this.dataRequests = this.dataRequests.concat(dataRequests);
   }
 
@@ -91,7 +82,7 @@ export default class DataRequestBroker {
     let dataResultsToSend = [];
     Object.entries(perTickResults).forEach(([shard, perTick]) => {
       Object.entries(perTick).forEach(([tick, data]) => {
-        if (!perTickRequests[shard] || perTickRequests[shard][tick])
+        if (!perTickRequests[shard] || !perTickRequests[shard][tick])
           dataResultsToSend = dataResultsToSend.concat(data);
       });
     });

@@ -4,10 +4,6 @@ const roomsCache = {
   data: {},
   lastUpdate: 0,
 };
-const userRoomsCountCache = {
-  data: [],
-  lastUpdate: 0,
-};
 
 function updateCache() {
   if (Date.now() - roomsCache.lastUpdate > 1000 * 60) {
@@ -17,27 +13,36 @@ function updateCache() {
     }
     roomsCache.lastUpdate = Date.now();
   }
-  if (Date.now() - userRoomsCountCache.lastUpdate > 1000 * 60) {
-    if (fs.existsSync(`files/userRoomsCount.json`)) {
-      const userRoomsCount = fs.readFileSync(`files/userRoomsCount.json`);
-      userRoomsCountCache.data = JSON.parse(userRoomsCount);
-    }
-    userRoomsCountCache.lastUpdate = Date.now();
-  }
 }
 
-export default function GetRooms(username) {
+export function GetRoomTotal(shards, type = "owned") {
+  let total = 0;
+  Object.values(shards).forEach((rooms) => {
+    switch (type) {
+      case "owned":
+        total += rooms.owned.length;
+        break;
+      case "reserved":
+        total += rooms.reserved.length;
+        break;
+      case "total":
+        total += rooms.owned.length + rooms.reserved.length;
+        break;
+      default:
+        break;
+    }
+  });
+
+  return total;
+}
+
+export function GetUserData(username) {
   updateCache();
 
   const rooms = roomsCache.data;
-  const userRoomsCount = userRoomsCountCache.data;
+  if (!rooms[username]) return { shards: [] };
 
-  if (!rooms[username]) return { rooms: [], total: 0 };
-
-  return {
-    rooms: rooms[username].shards,
-    total: userRoomsCount.find((u) => u[0] === username)[1],
-  };
+  return rooms[username];
 }
 
 export function GetUsername(room, shard) {
@@ -77,5 +82,5 @@ export function GetUsernameById(id) {
 export function GetUsernames() {
   updateCache();
 
-  return userRoomsCountCache.data.map((u) => u[0]);
+  return Object.keys(roomsCache.data);
 }

@@ -78,21 +78,8 @@ async function UpdateRooms() {
       }
     }
 
-    let userCounts = {};
-    Object.entries(users).forEach(([username, data]) => {
-      const count = Object.values(data.shards).reduce(
-        (acc, val) => acc + val.owned.length,
-        0
-      );
-      userCounts[username] = count;
-    });
-
-    userCounts = Object.entries(userCounts)
-      .sort((a, b) => b[1] - a[1])
-      .filter((u) => u[0] !== "Invader");
-
+    delete users.Invader;
     fs.writeFileSync("./files/users.json", JSON.stringify(users));
-    fs.writeFileSync("./files/userRoomsCount.json", JSON.stringify(userCounts));
   } catch (error) {
     if (error.message && error.message.startsWith("Rate limit exceeded"))
       return;

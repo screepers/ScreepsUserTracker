@@ -105,20 +105,22 @@ export function ActionListDefaultValuesFiller(actions) {
 
 function groupBy(original, value) {
   // eslint-disable-next-line no-param-reassign
-  if (!original && original !== 0) original = value;
+  if (original === null) original = value;
   const typeofValue = typeof value;
 
-  if (Array.isArray(value)) {
-    value.forEach((index) => {
-      original[index] = groupBy(original[index], value[index]).original;
-    });
-  } else if (typeofValue === "object") {
-    Object.keys(value).forEach((key) => {
-      original[key] = groupBy(original[key], value[key]).original;
-    });
-  } else if (typeofValue === "number") {
-    // eslint-disable-next-line no-param-reassign
-    original += value;
+  if (original !== null && value !== null) {
+    if (Array.isArray(value)) {
+      value.forEach((index) => {
+        original[index] = groupBy(original[index], value[index]).original;
+      });
+    } else if (typeofValue === "object") {
+      Object.keys(value).forEach((key) => {
+        original[key] = groupBy(original[key], value[key]).original;
+      });
+    } else if (typeofValue === "number") {
+      // eslint-disable-next-line no-param-reassign
+      original += value;
+    }
   }
   return { original, value };
 }
