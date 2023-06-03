@@ -63,7 +63,6 @@ export const mainLogger = {
     _mainLogger.info(log);
   },
   error(log) {
-    console.log(log, 2);
     _mainLogger.error(log);
   },
 };
@@ -85,7 +84,6 @@ export const graphiteLogger = {
     _graphiteLogger.info(log);
   },
   error(log) {
-    console.log(log, 4);
     _graphiteLogger.error(log);
   },
 };

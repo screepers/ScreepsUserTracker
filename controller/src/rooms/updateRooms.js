@@ -4,6 +4,7 @@ import {
   GetWorldSize,
   GetMapStats,
   GetGclOfUsers,
+  GetScoresOfUsers,
 } from "../data/screepsApi.js";
 import { mainLogger as logger } from "../logger.js";
 
@@ -53,6 +54,7 @@ async function UpdateRooms() {
   try {
     const users = {};
     const gcls = await GetGclOfUsers();
+    const scores = shards[0] === "shardSeason" ? await GetScoresOfUsers() : {};
 
     for (let s = 0; s < shards.length; s += 1) {
       const shard = shards[s];
@@ -64,13 +66,13 @@ async function UpdateRooms() {
         const username = usernames[u];
         const userData = usersPerShard[username];
 
-        if (!users[username]) {
-          users[username] = {
-            shards: {},
-            id: userData.id,
-            gcl: gcls[username],
-          };
-        }
+        users[username] = {
+          shards: {},
+          id: userData.id,
+          gcl: gcls[username],
+        };
+        if (scores[username]) users[username].score = scores[username];
+
         users[username].shards[shard] = {
           owned: userData.owned,
           reserved: userData.reserved,

@@ -49,8 +49,10 @@ export async function GetRoomHistory(shard, room, tick) {
       history.ticks["1"] = {};
     }
 
-    return history;
-  } catch {
-    return undefined;
+    return { status: "Success", result: history };
+  } catch (error) {
+    if (error.message && error.message.includes("404 Not Found"))
+      return { status: "Not found", result: null };
+    return { status: "Error" };
   }
 }

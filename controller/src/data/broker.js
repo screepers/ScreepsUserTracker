@@ -40,12 +40,12 @@ export default class DataBroker {
     let lastTick = dataList[0].dataRequest.tick;
     for (let i = 0; i < dataList.length; i += 1) {
       const { dataRequest } = dataList[i];
-      
+
       if (lastTick !== dataRequest.tick) {
         lastTick = dataRequest.tick;
         await this.CheckUsers();
       }
-      
+
       const username = GetUsername(dataRequest.room, dataRequest.shard);
       this.AddRoomData(
         username,
@@ -94,7 +94,7 @@ export default class DataBroker {
       stats[username] = { info: userStats };
     });
 
-    this.Upload({ status: ipStatus, stats }, undefined, {
+    this.Upload({ status: ipStatus, users: stats }, undefined, {
       start,
       type: "Status",
     });
@@ -108,55 +108,62 @@ export default class DataBroker {
     function getStatsObject() {
       return {
         shards: {},
-        overview: {
+        combined: {
           shards: {},
         },
       };
     }
 
     const shardTicks = {};
-
     usernames.forEach((username) => {
       const userStats = getStatsObject();
       Object.values(this._users[username]).forEach((shardData) => {
+        let hasStats = false;
+
         Object.values(shardData).forEach((roomData) => {
           const { dataResult, dataRequest } = roomData;
-          if (!timestamp) {
-            timestamp = dataResult.timestamp;
-          } else if (!shardTicks[dataRequest.shard]) {
-            shardTicks[dataRequest.shard] = dataRequest.tick;
-          }
+          if (dataResult) {
+            hasStats = true;
 
-          let actionsArray = [];
-          const { ticks } = dataResult;
-          const tickKeys = Object.keys(ticks);
-          for (let t = 0; t < tickKeys.length; t += 1) {
-            const tick = tickKeys[t];
-            if (ticks[tick]) {
-              actionsArray = actionsArray.concat(
-                handleObjects(
-                  username,
-                  ticks[tick],
-                  ticks[tickKeys[t - 1]],
-                  dataResult.ticks[dataRequest.tick]
-                )
-              );
+            if (!timestamp) {
+              timestamp = dataResult.timestamp;
+            } else if (!shardTicks[dataRequest.shard]) {
+              shardTicks[dataRequest.shard] = dataRequest.tick;
             }
-          }
 
-          if (!userStats.shards[dataRequest.shard]) {
-            userStats.shards[dataRequest.shard] = {};
+            let actionsArray = [];
+            const { ticks } = dataResult;
+            const tickKeys = Object.keys(ticks);
+            for (let t = 0; t < tickKeys.length; t += 1) {
+              const tick = tickKeys[t];
+              if (ticks[tick]) {
+                actionsArray = actionsArray.concat(
+                  handleObjects(
+                    username,
+                    ticks[tick],
+                    ticks[tickKeys[t - 1]],
+                    dataResult.ticks[dataRequest.tick]
+                  )
+                );
+              }
+            }
+
+            if (!userStats.shards[dataRequest.shard]) {
+              userStats.shards[dataRequest.shard] = {};
+            }
+            userStats.shards[dataRequest.shard][dataRequest.room] =
+              getStats(actionsArray);
           }
-          userStats.shards[dataRequest.shard][dataRequest.room] =
-            getStats(actionsArray);
-          userStats.overview.shards = handleCombinedRoomStats(userStats.shards);
         });
 
-        stats[username] = userStats;
+        if (hasStats) {
+          userStats.combined.shards = handleCombinedRoomStats(userStats.shards);
+          stats[username] = { stats: userStats };
+        }
       });
 
-      const shards = Object.keys(this._users[username])
-      for (let s = 0; s < shards.length; s++) {
+      const shards = Object.keys(this._users[username]);
+      for (let s = 0; s < shards.length; s += 1) {
         const shard = shards[s];
         const rooms = this._users[username][shard];
 
@@ -165,7 +172,7 @@ export default class DataBroker {
       }
     });
 
-    this.Upload({ stats, shardTicks }, timestamp, {
+    this.Upload({ users: stats, shardTicks }, timestamp, {
       start,
       type: "Users",
     });

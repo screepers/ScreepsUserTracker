@@ -31,8 +31,9 @@ export default class DataRequestBroker {
     return this.roomRequests.getRooms();
   }
 
-  addDataRequests(dataRequests) {
-    this.dataRequests = this.dataRequests.concat(dataRequests);
+  addDataRequests(dataRequests, addAtStart = false) {
+    if (!addAtStart) this.dataRequests = this.dataRequests.concat(dataRequests);
+    else this.dataRequests = dataRequests.concat(this.dataRequests);
   }
 
   getDataRequest() {
@@ -43,7 +44,23 @@ export default class DataRequestBroker {
     return [...this.dataRequests];
   }
 
-  addDataResult(dataResult, dataRequest) {
+  addDataResult(dataResult, dataRequest, force = false) {
+    if (force)
+      return this.dataResults.push({
+        dataResult,
+        dataRequest,
+        id: (resultId += 1),
+      });
+
+    const firstTickObjects = Object.values(dataResult.ticks).filter(
+      (tl) => tl !== null
+    )[0];
+    if (
+      !firstTickObjects ||
+      !Object.values(firstTickObjects).find((obj) => obj.type === "controller")
+    )
+      return;
+
     this.dataResults.push({ dataResult, dataRequest, id: (resultId += 1) });
   }
 
@@ -116,16 +133,20 @@ export default class DataRequestBroker {
     const { tick } = dataRequest;
 
     const dataResult = await GetRoomHistory(shard, room, tick);
-    if (dataResult) logger.debug(`Got data for ${shard}/${room}/${tick}`);
+    if (dataResult.status === "Success")
+      logger.debug(`Got data for ${shard}/${room}/${tick}`);
     else logger.debug(`Failed to get data for ${shard}/${room}/${tick}`);
 
-    if (dataResult) this.addDataResult(dataResult, dataRequest);
+    if (dataResult.status === "Success")
+      this.addDataResult(dataResult.result, dataRequest);
     else {
       dataRequest.retries = dataRequest.retries
         ? (dataRequest.retries += 1)
         : 1;
 
-      if (dataRequest.retries < 3) this.addDataRequests([dataRequest]);
+      if (dataRequest.retries < 3) this.addDataRequests([dataRequest], true);
+      else if (dataResult.status === "Not found")
+        this.addDataResult(dataResult.result, dataRequest, true);
       else
         logger.debug(
           `Failed to get data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick} after 3 retries`

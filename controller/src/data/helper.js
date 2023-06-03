@@ -55,39 +55,41 @@ export function groupBy(obj, key) {
 }
 
 export function getIntentEffect(action, originalObject) {
-  switch (action) {
-    case "harvest":
-      return { energy: originalObject.body.work * 2 };
-    case "build":
-      return { energy: originalObject.body.work * 5 };
-    case "repair":
-      if (originalObject.type === "tower") {
-        return { energy: 10 };
-      }
-      if (!originalObject.body) return 0;
-
-      return { energy: originalObject.body.work * 1 };
-    case "upgradeController":
-      return { energy: originalObject.body.work * 1 };
-    case "dismantle":
-      return { energy: originalObject.body.work * 0.25 };
-    case "attack":
-      if (originalObject.type === "tower") {
-        return { energy: 10, damage: 300 };
-      }
-      return { damage: originalObject.body.attack * 30 };
-    case "rangedAttack":
-      return { damage: originalObject.body.rangedAttack * 10 };
-    case "rangedMassAttack":
-      return { damage: originalObject.body.rangedAttack * 4 };
-    case "heal":
-      if (originalObject.type === "tower") {
-        return { energy: 10, damage: 200 };
-      }
-      return { damage: originalObject.body.heal * 12 };
-    case "rangedHeal":
-      return { damage: originalObject.body.heal * 4 };
-    default:
-      return 0;
+  try {
+    switch (action) {
+      case "harvest":
+        return { energy: originalObject.body.work * 2 };
+      case "build":
+        return { energy: originalObject.body.work * 5 };
+      case "repair":
+        if (originalObject.type === "tower") {
+          return { energy: 10 };
+        }
+        return { energy: originalObject.body.work * 1 };
+      case "upgradeController":
+        return { energy: originalObject.body.work * 1 };
+      case "dismantle":
+        return { energy: originalObject.body.work * 0.25 };
+      case "attack":
+        if (originalObject.type === "tower") {
+          return { energy: 10, damage: 300 };
+        }
+        return { damage: originalObject.body.attack * 30 };
+      case "rangedAttack":
+        return { damage: originalObject.body.rangedAttack * 10 };
+      case "rangedMassAttack":
+        return { damage: originalObject.body.rangedAttack * 4 };
+      case "heal":
+        if (originalObject.type === "tower") {
+          return { energy: 10, damage: 200 };
+        }
+        return { damage: originalObject.body.heal * 12 };
+      case "rangedHeal":
+        return { damage: originalObject.body.heal * 4 };
+      default:
+        return 0;
+    }
+  } catch (error) {
+    return 0;
   }
 }

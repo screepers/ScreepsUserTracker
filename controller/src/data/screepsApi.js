@@ -58,6 +58,35 @@ export async function GetGclOfUsers() {
   }
 }
 
+export async function GetScoresOfUsers() {
+  try {
+    const scores = {};
+
+    let offset = 0;
+    let hasUsersLeft = true;
+
+    while (hasUsersLeft) {
+      const scoreboard = await api.raw.scoreboard.list(20, offset);
+      if (!scoreboard.ok) throw new Error(JSON.stringify(scoreboard));
+      logger.debug(scoreboard);
+      offset += 20;
+
+      const users = Object.values(scoreboard.users);
+      users.forEach((user) => {
+        scores[user.username] = user.score;
+      });
+
+      if (users.length === 0) hasUsersLeft = false;
+      sleep(250);
+    }
+
+    return scores;
+  } catch (error) {
+    logger.error(error);
+    return {};
+  }
+}
+
 export async function GetWorldSize(shard) {
   try {
     const size = await api.raw.game.worldSize(shard);

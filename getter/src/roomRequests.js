@@ -76,7 +76,8 @@ export default class RoomRequests {
         }
       }
     }
-    await wait(1000 * 5);
+    // await wait(1000 * 5);
+    await wait(250);
     this.sync();
   }
 }
