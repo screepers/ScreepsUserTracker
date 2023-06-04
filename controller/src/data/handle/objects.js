@@ -12,6 +12,7 @@ import GetIntents from "./intentsHelper.js";
 export default function handleObjects(username, objects, extras = {}) {
   const currentObjects = extras.currentObjects || {};
   const ticks = extras.ticks || {};
+  const currentTick = parseInt(extras.tick, 10);
 
   const objectKeys = Object.keys(objects);
   for (let o = objectKeys.length - 1; o >= 0; o -= 1) {
@@ -26,6 +27,7 @@ export default function handleObjects(username, objects, extras = {}) {
   const creeps = findAllByType(objects, "creep");
   const structures = findAllByType(objects, "structure");
   const constructionSites = findAllByType(objects, "constructionSite");
+  const minerals = findAllByType(objects, "mineral");
   const intents = GetIntents(objects, currentObjects, ticks);
 
   let actions = [];
@@ -57,6 +59,16 @@ export default function handleObjects(username, objects, extras = {}) {
             acc += amount;
           });
         }
+        return acc;
+      }, 0),
+      ActionType.FirstTickOnly
+    )
+  );
+  actions.push(
+    CreateAction(
+      "totals.minerals",
+      minerals.reduce((acc, mineral) => {
+        acc += mineral.amount || 0;
         return acc;
       }, 0),
       ActionType.FirstTickOnly
@@ -153,7 +165,7 @@ export default function handleObjects(username, objects, extras = {}) {
   );
   // #endregion
 
-  // #region ResourcesStored
+  // #region ResourcesStored & Minerals
   const resourcesStored = structures.reduce((acc, structure) => {
     if (structure.store) {
       Object.entries(structure.store).forEach(([resource, amount]) => {
@@ -169,6 +181,15 @@ export default function handleObjects(username, objects, extras = {}) {
       CreateAction(
         `resourcesStored.${resource}`,
         resourcesStored[resource],
+        ActionType.FirstTickOnly
+      )
+    );
+  });
+  minerals.forEach((mineral) => {
+    actions.push(
+      CreateAction(
+        `minerals.${mineral.mineralType}`,
+        mineral.mineralAmount,
         ActionType.FirstTickOnly
       )
     );
@@ -273,6 +294,80 @@ export default function handleObjects(username, objects, extras = {}) {
       )
     );
   }
+
+  // #region Spawning
+  let storedSpawningEnergy = 0;
+  let capacitySpawningEnergy = 0;
+
+  if (structuresByType.spawn) {
+    const spawnCount = structuresByType.spawn.length;
+    const maxSpawnTime = Math.floor(100 * currentTick) / 100 + 100;
+    structuresByType.spawn.forEach((spawn) => {
+      if (spawn.store) storedSpawningEnergy += spawn.store.energy || 0;
+      if (spawn.storeCapacityResource)
+        capacitySpawningEnergy += spawn.storeCapacityResource.energy || 0;
+
+      if (spawn.spawning) {
+        const spawnDuration =
+          Math.min(spawn.spawning.spawnTime, maxSpawnTime) - currentTick;
+        actions.push(
+          CreateAction(
+            `spawning.spawnUptimePercentage`,
+            Math.round(spawnDuration / spawnCount),
+            ActionType.FirstTickOnly
+          )
+        );
+      }
+    });
+  }
+  if (structuresByType.extension) {
+    structuresByType.extension.forEach((extension) => {
+      if (extension.store) storedSpawningEnergy += extension.store.energy || 0;
+      if (extension.storeCapacityResource)
+        capacitySpawningEnergy += extension.storeCapacityResource.energy || 0;
+    });
+  }
+  actions.push(
+    CreateAction(
+      `spawning.storedSpawningEnergy`,
+      storedSpawningEnergy,
+      ActionType.FirstTickOnly
+    )
+  );
+  actions.push(
+    CreateAction(
+      `spawning.capacitySpawningEnergy`,
+      capacitySpawningEnergy,
+      ActionType.FirstTickOnly
+    )
+  );
+  // #endregion
+
+  // #region StructureHits
+  const structureHitsByType = {};
+  structuresByTypeKeys.forEach((structureKey) => {
+    if (structureKey !== "controller") {
+      structureHitsByType[structureKey] = structuresByType[structureKey].reduce(
+        (acc, structure) => {
+          acc += structure.hits || 0;
+          return acc;
+        },
+        0
+      );
+    }
+  });
+
+  const structureHitsByTypeKeys = Object.keys(structureHitsByType);
+  structureHitsByTypeKeys.forEach((structureKey) => {
+    actions.push(
+      CreateAction(
+        `structureHits.${structureKey}`,
+        structureHitsByType[structureKey],
+        ActionType.FirstTickOnly
+      )
+    );
+  });
+  // #endregion
 
   actions = actions.concat(ActionListDefaultValuesFiller(actions));
   return actions;

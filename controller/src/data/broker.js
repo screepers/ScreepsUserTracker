@@ -147,6 +147,7 @@ export default class DataBroker {
                     previousObjects: ticks[tickKeys[t - 1]],
                     currentObjects,
                     ticks,
+                    tick,
                   })
                 );
               }
