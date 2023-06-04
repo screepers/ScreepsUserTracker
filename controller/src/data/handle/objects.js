@@ -1,27 +1,17 @@
 /* eslint-disable no-param-reassign  */
 
 import prepareObject from "../prepare/object.js";
-import {
-  findOriginalObject,
-  findAllByType,
-  groupBy,
-  findAllIntents,
-  getIntentEffect,
-} from "../helper.js";
+import { findAllByType, groupBy } from "../helper.js";
 import {
   CreateAction,
   ActionType,
   ActionListDefaultValuesFiller,
 } from "./helper.js";
+import GetIntents from "./intentsHelper.js";
 
-export default function handleObjects(
-  username,
-  objects,
-  previousObjects,
-  firstTickObjects
-) {
-  if (!previousObjects) previousObjects = {};
-  if (!firstTickObjects) firstTickObjects = {};
+export default function handleObjects(username, objects, extras = {}) {
+  const currentObjects = extras.currentObjects || {};
+  const ticks = extras.ticks || {};
 
   const objectKeys = Object.keys(objects);
   for (let o = objectKeys.length - 1; o >= 0; o -= 1) {
@@ -36,7 +26,7 @@ export default function handleObjects(
   const creeps = findAllByType(objects, "creep");
   const structures = findAllByType(objects, "structure");
   const constructionSites = findAllByType(objects, "constructionSite");
-  const intents = findAllIntents(objects);
+  const intents = GetIntents(objects, currentObjects, ticks);
 
   let actions = [];
 
@@ -73,15 +63,7 @@ export default function handleObjects(
     )
   );
   actions.push(
-    CreateAction(
-      "totals.intents",
-      intents.reduce((acc, creep) => {
-        const amount = Object.keys(creep._actionLog || []).length;
-        acc += amount;
-        return acc;
-      }, 0),
-      ActionType.FirstTickOnly
-    )
+    CreateAction("totals.intents", intents.length, ActionType.Divide100)
   );
   // #endregion
 
@@ -133,11 +115,8 @@ export default function handleObjects(
   });
 
   const intentsByType = intents.reduce((acc, obj) => {
-    const actionLogKeys = Object.keys(obj._actionLog || []);
-    actionLogKeys.forEach((action) => {
-      if (!acc[action]) acc[action] = 0;
-      acc[action] += 1;
-    });
+    if (!acc[obj.action]) acc[obj.action] = 0;
+    acc[obj.action] += 1;
     return acc;
   }, {});
   const intentsByTypeKeys = Object.keys(intentsByType);
@@ -216,23 +195,14 @@ export default function handleObjects(
     },
   };
   for (let c = 0; c < intents.length; c += 1) {
-    const obj = intents[c];
-
-    const firstTickObject = findOriginalObject(obj._id, firstTickObjects);
-    if (firstTickObject) {
-      Object.keys(obj._actionLog || []).forEach((action) => {
-        const intentEffect = getIntentEffect(action, firstTickObject);
-        if (intentEffect) {
-          if (intentsCategories.income[action] !== undefined) {
-            intentsCategories.income[action] += intentEffect.energy;
-          } else if (intentsCategories.outcome[action] !== undefined) {
-            intentsCategories.outcome[action] += intentEffect.energy;
-          }
-          if (intentsCategories.offensive[action] !== undefined) {
-            intentsCategories.offensive[action] += intentEffect.damage;
-          }
-        }
-      });
+    const intent = intents[c];
+    if (intentsCategories.income[intent.action] !== undefined) {
+      intentsCategories.income[intent.action] += intent.energy;
+    } else if (intentsCategories.outcome[intent.action] !== undefined) {
+      intentsCategories.outcome[intent.action] += intent.energy;
+    }
+    if (intentsCategories.offensive[intent.action] !== undefined) {
+      intentsCategories.offensive[intent.action] += intent.damage;
     }
   }
 
@@ -250,34 +220,6 @@ export default function handleObjects(
       );
     });
   });
-  // #endregion
-
-  // #region Hits
-  const hitsObjects = Object.values(objects).filter((o) => o && o.hits);
-  const previousHitsObjects = Object.values(previousObjects).filter(
-    (o) => o && o.hits
-  );
-
-  let hitsGained = 0;
-  let hitsLost = 0;
-  for (let h = 0; h < hitsObjects.length; h += 1) {
-    const object = hitsObjects[h];
-    const previousObject = findOriginalObject(object._id, previousHitsObjects);
-    if (previousObject) {
-      if (object.hits > previousObject.hits) {
-        hitsGained += object.hits - previousObject.hits;
-      } else if (object.hits < previousObject.hits) {
-        hitsLost += previousObject.hits - object.hits;
-      }
-    }
-  }
-
-  actions.push(
-    CreateAction(`structureHits.gained`, hitsGained, ActionType.FirstTickOnly)
-  );
-  actions.push(
-    CreateAction(`structureHits.lost`, hitsLost, ActionType.FirstTickOnly)
-  );
   // #endregion
 
   // #region Controller
@@ -320,6 +262,13 @@ export default function handleObjects(
       CreateAction(
         `controller.safeModeAvailable`,
         controller.safeModeAvailable,
+        ActionType.FirstTickOnly
+      )
+    );
+    actions.push(
+      CreateAction(
+        `controller.rclPerTick`,
+        controller._upgraded || 0,
         ActionType.FirstTickOnly
       )
     );

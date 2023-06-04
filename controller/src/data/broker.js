@@ -134,16 +134,20 @@ export default class DataBroker {
             let actionsArray = [];
             const { ticks } = dataResult;
             const tickKeys = Object.keys(ticks);
+
+            const currentObjects = Object.values(ticks).filter(
+              (tl) => tl !== null
+            )[0];
+
             for (let t = 0; t < tickKeys.length; t += 1) {
               const tick = tickKeys[t];
               if (ticks[tick]) {
                 actionsArray = actionsArray.concat(
-                  handleObjects(
-                    username,
-                    ticks[tick],
-                    ticks[tickKeys[t - 1]],
-                    dataResult.ticks[dataRequest.tick]
-                  )
+                  handleObjects(username, ticks[tick], {
+                    previousObjects: ticks[tickKeys[t - 1]],
+                    currentObjects,
+                    ticks,
+                  })
                 );
               }
             }

@@ -45,12 +45,14 @@ export default class DataRequestBroker {
   }
 
   addDataResult(dataResult, dataRequest, force = false) {
-    if (force)
-      return this.dataResults.push({
+    if (force) {
+      this.dataResults.push({
         dataResult,
         dataRequest,
         id: (resultId += 1),
       });
+      return;
+    }
 
     const firstTickObjects = Object.values(dataResult.ticks).filter(
       (tl) => tl !== null

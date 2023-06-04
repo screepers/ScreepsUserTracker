@@ -21,27 +21,28 @@ export const STRUCTURE_TYPES = [
   "terminal",
   "container",
   "nuker",
-  "controller",
 ];
-export function findOriginalObject(id, firstTickObjects) {
-  const object = Object.values(firstTickObjects).find((o) => o && o._id === id);
-  if (object) {
-    return object;
+export function findOriginalObject(id, ticks) {
+  const tickKeys = Object.keys(ticks);
+  for (let t = 0; t < tickKeys.length; t += 1) {
+    const tickKey = tickKeys[t];
+    const tick = ticks[tickKey];
+    if (tick && tick[id]) {
+      return tick[id];
+    }
   }
   return null;
 }
 
 export function findAllByType(objects, type) {
   let possibleTypes = [type];
-  if (type === "structure") possibleTypes = STRUCTURE_TYPES;
+  if (type === "structure") {
+    possibleTypes = STRUCTURE_TYPES;
+    possibleTypes.push("controller");
+  }
   const list = Object.values(objects).filter(
     (o) => o && o.type && possibleTypes.includes(o.type)
   );
-  return list;
-}
-
-export function findAllIntents(objects) {
-  const list = Object.values(objects).filter((o) => o && o._actionLog);
   return list;
 }
 
@@ -58,38 +59,38 @@ export function getIntentEffect(action, originalObject) {
   try {
     switch (action) {
       case "harvest":
-        return { energy: originalObject.body.work * 2 };
+        return { action, energy: originalObject.body.work * 2 };
       case "build":
-        return { energy: originalObject.body.work * 5 };
+        return { action, energy: originalObject.body.work * 5 };
       case "repair":
         if (originalObject.type === "tower") {
-          return { energy: 10 };
+          return { action, energy: 10 };
         }
-        return { energy: originalObject.body.work * 1 };
+        return { action, energy: originalObject.body.work * 1 };
       case "upgradeController":
-        return { energy: originalObject.body.work * 1 };
+        return { action, energy: originalObject.body.work * 1 };
       case "dismantle":
-        return { energy: originalObject.body.work * 0.25 };
+        return { action, energy: originalObject.body.work * 0.25 };
       case "attack":
         if (originalObject.type === "tower") {
-          return { energy: 10, damage: 300 };
+          return { action, energy: 10, damage: 300 };
         }
-        return { damage: originalObject.body.attack * 30 };
+        return { action, damage: originalObject.body.attack * 30 };
       case "rangedAttack":
-        return { damage: originalObject.body.rangedAttack * 10 };
+        return { action, damage: originalObject.body.rangedAttack * 10 };
       case "rangedMassAttack":
-        return { damage: originalObject.body.rangedAttack * 4 };
+        return { action, damage: originalObject.body.rangedAttack * 4 };
       case "heal":
         if (originalObject.type === "tower") {
-          return { energy: 10, damage: 200 };
+          return { action, energy: 10, damage: 200 };
         }
-        return { damage: originalObject.body.heal * 12 };
+        return { action, damage: originalObject.body.heal * 12 };
       case "rangedHeal":
-        return { damage: originalObject.body.heal * 4 };
+        return { action, damage: originalObject.body.heal * 4 };
       default:
-        return 0;
+        return null;
     }
   } catch (error) {
-    return 0;
+    return null;
   }
 }
