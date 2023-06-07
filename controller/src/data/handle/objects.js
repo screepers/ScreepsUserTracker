@@ -301,6 +301,7 @@ export default function handleObjects(username, objects, extras = {}) {
 
   if (structuresByType.spawn) {
     const spawnCount = structuresByType.spawn.length;
+    let spawnDuration = 0;
     const maxSpawnTime = Math.floor(100 * currentTick) / 100 + 100;
     structuresByType.spawn.forEach((spawn) => {
       if (spawn.store) storedSpawningEnergy += spawn.store.energy || 0;
@@ -308,17 +309,18 @@ export default function handleObjects(username, objects, extras = {}) {
         capacitySpawningEnergy += spawn.storeCapacityResource.energy || 0;
 
       if (spawn.spawning) {
-        const spawnDuration =
+        spawnDuration +=
           Math.min(spawn.spawning.spawnTime, maxSpawnTime) - currentTick;
-        actions.push(
+      }
+    });
+    
+    actions.push(
           CreateAction(
             `spawning.spawnUptimePercentage`,
             Math.round(spawnDuration / spawnCount),
             ActionType.FirstTickOnly
           )
         );
-      }
-    });
   }
   if (structuresByType.extension) {
     structuresByType.extension.forEach((extension) => {
