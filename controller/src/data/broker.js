@@ -14,6 +14,8 @@ const client = graphite.createClient(
 export default class DataBroker {
   static _users = {};
 
+  static _lastTickTimestamp = {};
+
   static Reset() {
     this._users = {};
   }
@@ -121,6 +123,7 @@ export default class DataBroker {
     }
 
     const shardTicks = {};
+    const tickRates = {};
     usernames.forEach((username) => {
       const userStats = getStatsObject();
       Object.values(this._users[username]).forEach((shardData) => {
@@ -133,8 +136,20 @@ export default class DataBroker {
 
             if (!timestamp) {
               timestamp = dataResult.timestamp;
-            } else if (!shardTicks[dataRequest.shard]) {
+            }
+            if (!shardTicks[dataRequest.shard]) {
               shardTicks[dataRequest.shard] = dataRequest.tick;
+              tickRates[dataRequest.shard] = this._lastTickTimestamp[
+                dataRequest.shard
+              ]
+                ? Math.round(
+                    (dataResult.timestamp -
+                      this._lastTickTimestamp[dataRequest.shard]) /
+                      100
+                  )
+                : 0;
+
+              this._lastTickTimestamp[dataRequest.shard] = dataResult.timestamp;
             }
 
             let actionsArray = [];
@@ -183,7 +198,7 @@ export default class DataBroker {
       }
     });
 
-    this.Upload({ users: stats, shardTicks }, timestamp, {
+    this.Upload({ users: stats, shardTicks, tickRates }, timestamp, {
       start,
       type: "Users",
     });
@@ -197,16 +212,15 @@ export default class DataBroker {
       { screeps: { userTracker: { [process.env.SERVER_TYPE]: data } } },
       _timestamp,
       (err) => {
-        if (logInfo)
+        if (err) {
+          logger.error(err);
+        } else if (logInfo)
           logger.info(
             `Written data for ${logInfo.type}, took ${(
               (Date.now() - logInfo.start) /
               1000
             ).toFixed(2)}s`
           );
-        if (err) {
-          logger.error(err);
-        }
       }
     );
   }
