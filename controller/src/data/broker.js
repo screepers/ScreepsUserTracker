@@ -5,6 +5,8 @@ import handleUsers from "./handle/users.js";
 import handleObjects from "./handle/objects.js";
 import { getStats, handleCombinedRoomStats } from "./handle/helper.js";
 import { graphiteLogger as logger } from "../logger.js";
+import { GetGameTime } from "./screepsApi.js";
+import { GetShards } from "./helper.js";
 
 dotenv.config();
 const client = graphite.createClient(
@@ -15,6 +17,8 @@ export default class DataBroker {
   static _users = {};
 
   static _lastTickTimestamp = {};
+
+  static _shards = GetShards();
 
   static Reset() {
     this._users = {};
@@ -102,10 +106,26 @@ export default class DataBroker {
       stats[username] = { info: userStats };
     });
 
-    this.Upload({ status: ipStatus, users: stats }, undefined, {
-      start,
-      type: "Status",
-    });
+    const liveTicks = {};
+    for (let t = 0; t < this._shards.length; t += 1) {
+      const shardName = this._shards[t];
+      liveTicks[shardName] = await GetGameTime(shardName);
+    }
+
+    this.Upload(
+      {
+        status: ipStatus,
+        ticks: {
+          live: liveTicks,
+        },
+        users: stats,
+      },
+      undefined,
+      {
+        start,
+        type: "Status",
+      }
+    );
   }
 
   static async UploadUsers(usernames) {
@@ -122,7 +142,7 @@ export default class DataBroker {
       };
     }
 
-    const shardTicks = {};
+    const historyTicks = {};
     const tickRates = {};
     usernames.forEach((username) => {
       const userStats = getStatsObject();
@@ -137,8 +157,8 @@ export default class DataBroker {
             if (!timestamp) {
               timestamp = dataResult.timestamp;
             }
-            if (!shardTicks[dataRequest.shard]) {
-              shardTicks[dataRequest.shard] = dataRequest.tick;
+            if (!historyTicks[dataRequest.shard]) {
+              historyTicks[dataRequest.shard] = dataRequest.tick;
               tickRates[dataRequest.shard] = this._lastTickTimestamp[
                 dataRequest.shard
               ]
@@ -198,10 +218,14 @@ export default class DataBroker {
       }
     });
 
-    this.Upload({ users: stats, shardTicks, tickRates }, timestamp, {
-      start,
-      type: "Users",
-    });
+    this.Upload(
+      { users: stats, ticks: { history: historyTicks }, tickRates },
+      timestamp,
+      {
+        start,
+        type: "Users",
+      }
+    );
   }
 
   static Upload(data, timestamp, logInfo) {
