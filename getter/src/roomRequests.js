@@ -21,9 +21,9 @@ export default class RoomRequests {
     this.rooms = rooms;
     this.DataRequestBroker = DataRequestBroker;
 
-    if (process.env.START_FROM_TICK_ZERO === "TRUE") {
+    if (process.env.START_FROM_TICK) {
       this.shards.forEach((shard) => {
-        this.lastTickTimes[shard] = -100;
+        this.lastTickTimes[shard] = Number(process.env.START_FROM_TICK) - 100;
       });
     }
   }
