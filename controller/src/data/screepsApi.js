@@ -48,10 +48,40 @@ export async function GetGclOfUsers() {
       });
 
       if (users.length === 0) hasUsersLeft = false;
-      sleep(250);
+      sleep(500);
     }
 
     return gcls;
+  } catch (error) {
+    logger.error(error);
+    return {};
+  }
+}
+
+export async function GetPowerOfUsers() {
+  try {
+    const powers = {};
+
+    let offset = 0;
+    const mode = "power";
+    let hasUsersLeft = true;
+
+    while (hasUsersLeft) {
+      const leaderboard = await api.raw.leaderboard.list(20, mode, offset);
+      if (!leaderboard.ok) throw new Error(JSON.stringify(leaderboard));
+      logger.debug(leaderboard);
+      offset += 20;
+
+      const users = Object.values(leaderboard.users);
+      users.forEach((user) => {
+        powers[user.username] = user.gcl;
+      });
+
+      if (users.length === 0) hasUsersLeft = false;
+      sleep(500);
+    }
+
+    return powers;
   } catch (error) {
     logger.error(error);
     return {};

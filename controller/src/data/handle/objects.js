@@ -313,14 +313,14 @@ export default function handleObjects(username, objects, extras = {}) {
           Math.min(spawn.spawning.spawnTime, maxSpawnTime) - currentTick;
       }
     });
-    
+
     actions.push(
-          CreateAction(
-            `spawning.spawnUptimePercentage`,
-            Math.round(spawnDuration / spawnCount),
-            ActionType.FirstTickOnly
-          )
-        );
+      CreateAction(
+        `spawning.spawnUptimePercentage`,
+        Math.round(spawnDuration / spawnCount),
+        ActionType.FirstTickOnly
+      )
+    );
   }
   if (structuresByType.extension) {
     structuresByType.extension.forEach((extension) => {

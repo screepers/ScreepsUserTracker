@@ -27,9 +27,10 @@ export default class DataBroker {
     }
 
     const knownUsers = Object.keys(this._users[username][shard]);
-    knownUsers.forEach((username) => {
-      if (!this._users[username][shard][username]) delete this._users[username][shard][username]
-    })
+    knownUsers.forEach((roomName) => {
+      if (!this._users[username][shard][roomName])
+        delete this._users[username][shard][roomName];
+    });
 
     rooms.forEach((roomName) => {
       if (!this._users[username][shard][roomName] || force)

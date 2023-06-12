@@ -9,9 +9,12 @@ const shardNames = GetShards();
 
 async function handleUser(username) {
   const user = GetUserData(username);
-  const { shards, gcl, score } = user;
+  const { shards, gcl, power, score } = user;
 
-  const stats = { shards: {}, overview: { gcl, score } };
+  const stats = {
+    shards: {},
+    overview: { gcl: gcl || 0, power: power || 0, score },
+  };
 
   shardNames.forEach((shard) => {
     if (shards[shard]) {
