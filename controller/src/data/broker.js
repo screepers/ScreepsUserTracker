@@ -163,10 +163,10 @@ export default class DataBroker {
                 dataRequest.shard
               ]
                 ? Math.round(
-                    (dataResult.timestamp -
-                      this._lastTickTimestamp[dataRequest.shard]) /
-                      100
-                  )
+                  (dataResult.timestamp -
+                    this._lastTickTimestamp[dataRequest.shard]) /
+                  100
+                )
                 : 0;
 
               this._lastTickTimestamp[dataRequest.shard] = dataResult.timestamp;
@@ -219,7 +219,7 @@ export default class DataBroker {
     });
 
     this.Upload(
-      { users: stats, ticks: { history: historyTicks }, tickRates },
+      { users: stats, ticks: { history: historyTicks }, ticks: { tickRates } },
       timestamp,
       {
         start,
