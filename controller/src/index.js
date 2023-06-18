@@ -3,9 +3,9 @@ import bodyParser from "body-parser";
 import axios from "axios";
 import fs from "fs";
 import Cron from "cron";
-import { GetUserData, GetUsernames, GetRoomTotal } from "./rooms/userHelper.js";
 import UpdateRooms from "./rooms/updateRooms.js";
-import DataBroker from "./data/broker.js";
+import MainDataBroker from "./data/broker/main.js";
+import ReactorDataBroker from "./data/broker/reactor.js";
 import { mainLogger as logger } from "./logger.js";
 
 const { CronJob } = Cron;
@@ -13,6 +13,9 @@ const DEBUG = process.env.DEBUG === "TRUE";
 
 const app = express();
 const port = 5000;
+
+const mainDataBroker = new MainDataBroker();
+const reactorDataBroker = new ReactorDataBroker();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -80,7 +83,7 @@ app.delete("/ip", async (req, res) => {
   }
 });
 
-const dataGetterJob = new CronJob(
+const mainDataGetterJob = new CronJob(
   !DEBUG ? "*/5 * * * *" : "* * * * *",
   async () => {
     const start = Date.now();
@@ -91,7 +94,7 @@ const dataGetterJob = new CronJob(
     for (let i = 0; i < ips.length; i += 1) {
       const ip = ips[i];
       try {
-        const result = await axios.get(`${ip}/data`);
+        const result = await axios.get(`${ip}/data/main`);
         data = [...data, ...result.data.results];
 
         const simpleIp = ip
@@ -100,6 +103,7 @@ const dataGetterJob = new CronJob(
         status[simpleIp] = {
           activeRequestsCount: result.data.activeRequestsCount,
           dataCount: result.data.results.length,
+          roomsCount: result.data.roomCount,
         };
       } catch (error) {
         logger.error(error);
@@ -111,20 +115,67 @@ const dataGetterJob = new CronJob(
     }
 
     logger.info(
-      `Got ${data.length} results from ${ips.length} ips in ${(
+      `Got ${data.length} main results from ${ips.length} ips in ${(
         (Date.now() - start) /
         1000
       ).toFixed(2)}s`
     );
 
-    await DataBroker.UploadStatus(status);
-    await DataBroker.AddRoomsData(data);
+    await mainDataBroker.UploadStatus(status);
+    await mainDataBroker.AddRoomsData(data);
   },
   null,
   false,
   "Europe/Amsterdam"
 );
-dataGetterJob.start();
+mainDataGetterJob.start();
+
+const reactorDataGetterJob = new CronJob(
+  !DEBUG ? "*/5 * * * *" : "* * * * *",
+  async () => {
+    const start = Date.now();
+    const ips = getIps();
+
+    let data = [];
+    const status = {};
+    for (let i = 0; i < ips.length; i += 1) {
+      const ip = ips[i];
+      try {
+        const result = await axios.get(`${ip}/data/reactor`);
+        data = [...data, ...result.data.results];
+
+        const simpleIp = ip
+          .replace(/http:\/\/|https:\/\//g, "")
+          .replace(/\/|:/g, "");
+        status[simpleIp] = {
+          activeRequestsCount: result.data.activeRequestsCount,
+          dataCount: result.data.results.length,
+          roomsCount: result.data.roomCount,
+        };
+      } catch (error) {
+        logger.error(error);
+
+        if (error.message.includes("ECONNREFUSED")) {
+          removeIp(ip);
+        }
+      }
+    }
+
+    logger.info(
+      `Got ${data.length} reactor results from ${ips.length} ips in ${(
+        (Date.now() - start) /
+        1000
+      ).toFixed(2)}s`
+    );
+
+    await ReactorDataBroker.UploadStatus(status);
+    await reactorDataBroker.AddRoomsData(data);
+  },
+  null,
+  false,
+  "Europe/Amsterdam"
+);
+if (process.env.SERVER_TYPE === "seasonal") reactorDataGetterJob.start();
 
 UpdateRooms();
 
@@ -141,48 +192,43 @@ const requestRoomUpdaterJob = new CronJob(
     const roomsPerIp = 4.5 * 100 * 2;
     const roomsPerCycle = roomsPerIp * ipCount;
 
-    const usernames = GetUsernames();
-    let userCount = 0;
-    let roomCount = 0;
-    const shardRooms = {};
-
-    for (let i = 0; i < usernames.length; i += 1) {
-      const username = usernames[i];
-      const userData = GetUserData(username);
-
-      userData.total = GetRoomTotal(userData.shards);
-      if (userData.total + roomCount <= roomsPerCycle) {
-        userCount += 1;
-        roomCount += userData.total;
-        Object.entries(userData.shards).forEach(([shard, data]) => {
-          if (!shardRooms[shard]) {
-            shardRooms[shard] = [];
-          }
-          shardRooms[shard].push(...data.owned);
-          DataBroker.AddRooms(username, shard, data.owned);
-        });
-      } else break;
+    // eslint-disable-next-line
+    let { userCount, roomCount, types } = mainDataBroker.getRoomsToCheck(
+      roomsPerCycle
+    );
+    if (process.env.SERVER_TYPE === "seasonal") {
+      roomCount = await reactorDataBroker.getRoomsToCheck(
+        roomsPerCycle,
+        roomCount,
+        types
+      );
     }
 
     let splittedRoomsIndex = 0;
     let roomNumber = 0;
     const splittedRooms = [];
-    Object.entries(shardRooms).forEach(([shard, rooms]) => {
-      for (let i = 0; i < rooms.length; i += 1) {
-        if (roomNumber <= roomsPerIp) {
-          if (!splittedRooms[splittedRoomsIndex]) {
-            splittedRooms[splittedRoomsIndex] = {};
+    const typeKeys = Object.keys(types);
+    typeKeys.forEach((type) => {
+      Object.entries(types[type]).forEach(([shard, rooms]) => {
+        for (let i = 0; i < rooms.length; i += 1) {
+          if (roomNumber <= roomsPerIp) {
+            if (!splittedRooms[splittedRoomsIndex]) {
+              splittedRooms[splittedRoomsIndex] = {};
+            }
+            if (!splittedRooms[splittedRoomsIndex][type]) {
+              splittedRooms[splittedRoomsIndex][type] = {};
+            }
+            if (!splittedRooms[splittedRoomsIndex][type][shard]) {
+              splittedRooms[splittedRoomsIndex][type][shard] = [];
+            }
+            splittedRooms[splittedRoomsIndex][type][shard].push(rooms[i]);
+            roomNumber += 1;
+          } else {
+            splittedRoomsIndex += 1;
+            roomNumber = 0;
           }
-          if (!splittedRooms[splittedRoomsIndex][shard]) {
-            splittedRooms[splittedRoomsIndex][shard] = [];
-          }
-          splittedRooms[splittedRoomsIndex][shard].push(rooms[i]);
-          roomNumber += 1;
-        } else {
-          splittedRoomsIndex += 1;
-          roomNumber = 0;
         }
-      }
+      });
     });
 
     for (let y = 0; y < ips.length; y += 1) {
@@ -190,7 +236,13 @@ const requestRoomUpdaterJob = new CronJob(
       try {
         if (!splittedRooms[y]) splittedRooms[y] = [];
         const ipRoomCount = Object.values(splittedRooms[y]).reduce(
-          (acc, curr) => acc + curr.length,
+          (acc, curr) => {
+            Object.values(curr).forEach((shard) => {
+              // eslint-disable-next-line
+              acc += shard.length;
+            });
+            return acc;
+          },
           0
         );
         logger.info(`Updating rooms for ${ip} with ${ipRoomCount} rooms`);
@@ -207,7 +259,7 @@ const requestRoomUpdaterJob = new CronJob(
     logger.info(
       `Updated rooms for ${
         ips.length
-      } ips with ${roomCount} for ${userCount} users in ${(
+      } ips with ${roomCount} rooms and ${userCount} users in ${(
         (Date.now() - start) /
         1000
       ).toFixed(2)}s`

@@ -34,13 +34,22 @@ app.put("/rooms", (req, res) => {
   try {
     const roomCount = Object.entries(req.body.rooms).reduce(
       // eslint-disable-next-line no-unused-vars
-      (acc, [_, value]) => acc + value.length,
+      (acc, [_, value]) => {
+        Object.values(value).forEach((shard) => {
+          // eslint-disable-next-line no-param-reassign
+          acc += shard.length;
+        });
+        return acc;
+      },
       0
     );
     logger.info(`${req.ip}: Updating rooms, received ${roomCount} rooms`);
 
     const { rooms } = req.body;
-    dataRequestBroker.forceUpdateRooms(rooms);
+    const types = Object.keys(rooms);
+    types.forEach((type) => {
+      dataRequestBroker.forceUpdateRooms(rooms[type], type);
+    });
 
     logger.info(`Room:put took ${((Date.now() - start) / 1000).toFixed(2)}s`);
     return res.json("Success");
@@ -53,20 +62,44 @@ app.put("/rooms", (req, res) => {
     return res.status(500).json("Failed to update rooms");
   }
 });
-app.get("/data", (req, res) => {
+app.get("/data/main", (req, res) => {
   const start = Date.now();
   try {
-    logger.info(`${req.ip}: Received data request`);
+    logger.info(`${req.ip}: Received main data request`);
 
-    const results = dataRequestBroker.getDataResultsToSend();
-    const activeRequests = dataRequestBroker.getDataRequests();
-    const rooms = dataRequestBroker.getRooms();
+    const results = dataRequestBroker.getDataResultsToSend("main");
+    const activeRequests = dataRequestBroker.getDataRequests("main");
+    const roomCount = Object.values(dataRequestBroker.getRooms("main"))
+      .map((x) => x.length)
+      .reduce((a, b) => a + b, 0);
 
     logger.info(`Data:get took ${((Date.now() - start) / 1000).toFixed(2)}s`);
     return res.json({
       results,
       activeRequestsCount: activeRequests.length,
-      rooms,
+      roomCount,
+    });
+  } catch (e) {
+    logger.error(`${req.ip}: Failed to get data with ${e}`);
+    return res.status(500).json("Failed to get data");
+  }
+});
+app.get("/data/reactor", (req, res) => {
+  const start = Date.now();
+  try {
+    logger.info(`${req.ip}: Received reactor data request`);
+
+    const results = dataRequestBroker.getDataResultsToSend("reactor");
+    const activeRequests = dataRequestBroker.getDataRequests("reactor");
+    const roomCount = Object.values(dataRequestBroker.getRooms("reactor"))
+      .map((x) => x.length)
+      .reduce((a, b) => a + b, 0);
+
+    logger.info(`Data:get took ${((Date.now() - start) / 1000).toFixed(2)}s`);
+    return res.json({
+      results,
+      activeRequestsCount: activeRequests.length,
+      roomCount,
     });
   } catch (e) {
     logger.error(`${req.ip}: Failed to get data with ${e}`);
@@ -97,11 +130,12 @@ app.listen(port, async () => {
 const job = new CronJob(
   !DEBUG ? "0 * * * *" : "* * * * *",
   () => {
-    const roomCount = Object.values(dataRequestBroker.getRooms())
+    const roomCount = Object.values(dataRequestBroker.getRooms("main"))
       .map((x) => x.length)
       .reduce((a, b) => a + b, 0);
-    const activeRequestCount = dataRequestBroker.getDataRequests().length;
-    const resultCount = dataRequestBroker.getTotalDataResults();
+
+    const activeRequestCount = dataRequestBroker.getDataRequests("main").length;
+    const resultCount = dataRequestBroker.getTotalDataResults("main");
     backlogLogger.info(
       `Room count: ${roomCount}, Active request count: ${activeRequestCount}, Result count: ${resultCount}`
     );

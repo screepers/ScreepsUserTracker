@@ -74,7 +74,7 @@ export async function GetPowerOfUsers() {
 
       const users = Object.values(leaderboard.users);
       users.forEach((user) => {
-        powers[user.username] = user.gcl;
+        powers[user.username] = user.score;
       });
 
       if (users.length === 0) hasUsersLeft = false;

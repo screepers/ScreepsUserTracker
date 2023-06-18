@@ -9,7 +9,7 @@ function wait(ms) {
 }
 
 export default class RoomRequests {
-  lastTickTimes = {};
+  lastTickTimes = { main: {} };
 
   shards = process.env.SHARDS.split(" ");
 
@@ -17,23 +17,30 @@ export default class RoomRequests {
 
   DataRequestBroker = null;
 
-  constructor(rooms, DataRequestBroker) {
-    this.rooms = rooms;
+  constructor(DataRequestBroker) {
     this.DataRequestBroker = DataRequestBroker;
 
-    if (process.env.START_FROM_TICK) {
+    if (process.env.START_FROM_TICK_MAIN) {
       this.shards.forEach((shard) => {
-        this.lastTickTimes[shard] = Number(process.env.START_FROM_TICK) - 100;
+        this.lastTickTimes.main[shard] =
+          Number(process.env.START_FROM_TICK_MAIN) - 100;
+      });
+    }
+    if (process.env.START_FROM_TICK_REACTOR) {
+      if (!this.lastTickTimes.reactor) this.lastTickTimes.reactor = {};
+      this.shards.forEach((shard) => {
+        this.lastTickTimes.reactor[shard] =
+          Number(process.env.START_FROM_TICK_REACTOR) - 100;
       });
     }
   }
 
-  forceUpdateRooms(rooms) {
-    this.rooms = rooms;
+  forceUpdateRooms(rooms, type) {
+    this.rooms[type] = rooms;
   }
 
-  getRooms() {
-    return this.rooms;
+  getRooms(type) {
+    return this.rooms[type] || [];
   }
 
   async getCurrentTick(shard) {
@@ -53,28 +60,32 @@ export default class RoomRequests {
       const currentTick = await this.getCurrentTick(shard);
       let requestTick = Math.max(currentTick - (currentTick % 100) - 1000, 0);
 
-      const rooms = this.rooms[shard];
-      if (rooms && rooms.length > 0) {
-        if (
-          this.lastTickTimes[shard] !== undefined &&
-          requestTick - 100 > this.lastTickTimes[shard]
-        ) {
-          requestTick = this.lastTickTimes[shard] + 100;
-        }
+      const types = Object.keys(this.rooms);
+      types.forEach((type) => {
+        const rooms = this.rooms[type][shard];
+        if (rooms && rooms.length > 0) {
+          if (
+            this.lastTickTimes[type][shard] !== undefined &&
+            requestTick - 100 > this.lastTickTimes[type][shard]
+          ) {
+            requestTick = this.lastTickTimes[type][shard] + 100;
+          }
 
-        if (this.lastTickTimes[shard] !== requestTick) {
-          rooms.forEach((room) => {
-            const dataRequest = {
-              room,
-              shard,
-              tick: requestTick,
-            };
-            dataRequests.push(dataRequest);
-          });
-          this.DataRequestBroker.addDataRequests(dataRequests);
-          this.lastTickTimes[shard] = requestTick;
+          if (this.lastTickTimes[type][shard] !== requestTick) {
+            rooms.forEach((room) => {
+              const dataRequest = {
+                room,
+                shard,
+                tick: requestTick,
+                type,
+              };
+              dataRequests.push(dataRequest);
+            });
+            this.DataRequestBroker.addDataRequests(dataRequests);
+            this.lastTickTimes[type][shard] = requestTick;
+          }
         }
-      }
+      });
     }
     await wait(1000 * 10);
     this.sync();

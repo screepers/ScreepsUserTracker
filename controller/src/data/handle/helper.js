@@ -1,7 +1,5 @@
 import fs from "fs";
 
-let defaultActions;
-
 export const ActionType = Object.freeze({
   Divide100: 0,
   FirstTickOnly: 1,
@@ -63,28 +61,27 @@ export function getStats(actions) {
   return stats;
 }
 
-export function getDefaultActions() {
-  if (defaultActions) return defaultActions;
-  if (fs.existsSync("./files/defaultActions.json")) {
-    defaultActions = JSON.parse(fs.readFileSync("./files/defaultActions.json"));
-    return defaultActions;
+export function getDefaultActions(type) {
+  const fileName = `./files/defaultActions.${type}.json`;
+  if (fs.existsSync(fileName)) {
+    return JSON.parse(fs.readFileSync(fileName));
   }
-  fs.writeFileSync("./files/defaultActions.json", JSON.stringify([]));
-
+  fs.writeFileSync(fileName, JSON.stringify([]));
   return [];
 }
 
-function addNewDefaultAction(action) {
-  let file = JSON.parse(fs.readFileSync("./files/defaultActions.json"));
+function addNewDefaultAction(action, type) {
+  const fileName = `./files/defaultActions.${type}.json`;
+  let file = JSON.parse(fs.readFileSync(fileName));
   file = file.filter((a) => a.path !== action.path);
 
   action.value = 0;
   file.push(action);
-  fs.writeFileSync("./files/defaultActions.json", JSON.stringify(file));
+  fs.writeFileSync(fileName, JSON.stringify(file));
 }
 
-export function ActionListDefaultValuesFiller(actions) {
-  getDefaultActions().forEach((defaultAction) => {
+export function ActionListDefaultValuesFiller(actions, type) {
+  getDefaultActions(type).forEach((defaultAction) => {
     const action = actions.find((a) => a.path === defaultAction.path);
     if (!action) {
       actions.push(defaultAction);
@@ -92,11 +89,11 @@ export function ActionListDefaultValuesFiller(actions) {
   });
 
   actions.forEach((action) => {
-    const defaultAction = getDefaultActions().find(
+    const defaultAction = getDefaultActions(type).find(
       (a) => a.path === action.path && a.action === action.action
     );
     if (!defaultAction) {
-      addNewDefaultAction(action);
+      addNewDefaultAction(action, type);
     }
   });
 
@@ -125,8 +122,8 @@ function groupBy(original, value) {
   return { original, value };
 }
 
-export function handleCombinedRoomStats(shards) {
-  const defaultStats = getStats(getDefaultActions());
+export function handleCombinedRoomStats(shards, type) {
+  const defaultStats = getStats(getDefaultActions(type));
   const stats = {};
 
   Object.entries(shards).forEach(([shard, rooms]) => {

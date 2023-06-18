@@ -371,6 +371,6 @@ export default function handleObjects(username, objects, extras = {}) {
   });
   // #endregion
 
-  actions = actions.concat(ActionListDefaultValuesFiller(actions));
+  actions = actions.concat(ActionListDefaultValuesFiller(actions, extras.type));
   return actions;
 }

@@ -16,19 +16,19 @@ export default class DataRequestBroker {
 
   roomRequests = null;
 
-  constructor(rooms = {}) {
-    this.roomRequests = new RoomRequests(rooms, this);
+  constructor() {
+    this.roomRequests = new RoomRequests(this);
 
     this.roomRequests.sync();
     this.executeSingle();
   }
 
-  forceUpdateRooms(rooms) {
-    this.roomRequests.forceUpdateRooms(rooms);
+  forceUpdateRooms(rooms, type) {
+    this.roomRequests.forceUpdateRooms(rooms, type);
   }
 
-  getRooms() {
-    return this.roomRequests.getRooms();
+  getRooms(type) {
+    return this.roomRequests.getRooms(type);
   }
 
   addDataRequests(dataRequests, addAtStart = false) {
@@ -40,8 +40,8 @@ export default class DataRequestBroker {
     return this.dataRequests.shift();
   }
 
-  getDataRequests() {
-    return [...this.dataRequests];
+  getDataRequests(type) {
+    return [...this.dataRequests.filter((dr) => dr.type === type)];
   }
 
   addDataResult(dataResult, dataRequest, force = false) {
@@ -72,9 +72,11 @@ export default class DataRequestBroker {
     );
   }
 
-  getDataResultsToSend() {
-    const { dataResults } = this;
-    const { dataRequests } = this;
+  getDataResultsToSend(type) {
+    const dataResults = this.dataResults.filter(
+      (dr) => dr.dataRequest.type === type
+    );
+    const dataRequests = this.dataRequests.filter((dr) => dr.type === type);
 
     const perTickResults = {};
     dataResults.forEach(({ dataResult, dataRequest, id }) => {
@@ -140,7 +142,11 @@ export default class DataRequestBroker {
     else logger.debug(`Failed to get data for ${shard}/${room}/${tick}`);
 
     if (dataResult.status === "Success")
-      this.addDataResult(dataResult.result, dataRequest);
+      this.addDataResult(
+        dataResult.result,
+        dataRequest,
+        dataRequest.type !== "main"
+      );
     else {
       dataRequest.retries = dataRequest.retries
         ? (dataRequest.retries += 1)
