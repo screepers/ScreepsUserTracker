@@ -74,7 +74,7 @@ export async function GetPowerOfUsers() {
 
       const list = Object.values(leaderboard.list);
       list.forEach((rank) => {
-        const user = leaderboard.users[rank.user]
+        const user = leaderboard.users[rank.user];
         powers[user.username] = rank.score;
       });
 

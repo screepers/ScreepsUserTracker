@@ -2,7 +2,7 @@ import graphite from "graphite";
 import * as dotenv from "dotenv";
 import { graphiteLogger as logger } from "../../logger.js";
 import { GetShards } from "../helper.js";
-import {GetUsername} from "../../rooms/userHelper.js"
+import { GetUsername } from "../../rooms/userHelper.js";
 
 dotenv.config();
 const client = graphite.createClient(
@@ -57,10 +57,7 @@ export default class BaseDataBroker {
       let username;
       switch (dataRequest.type) {
         case "main":
-          username = GetUsername(
-            dataRequest.room,
-            dataRequest.shard
-          );
+          username = GetUsername(dataRequest.room, dataRequest.shard);
           break;
         case "reactor":
           username = "reactor";

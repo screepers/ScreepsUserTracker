@@ -19,7 +19,7 @@ export default class ReactorDataBroker extends BaseDataBroker {
       undefined,
       {
         start,
-        type: ReactorDataBroker.Type+"Status",
+        type: `${ReactorDataBroker.Type}Status`,
       }
     );
   }

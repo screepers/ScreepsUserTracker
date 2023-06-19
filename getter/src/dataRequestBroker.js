@@ -41,6 +41,7 @@ export default class DataRequestBroker {
   }
 
   getDataRequests(type) {
+    if (!type) return [...this.dataRequests];
     return [...this.dataRequests.filter((dr) => dr.type === type)];
   }
 

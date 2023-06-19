@@ -87,7 +87,9 @@ export default class RoomRequests {
         }
       });
     }
-    await wait(1000 * 10);
+
+    const timeToWait = this.DataRequestBroker.getDataRequests().length > 100 * 1000 ? 1000 * 60 * 60 : 1000 * 5;
+    await wait(timeToWait);
     this.sync();
   }
 }
