@@ -72,12 +72,13 @@ export async function GetPowerOfUsers() {
       logger.debug(leaderboard);
       offset += 20;
 
-      const users = Object.values(leaderboard.users);
-      users.forEach((user) => {
-        powers[user.username] = user.score;
+      const list = Object.values(leaderboard.list);
+      list.forEach((rank) => {
+        const user = leaderboard.users[rank.user]
+        powers[user.username] = rank.score;
       });
 
-      if (users.length === 0) hasUsersLeft = false;
+      if (list.length === 0) hasUsersLeft = false;
       sleep(500);
     }
 
