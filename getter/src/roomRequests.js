@@ -9,7 +9,7 @@ function wait(ms) {
 }
 
 export default class RoomRequests {
-  lastTickTimes = { main: {} };
+  lastTickTimes = { main: {}, reactor: {} };
 
   shards = process.env.SHARDS.split(" ");
 
