@@ -73,6 +73,8 @@ export default class BaseDataBroker {
         dataList[i]
       );
     }
+
+    await this.CheckUsers();
   }
 
   AddRoomData(username, shard, roomName, data) {

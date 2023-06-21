@@ -121,7 +121,7 @@ export default class MainDataBroker extends BaseDataBroker {
         });
 
         if (hasStats) {
-          userStats.combined.shards = handleCombinedRoomStats(userStats.shards);
+          userStats.combined.shards = handleCombinedRoomStats(userStats.shards, MainDataBroker.Type);
           stats[username] = { stats: userStats };
         }
       });
