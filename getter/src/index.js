@@ -4,6 +4,7 @@ import axios from "axios";
 import Cron from "cron";
 import DataRequestBroker from "./dataRequestBroker.js";
 import { mainLogger as logger, backlogLogger } from "./logger.js";
+import { writeSettings } from "./settings.js";
 
 const { CronJob } = Cron;
 
@@ -25,80 +26,43 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.get("/ping", (req, res) => {
+  writeSettings(req.body);
+
   logger.info(`${req.ip}: Received ping`);
   return res.send("pong");
 });
 
-app.put("/rooms", (req, res) => {
+app.post("/requests", (req, res) => {
   const start = Date.now();
   try {
-    const roomCount = Object.entries(req.body.rooms).reduce(
-      // eslint-disable-next-line no-unused-vars
-      (acc, [_, value]) => {
-        Object.values(value).forEach((shard) => {
-          // eslint-disable-next-line no-param-reassign
-          acc += shard.length;
-        });
-        return acc;
-      },
-      0
-    );
-    logger.info(`${req.ip}: Updating rooms, received ${roomCount} rooms`);
+    dataRequestBroker.addDataRequests(req.body)
 
-    const { rooms } = req.body;
-    const types = Object.keys(rooms);
-    types.forEach((type) => {
-      dataRequestBroker.forceUpdateRooms(rooms[type], type);
-    });
-
-    logger.info(`Room:put took ${((Date.now() - start) / 1000).toFixed(2)}s`);
+    logger.info(`Request:post took ${((Date.now() - start) / 1000).toFixed(2)}s`);
     return res.json("Success");
   } catch (e) {
     logger.error(
-      `${req.ip}: Failed to update rooms with ${JSON.stringify(
+      `${req.ip}: Failed to save requests with ${JSON.stringify(
         req.body
       )} and error ${e}`
     );
-    return res.status(500).json("Failed to update rooms");
+    return res.status(500).json("Failed to save requests");
   }
 });
-app.get("/data/main", (req, res) => {
+app.get("/data", (req, res) => {
   const start = Date.now();
   try {
-    logger.info(`${req.ip}: Received main data request`);
+    logger.info(`${req.ip}: Received data request`);
 
-    const results = dataRequestBroker.getDataResultsToSend("main");
-    const activeRequests = dataRequestBroker.getDataRequests("main");
-    const roomCount = Object.values(dataRequestBroker.getRooms("main"))
+    const results = dataRequestBroker.getDataResultsToSend();
+    const requestsCount = dataRequestBroker.getTotalDataRequests();
+    const roomCount = Object.values(dataRequestBroker.getRooms())
       .map((x) => x.length)
       .reduce((a, b) => a + b, 0);
 
     logger.info(`Data:get took ${((Date.now() - start) / 1000).toFixed(2)}s`);
     return res.json({
       results,
-      activeRequestsCount: activeRequests.length,
-      roomCount,
-    });
-  } catch (e) {
-    logger.error(`${req.ip}: Failed to get data with ${e}`);
-    return res.status(500).json("Failed to get data");
-  }
-});
-app.get("/data/reactor", (req, res) => {
-  const start = Date.now();
-  try {
-    logger.info(`${req.ip}: Received reactor data request`);
-
-    const results = dataRequestBroker.getDataResultsToSend("reactor");
-    const activeRequests = dataRequestBroker.getDataRequests("reactor");
-    const roomCount = Object.values(dataRequestBroker.getRooms("reactor"))
-      .map((x) => x.length)
-      .reduce((a, b) => a + b, 0);
-
-    logger.info(`Data:get took ${((Date.now() - start) / 1000).toFixed(2)}s`);
-    return res.json({
-      results,
-      activeRequestsCount: activeRequests.length,
+      requestsCount,
       roomCount,
     });
   } catch (e) {
@@ -112,20 +76,14 @@ async function connectToController() {
     const result = await axios.post(`${controllerIp}/ip`, { ip });
     if (result.status === 200) {
       logger.info(`Connected to controller at ${controllerIp}`);
-      return;
     }
   } catch (e) {
     logger.error(`Failed to connect to controller, trying again in 60 seconds`);
+    // eslint-disable-next-line no-promise-executor-return
+    await new Promise((resolve) => setTimeout(resolve, 60 * 1000));
+    connectToController();
   }
-  // eslint-disable-next-line no-promise-executor-return
-  await new Promise((resolve) => setTimeout(resolve, 60 * 1000));
-  connectToController();
 }
-
-app.listen(port, async () => {
-  connectToController();
-  console.log(`API listening on port ${port}`);
-});
 
 const job = new CronJob(
   !DEBUG ? "0 * * * *" : "* * * * *",
@@ -137,13 +95,16 @@ const job = new CronJob(
     const activeRequestCount = dataRequestBroker.getDataRequests("main").length;
     const resultCount = dataRequestBroker.getTotalDataResults("main");
     backlogLogger.info(
-      `Room count: ${roomCount}, Active request count: ${activeRequestCount}, Result count: ${resultCount}`
+      `Room count: ${roomCount}, Request count: ${activeRequestCount}, Result count: ${resultCount}`
     );
-
-    if (resultCount > 5000) dataRequestBroker.resetDataResults();
   },
   null,
   false,
   "Europe/Amsterdam"
 );
 job.start();
+
+app.listen(port, async () => {
+  connectToController();
+  console.log(`API listening on port ${port}`);
+});

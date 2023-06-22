@@ -73,44 +73,11 @@ export default class DataRequestBroker {
     );
   }
 
-  getDataResultsToSend(type) {
-    const dataResults = this.dataResults.filter(
-      (dr) => dr.dataRequest.type === type
-    );
-    const dataRequests = this.dataRequests.filter((dr) => dr.type === type);
-
-    const perTickResults = {};
-    dataResults.forEach(({ dataResult, dataRequest, id }) => {
-      if (!perTickResults[dataRequest.shard])
-        perTickResults[dataRequest.shard] = {};
-      if (!perTickResults[dataRequest.shard][dataRequest.tick])
-        perTickResults[dataRequest.shard][dataRequest.tick] = [];
-      perTickResults[dataRequest.shard][dataRequest.tick].push({
-        dataResult,
-        dataRequest,
-        id,
-      });
-    });
-
-    const perTickRequests = {};
-    dataRequests.forEach((dataRequest) => {
-      if (!perTickRequests[dataRequest.shard])
-        perTickRequests[dataRequest.shard] = {};
-      if (!perTickRequests[dataRequest.shard][dataRequest.tick])
-        perTickRequests[dataRequest.shard][dataRequest.tick] = [];
-      perTickRequests[dataRequest.shard][dataRequest.tick].push(dataRequest);
-    });
-
-    let dataResultsToSend = [];
-    Object.entries(perTickResults).forEach(([shard, perTick]) => {
-      Object.entries(perTick).forEach(([tick, data]) => {
-        if (!perTickRequests[shard] || !perTickRequests[shard][tick])
-          dataResultsToSend = dataResultsToSend.concat(data);
-      });
-    });
+  getDataResultsToSend() {
+    const dataResults = [...this.dataResults];
 
     const dataResultsIdsToRemove = [];
-    dataResultsToSend.forEach(({ id }) => {
+    dataResults.forEach(({ id }) => {
       dataResultsIdsToRemove.push(id);
     });
     this.removeDataResults(dataResultsIdsToRemove);
@@ -118,12 +85,11 @@ export default class DataRequestBroker {
     return dataResultsToSend;
   }
 
-  resetDataResults() {
-    this.dataResults = [];
-  }
-
   getTotalDataResults() {
     return this.dataResults.length;
+  }
+  getTotalDataRequests() {
+    return this.dataRequests.length;
   }
 
   async executeSingle() {
