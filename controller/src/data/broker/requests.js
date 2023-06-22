@@ -72,6 +72,7 @@ export default class DataRequestsBroker {
     }
 
     async getCurrentTick(type, shard) {
+        await wait(500);
         const tick = await GetGameTime(shard);
         if (tick) {
             return tick;
