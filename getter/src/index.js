@@ -41,9 +41,7 @@ app.post("/requests", (req, res) => {
     return res.json("Success");
   } catch (e) {
     logger.error(
-      `${req.ip}: Failed to save requests with ${JSON.stringify(
-        req.body
-      )} and error ${e}`
+      `${req.ip}: Failed to save requests with ${e.message} and stack of ${e.stack}`
     );
     return res.status(500).json("Failed to save requests");
   }
@@ -66,7 +64,7 @@ app.get("/data", (req, res) => {
       roomCount,
     });
   } catch (e) {
-    logger.error(`${req.ip}: Failed to get data with ${e}`);
+    logger.error(`${req.ip}: Failed to get data with ${e.message} and stack of ${e.stack}`);
     return res.status(500).json("Failed to get data");
   }
 });
