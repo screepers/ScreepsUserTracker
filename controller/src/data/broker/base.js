@@ -1,12 +1,13 @@
 import * as dotenv from "dotenv";
-dotenv.config();
 
 import graphite from "graphite";
 import { graphiteLogger as logger } from "../../logger.js";
 import { GetShards } from "../helper.js";
-import { GetUsername,GetUsernames } from "../../rooms/userHelper.js";
+import { GetUsername, GetUsernames } from "../../rooms/userHelper.js";
 import handleUsers from "../handle/users.js";
 import { GetGameTime } from "../screepsApi.js";
+
+dotenv.config();
 
 const client = graphite.createClient(
   `plaintext://${process.env.GRAPHITE_HOST}/`
@@ -50,7 +51,7 @@ export default class BaseDataBroker {
       undefined,
       {
         start,
-        type: 'Status',
+        type: "Status",
       }
     );
   }

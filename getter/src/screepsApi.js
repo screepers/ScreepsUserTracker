@@ -1,5 +1,5 @@
 import { ScreepsAPI } from "screeps-api";
-import settings from "./settings.js"
+import settings from "./settings.js";
 
 let path;
 switch (settings.serverType) {

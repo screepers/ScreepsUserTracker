@@ -53,7 +53,7 @@ export default class DataRequestBroker {
   }
 
   resetDataResults() {
-    this.dataResults = []
+    this.dataResults = [];
   }
 
   getDataResultsToSend() {
@@ -66,6 +66,7 @@ export default class DataRequestBroker {
   getTotalDataResults() {
     return this.dataResults.length;
   }
+
   getTotalDataRequests() {
     return this.dataRequests.length;
   }

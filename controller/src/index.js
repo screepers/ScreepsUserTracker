@@ -6,7 +6,7 @@ import Cron from "cron";
 import UpdateRooms from "./rooms/updateRooms.js";
 import MainDataBroker from "./data/broker/main.js";
 import ReactorDataBroker from "./data/broker/reactor.js";
-import DataRequestsBroker from "./data/broker/requests.js"
+import DataRequestsBroker from "./data/broker/requests.js";
 import { mainLogger as logger } from "./logger.js";
 
 const { CronJob } = Cron;
@@ -33,7 +33,7 @@ function getRoomsPerCycle(ipCount) {
 const settings = {
   serverType: process.env.SERVER_TYPE,
   screepsToken: process.env.SCREEPS_TOKEN,
-}
+};
 
 const getIps = () =>
   fs.existsSync("./files/ips.json")
@@ -104,10 +104,13 @@ const dataGetterJob = new CronJob(
     if (!isOnline) return;
     const start = Date.now();
     const ips = getIps();
-    const roomsPerCycle = getRoomsPerCycle(ips.length)
+    const roomsPerCycle = getRoomsPerCycle(ips.length);
 
     let data = [];
-    const status = { totalRequests: dataRequestsBroker.requests.length, ips: {} };
+    const status = {
+      totalRequests: dataRequestsBroker.requests.length,
+      ips: {},
+    };
     for (let i = 0; i < ips.length; i += 1) {
       const ip = ips[i];
       try {
@@ -122,7 +125,15 @@ const dataGetterJob = new CronJob(
           dataCount: result.data.results.length,
         };
 
-        await axios.post(`${ip}/requests`, dataRequestsBroker.getRequestsToSend(Math.min(roomsPerCycle * 5 - result.data.requestsCount,roomsPerCycle)));
+        await axios.post(
+          `${ip}/requests`,
+          dataRequestsBroker.getRequestsToSend(
+            Math.min(
+              roomsPerCycle * 5 - result.data.requestsCount,
+              roomsPerCycle
+            )
+          )
+        );
       } catch (error) {
         logger.error(error);
 
@@ -141,14 +152,14 @@ const dataGetterJob = new CronJob(
 
     await mainDataBroker.UploadStatus(status);
 
-    const dataByType = data.reduce((acc, curr) => { 
-      const requestType = curr.dataRequest.type
-      if (!acc[requestType]) acc[requestType] = []
+    const dataByType = data.reduce((acc, curr) => {
+      const requestType = curr.dataRequest.type;
+      if (!acc[requestType]) acc[requestType] = [];
       acc[requestType].push(curr);
       return acc;
-    }, {})
+    }, {});
     const dataByTypeKeys = Object.keys(dataByType);
-    for (let i = 0; i < dataByTypeKeys.length; i++) {
+    for (let i = 0; i < dataByTypeKeys.length; i += 1) {
       const dataType = dataByTypeKeys[i];
       const dataOfType = dataByType[dataType];
 
@@ -180,16 +191,22 @@ const requestRoomUpdaterJob = new CronJob(
     await UpdateRooms();
 
     const ips = getIps();
-    const roomsPerCycle = getRoomsPerCycle(ips.length)
+    const roomsPerCycle = getRoomsPerCycle(ips.length);
 
-    let { userCount, roomCount, types } = { userCount: 0, roomCount: 0, types: {} };
-    const dataTypes = process.env.DATA_TYPES.split(' ');
-    for (let dt = 0; dt < dataTypes.length; dt++) {
+    // eslint-disable-next-line prefer-const
+    let { userCount, roomCount, types } = {
+      userCount: 0,
+      roomCount: 0,
+      types: {},
+    };
+    const dataTypes = process.env.DATA_TYPES.split(" ");
+    for (let dt = 0; dt < dataTypes.length; dt += 1) {
       const dataType = dataTypes[dt];
       switch (dataType) {
-        case 'main': {
+        case "main": {
           const roomsToCheck = mainDataBroker.getRoomsToCheck(
-            roomsPerCycle, types
+            roomsPerCycle,
+            types
           );
           userCount += roomsToCheck.userCount;
           roomCount += roomsToCheck.roomCount;
@@ -201,15 +218,15 @@ const requestRoomUpdaterJob = new CronJob(
               roomsPerCycle,
               roomCount,
               types
-              );
-            }
+            );
+          }
           break;
         default:
           break;
       }
     }
 
-    dataRequestsBroker.saveRoomsBeingChecked(types)
+    dataRequestsBroker.saveRoomsBeingChecked(types);
 
     logger.info(
       `Updated requested rooms with ${roomCount} rooms and ${userCount} users in ${(
@@ -228,7 +245,7 @@ app.listen(port, async () => {
   const ips = getIps();
   for (let i = 0; i < ips.length; i += 1) {
     const ip = ips[i];
-    if (!await ipIsOnline(ip)) {
+    if (!(await ipIsOnline(ip))) {
       removeIp();
       logger.info(`Removed ${ip} from ips.json because it was offline!`);
     }

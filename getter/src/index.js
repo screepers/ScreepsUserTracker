@@ -1,5 +1,4 @@
-import * as dotenv from 'dotenv'
-dotenv.config()
+import * as dotenv from "dotenv";
 
 import express from "express";
 import bodyParser from "body-parser";
@@ -8,6 +7,8 @@ import Cron from "cron";
 import DataRequestBroker from "./dataRequestBroker.js";
 import { mainLogger as logger, backlogLogger } from "./logger.js";
 import { writeSettings } from "./settings.js";
+
+dotenv.config();
 
 const { CronJob } = Cron;
 
@@ -38,9 +39,11 @@ app.post("/ping", (req, res) => {
 app.post("/requests", (req, res) => {
   const start = Date.now();
   try {
-    dataRequestBroker.addDataRequests(req.body)
+    dataRequestBroker.addDataRequests(req.body);
 
-    logger.info(`Request:post took ${((Date.now() - start) / 1000).toFixed(2)}s`);
+    logger.info(
+      `Request:post took ${((Date.now() - start) / 1000).toFixed(2)}s`
+    );
     return res.json("Success");
   } catch (e) {
     logger.error(
@@ -63,7 +66,9 @@ app.get("/data", (req, res) => {
       requestsCount,
     });
   } catch (e) {
-    logger.error(`${req.ip}: Failed to get data with ${e.message} and stack of ${e.stack}`);
+    logger.error(
+      `${req.ip}: Failed to get data with ${e.message} and stack of ${e.stack}`
+    );
     return res.status(500).json("Failed to get data");
   }
 });

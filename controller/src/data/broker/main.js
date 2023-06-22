@@ -25,7 +25,6 @@ export default class MainDataBroker extends BaseDataBroker {
     }
     let hasStatsGlobally = false;
 
-
     const historyTicks = {};
     const tickRates = {};
     usernames.forEach((username) => {
@@ -49,10 +48,10 @@ export default class MainDataBroker extends BaseDataBroker {
                 dataRequest.shard
               ]
                 ? Math.round(
-                  (dataResult.timestamp -
-                    this._lastTickTimestamp[dataRequest.shard]) /
-                  100
-                )
+                    (dataResult.timestamp -
+                      this._lastTickTimestamp[dataRequest.shard]) /
+                      100
+                  )
                 : 0;
 
               this._lastTickTimestamp[dataRequest.shard] = dataResult.timestamp;
@@ -90,7 +89,10 @@ export default class MainDataBroker extends BaseDataBroker {
         });
 
         if (hasStats) {
-          userStats.combined.shards = handleCombinedRoomStats(userStats.shards, MainDataBroker.Type);
+          userStats.combined.shards = handleCombinedRoomStats(
+            userStats.shards,
+            MainDataBroker.Type
+          );
           stats[username] = { stats: userStats };
         }
       });
