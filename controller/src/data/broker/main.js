@@ -5,44 +5,10 @@ import {
   GetRoomTotal,
 } from "../../rooms/userHelper.js";
 import handleObjects from "../handle/objects.js";
-import handleUsers from "../handle/users.js";
-import { GetGameTime } from "../screepsApi.js";
 import { getStats, handleCombinedRoomStats } from "../handle/helper.js";
 
 export default class MainDataBroker extends BaseDataBroker {
   static Type = "main";
-
-  async UploadStatus(ipStatus) {
-    const start = Date.now();
-    const usernames = GetUsernames();
-
-    const stats = {};
-    const handledUsernames = await handleUsers(usernames);
-    Object.entries(handledUsernames).forEach(([username, userStats]) => {
-      stats[username] = { info: userStats };
-    });
-
-    const liveTicks = {};
-    for (let t = 0; t < this._shards.length; t += 1) {
-      const shardName = this._shards[t];
-      liveTicks[shardName] = await GetGameTime(shardName);
-    }
-
-    BaseDataBroker.Upload(
-      {
-        status: { [MainDataBroker.Type]: ipStatus },
-        ticks: {
-          live: liveTicks,
-        },
-        users: stats,
-      },
-      undefined,
-      {
-        start,
-        type: `${MainDataBroker.Type}Status`,
-      }
-    );
-  }
 
   async UploadUsers(usernames) {
     const start = Date.now();
@@ -57,6 +23,8 @@ export default class MainDataBroker extends BaseDataBroker {
         },
       };
     }
+    let hasStatsGlobally = false;
+
 
     const historyTicks = {};
     const tickRates = {};
@@ -69,6 +37,7 @@ export default class MainDataBroker extends BaseDataBroker {
           const { dataResult, dataRequest } = roomData;
           if (dataResult) {
             hasStats = true;
+            hasStatsGlobally = true;
 
             if (!timestamp) {
               timestamp = dataResult.timestamp;
@@ -80,10 +49,10 @@ export default class MainDataBroker extends BaseDataBroker {
                 dataRequest.shard
               ]
                 ? Math.round(
-                    (dataResult.timestamp -
-                      this._lastTickTimestamp[dataRequest.shard]) /
-                      100
-                  )
+                  (dataResult.timestamp -
+                    this._lastTickTimestamp[dataRequest.shard]) /
+                  100
+                )
                 : 0;
 
               this._lastTickTimestamp[dataRequest.shard] = dataResult.timestamp;
@@ -136,19 +105,20 @@ export default class MainDataBroker extends BaseDataBroker {
       }
     });
 
-    BaseDataBroker.Upload(
-      { users: stats, ticks: { history: historyTicks, tickRates } },
-      timestamp,
-      {
-        start,
-        type: MainDataBroker.Type,
-      }
-    );
+    if (hasStatsGlobally) {
+      BaseDataBroker.Upload(
+        { users: stats, ticks: { history: historyTicks, tickRates } },
+        timestamp,
+        {
+          start,
+          type: MainDataBroker.Type,
+        }
+      );
+    }
   }
 
-  getRoomsToCheck(roomsPerCycle) {
+  getRoomsToCheck(roomsPerCycle, types) {
     const usernames = GetUsernames();
-    const types = {};
     let userCount = 0;
     let roomCount = 0;
 
@@ -174,6 +144,6 @@ export default class MainDataBroker extends BaseDataBroker {
       } else break;
     }
 
-    return { types, userCount, roomCount };
+    return { userCount, roomCount };
   }
 }
