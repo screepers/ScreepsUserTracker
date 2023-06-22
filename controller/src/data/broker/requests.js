@@ -78,10 +78,13 @@ export default class DataRequestsBroker {
     return requestsToSend;
   }
 
-  async getCurrentTick(type, shard) {
+  async getCurrentTick(type, shard, knownTickTimes) {
+    if (knownTickTimes[shard]) return knownTickTimes[shard];
+
     await wait(500);
     const tick = await GetGameTime(shard);
     if (tick) {
+      knownTickTimes[shard] = tick;
       return tick;
     }
 
@@ -89,13 +92,18 @@ export default class DataRequestsBroker {
   }
 
   async syncRequests() {
+    const knownTickTimes = {};
     for (let i = 0; i < shards.length; i += 1) {
       const shard = shards[i];
 
       const types = Object.keys(this.roomsBeingChecked);
       for (let t = 0; t < types.length; t += 1) {
         const type = types[t];
-        const currentTick = await this.getCurrentTick(type, shard);
+        const currentTick = await this.getCurrentTick(
+          type,
+          shard,
+          knownTickTimes
+        );
         let requestTick = Math.max(currentTick - (currentTick % 100) - 1000, 0);
 
         const rooms = this.roomsBeingChecked[type][shard];
