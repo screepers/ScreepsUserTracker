@@ -1,10 +1,13 @@
-import graphite from "graphite";
 import * as dotenv from "dotenv";
+dotenv.config();
+
+import graphite from "graphite";
 import { graphiteLogger as logger } from "../../logger.js";
 import { GetShards } from "../helper.js";
-import { GetUsername } from "../../rooms/userHelper.js";
+import { GetUsername,GetUsernames } from "../../rooms/userHelper.js";
+import handleUsers from "../handle/users.js";
+import { GetGameTime } from "../screepsApi.js";
 
-dotenv.config();
 const client = graphite.createClient(
   `plaintext://${process.env.GRAPHITE_HOST}/`
 );
@@ -18,6 +21,38 @@ export default class BaseDataBroker {
 
   Reset() {
     this._users = {};
+  }
+
+  async UploadStatus(ipStatus) {
+    const start = Date.now();
+    const usernames = GetUsernames();
+
+    const stats = {};
+    const handledUsernames = await handleUsers(usernames);
+    Object.entries(handledUsernames).forEach(([username, userStats]) => {
+      stats[username] = { info: userStats };
+    });
+
+    const liveTicks = {};
+    for (let t = 0; t < this._shards.length; t += 1) {
+      const shardName = this._shards[t];
+      liveTicks[shardName] = await GetGameTime(shardName);
+    }
+
+    BaseDataBroker.Upload(
+      {
+        status: ipStatus,
+        ticks: {
+          live: liveTicks,
+        },
+        users: stats,
+      },
+      undefined,
+      {
+        start,
+        type: 'Status',
+      }
+    );
   }
 
   AddRooms(username, shard, rooms, force = false) {

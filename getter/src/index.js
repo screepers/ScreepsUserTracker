@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv'
+dotenv.config()
+
 import express from "express";
 import bodyParser from "body-parser";
 import axios from "axios";
@@ -8,7 +11,7 @@ import { writeSettings } from "./settings.js";
 
 const { CronJob } = Cron;
 
-const controllerIp = "http://localhost:5000";
+const controllerIp = process.env.CONTROLLER_IP || "http://localhost:5000";
 const port = 4000;
 const ip = `http://localhost:${port}`;
 const DEBUG = true;
@@ -25,7 +28,7 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.get("/ping", (req, res) => {
+app.post("/ping", (req, res) => {
   writeSettings(req.body);
 
   logger.info(`${req.ip}: Received ping`);
@@ -53,15 +56,11 @@ app.get("/data", (req, res) => {
 
     const results = dataRequestBroker.getDataResultsToSend();
     const requestsCount = dataRequestBroker.getTotalDataRequests();
-    const roomCount = Object.values(dataRequestBroker.getRooms())
-      .map((x) => x.length)
-      .reduce((a, b) => a + b, 0);
 
     logger.info(`Data:get took ${((Date.now() - start) / 1000).toFixed(2)}s`);
     return res.json({
       results,
       requestsCount,
-      roomCount,
     });
   } catch (e) {
     logger.error(`${req.ip}: Failed to get data with ${e.message} and stack of ${e.stack}`);
@@ -86,14 +85,10 @@ async function connectToController() {
 const job = new CronJob(
   !DEBUG ? "0 * * * *" : "* * * * *",
   () => {
-    const roomCount = Object.values(dataRequestBroker.getRooms("main"))
-      .map((x) => x.length)
-      .reduce((a, b) => a + b, 0);
-
-    const activeRequestCount = dataRequestBroker.getDataRequests("main").length;
-    const resultCount = dataRequestBroker.getTotalDataResults("main");
+    const requestCount = dataRequestBroker.getTotalDataRequests();
+    const resultCount = dataRequestBroker.getTotalDataResults();
     backlogLogger.info(
-      `Room count: ${roomCount}, Request count: ${activeRequestCount}, Result count: ${resultCount}`
+      `Request count: ${requestCount}, Result count: ${resultCount}`
     );
   },
   null,

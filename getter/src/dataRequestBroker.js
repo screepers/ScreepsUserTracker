@@ -1,5 +1,4 @@
 import { GetRoomHistory } from "./screepsApi.js";
-import RoomRequests from "./roomRequests.js";
 import { dataRequestBroker as logger } from "./logger.js";
 
 let resultId = 0;
@@ -14,26 +13,12 @@ export default class DataRequestBroker {
 
   dataResults = [];
 
-  roomRequests = null;
-
   constructor() {
-    this.roomRequests = new RoomRequests(this);
-
-    this.roomRequests.sync();
     this.executeSingle();
   }
 
-  forceUpdateRooms(rooms, type) {
-    this.roomRequests.forceUpdateRooms(rooms, type);
-  }
-
-  getRooms(type) {
-    return this.roomRequests.getRooms(type);
-  }
-
-  addDataRequests(dataRequests, addAtStart = false) {
-    if (!addAtStart) this.dataRequests = this.dataRequests.concat(dataRequests);
-    else this.dataRequests = dataRequests.concat(this.dataRequests);
+  addDataRequests(dataRequests) {
+    this.dataRequests = dataRequests.concat(this.dataRequests);
   }
 
   getDataRequest() {
@@ -67,22 +52,15 @@ export default class DataRequestBroker {
     this.dataResults.push({ dataResult, dataRequest, id: (resultId += 1) });
   }
 
-  removeDataResults(ids) {
-    this.dataResults = this.dataResults.filter(
-      (dataResult) => !ids.includes(dataResult.id)
-    );
+  resetDataResults() {
+    this.dataResults = []
   }
 
   getDataResultsToSend() {
     const dataResults = [...this.dataResults];
+    this.resetDataResults();
 
-    const dataResultsIdsToRemove = [];
-    dataResults.forEach(({ id }) => {
-      dataResultsIdsToRemove.push(id);
-    });
-    this.removeDataResults(dataResultsIdsToRemove);
-
-    return dataResultsToSend;
+    return dataResults;
   }
 
   getTotalDataResults() {
@@ -119,7 +97,7 @@ export default class DataRequestBroker {
         ? (dataRequest.retries += 1)
         : 1;
 
-      if (dataRequest.retries < 3) this.addDataRequests([dataRequest], true);
+      if (dataRequest.retries < 3) this.addDataRequests([dataRequest]);
       else if (dataResult.status === "Not found")
         this.addDataResult(dataResult.result, dataRequest, true);
       else
