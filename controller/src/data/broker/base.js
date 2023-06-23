@@ -16,13 +16,11 @@ const client = graphite.createClient(
 export default class BaseDataBroker {
   _users = {};
 
+  _data = {};
+
   _lastTickTimestamp = {};
 
   _shards = GetShards();
-
-  Reset() {
-    this._users = {};
-  }
 
   async UploadStatus(ipStatus) {
     const start = Date.now();
@@ -40,7 +38,7 @@ export default class BaseDataBroker {
       liveTicks[shardName] = await GetGameTime(shardName);
     }
 
-    BaseDataBroker.Upload(
+    await BaseDataBroker.Upload(
       {
         status: ipStatus,
         ticks: {
@@ -56,6 +54,23 @@ export default class BaseDataBroker {
     );
   }
 
+  RemoveUploadedData(username, shard, rooms) {
+    const knownRoomNames = Object.keys(this._data[username][shard]);
+    const removedRooms = knownRoomNames.filter((kr) => !rooms.includes(kr));
+
+    removedRooms.forEach((roomName) => {
+      delete this._data[username][shard][roomName];
+    });
+
+    const roomNames = Object.keys(this._users[username][shard]);
+    roomNames.forEach((roomName) => {
+      const userData = this._users[username][shard][roomName];
+      if (userData) {
+        this._data[username][shard][roomName].shift();
+      }
+    });
+  }
+
   AddRooms(username, shard, rooms, force = false) {
     if (!this._users[username]) {
       this._users[username] = {};
@@ -64,8 +79,10 @@ export default class BaseDataBroker {
       this._users[username][shard] = {};
     }
 
-    const knownUsers = Object.keys(this._users[username][shard]);
-    knownUsers.forEach((roomName) => {
+    if (force) this.RemoveUploadedData(username, shard, rooms);
+
+    const knownRoomNames = Object.keys(this._users[username][shard]);
+    knownRoomNames.forEach((roomName) => {
       if (!this._users[username][shard][roomName])
         delete this._users[username][shard][roomName];
     });
@@ -114,11 +131,15 @@ export default class BaseDataBroker {
   }
 
   AddRoomData(username, shard, roomName, data) {
-    if (!this._users[username]) return;
-    if (!this._users[username][shard]) return;
-    if (this._users[username][shard][roomName] === undefined) return;
+    if (!this._data[username]) this._data[username] = {};
+    if (!this._data[username][shard]) this._data[username][shard] = {};
+    if (!this._data[username][shard][roomName])
+      this._data[username][shard][roomName] = [];
 
-    this._users[username][shard][roomName] = data;
+    this._data[username][shard][roomName].push(data);
+    this._data[username][shard][roomName].sort(
+      (a, b) => a.dataRequest.tick - b.dataRequest.tick
+    );
   }
 
   async CheckUsers() {
@@ -127,9 +148,17 @@ export default class BaseDataBroker {
     Object.entries(this._users).forEach(([username, shards]) => {
       let hasUndefinedData = false;
 
-      Object.values(shards).forEach((rooms) => {
-        Object.values(rooms).forEach((roomData) => {
-          if (!roomData) hasUndefinedData = true;
+      Object.entries(shards).forEach(([shard, rooms]) => {
+        Object.keys(rooms).forEach((roomName) => {
+          try {
+            const roomDataList = this._data[username][shard][roomName];
+            const roomData = roomDataList[0];
+            if (roomData) {
+              this._users[username][shard][roomName] = roomData;
+            } else hasUndefinedData = true;
+          } catch {
+            hasUndefinedData = true;
+          }
         });
       });
 
@@ -141,24 +170,28 @@ export default class BaseDataBroker {
     if (usernamesToUpload.length) await this.UploadUsers(usernamesToUpload);
   }
 
-  static Upload(data, timestamp, logInfo) {
-    const _timestamp = timestamp || Date.now();
+  static async Upload(data, timestamp, logInfo) {
+    return new Promise((resolve) => {
+      const _timestamp = timestamp || Date.now();
 
-    if (process.env.GRAPHITE_ONLINE !== "TRUE") return;
-    client.write(
-      { screeps: { userTracker: { [process.env.SERVER_TYPE]: data } } },
-      _timestamp,
-      (err) => {
-        if (err) {
-          logger.error(err);
-        } else if (logInfo)
-          logger.info(
-            `Written data for ${logInfo.type}, took ${(
-              (Date.now() - logInfo.start) /
-              1000
-            ).toFixed(2)}s`
-          );
-      }
-    );
+      if (process.env.GRAPHITE_ONLINE !== "TRUE") return;
+      client.write(
+        { screeps: { userTracker: { [process.env.SERVER_TYPE]: data } } },
+        _timestamp,
+        (err) => {
+          if (err) {
+            logger.error(err);
+          } else if (logInfo)
+            logger.info(
+              `Written data for ${logInfo.type}, took ${(
+                (Date.now() - logInfo.start) /
+                1000
+              ).toFixed(2)}s`
+            );
+
+          resolve();
+        }
+      );
+    });
   }
 }

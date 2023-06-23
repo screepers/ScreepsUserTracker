@@ -1,5 +1,7 @@
 import fs from "fs";
 
+const defaultActionsPerType = {};
+
 export const ActionType = Object.freeze({
   Divide100: 0,
   FirstTickOnly: 1,
@@ -62,12 +64,19 @@ export function getStats(actions) {
 }
 
 export function getDefaultActions(type) {
-  const fileName = `./files/defaultActions.${type}.json`;
-  if (fs.existsSync(fileName)) {
-    return JSON.parse(fs.readFileSync(fileName));
+  const time = Date.now();
+  if (defaultActionsPerType[type]) {
+    const cached = defaultActionsPerType[type];
+    if (time - cached.time < 60 * 1000) return cached.data;
   }
-  fs.writeFileSync(fileName, JSON.stringify([]));
-  return [];
+
+  const fileName = `./files/defaultActions.${type}.json`;
+  let data = [];
+  if (fs.existsSync(fileName)) data = JSON.parse(fs.readFileSync(fileName));
+  else fs.writeFileSync(fileName, JSON.stringify([]));
+
+  defaultActionsPerType[type] = { data, time };
+  return data;
 }
 
 function addNewDefaultAction(action, type) {
@@ -78,6 +87,7 @@ function addNewDefaultAction(action, type) {
   action.value = 0;
   file.push(action);
   fs.writeFileSync(fileName, JSON.stringify(file));
+  defaultActionsPerType[type].data = file;
 }
 
 export function ActionListDefaultValuesFiller(actions, type) {

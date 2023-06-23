@@ -80,8 +80,8 @@ app.post("/ip", async (req, res) => {
     ips.push(ip);
     fs.writeFileSync("./files/ips.json", JSON.stringify(ips));
     res.json("Success");
-  } catch (error) {
-    logger.error(error);
+  } catch (e) {
+    logger.error(`${e.message}\nStack of ${e.stack}`);
     res.status(500).json("Failed to register with controller!");
   }
 });
@@ -98,148 +98,145 @@ app.delete("/ip", async (req, res) => {
   }
 });
 
-const dataGetterJob = new CronJob(
-  !DEBUG ? "*/5 * * * *" : "* * * * *",
-  async () => {
-    if (!isOnline) return;
-    const start = Date.now();
-    const ips = getIps();
-    const roomsPerCycle = getRoomsPerCycle(ips.length);
+async function dataGetter() {
+  if (!isOnline) return;
+  const start = Date.now();
+  const ips = getIps();
+  const roomsPerCycle = getRoomsPerCycle(ips.length);
 
-    let data = [];
-    const status = {
-      totalRequests: dataRequestsBroker.requests.length,
-      ips: {},
-    };
-    for (let i = 0; i < ips.length; i += 1) {
-      const ip = ips[i];
-      try {
-        const result = await axios.get(`${ip}/data`);
-        data = [...data, ...result.data.results];
+  let data = [];
+  const status = {
+    totalRequests: dataRequestsBroker.requests.length,
+    ips: {},
+  };
+  for (let i = 0; i < ips.length; i += 1) {
+    const ip = ips[i];
+    try {
+      const result = await axios.get(`${ip}/data`);
+      data = [...data, ...result.data.results];
 
-        const simpleIp = ip
-          .replace(/http:\/\/|https:\/\//g, "")
-          .replace(/\/|:/g, "");
-        status.ips[simpleIp] = {
-          requestsCount: result.data.requestsCount,
-          dataCount: result.data.results.length,
-        };
+      const simpleIp = ip
+        .replace(/http:\/\/|https:\/\//g, "")
+        .replace(/\/|:/g, "");
+      status.ips[simpleIp] = {
+        requestsCount: result.data.requestsCount,
+        dataCount: result.data.results.length,
+      };
 
-        await axios.post(
-          `${ip}/requests`,
-          dataRequestsBroker.getRequestsToSend(
-            Math.min(
-              roomsPerCycle * 5 - result.data.requestsCount,
-              roomsPerCycle
-            )
-          )
+      await axios.post(
+        `${ip}/requests`,
+        dataRequestsBroker.getRequestsToSend(
+          Math.min(roomsPerCycle * 5 - result.data.requestsCount, roomsPerCycle)
+        )
+      );
+    } catch (error) {
+      logger.error(`${error.message}\nStack of ${error.stack}`);
+
+      if (error.message.includes("ECONNREFUSED")) {
+        removeIp(ip);
+      }
+    }
+  }
+
+  logger.info(
+    `Got ${data.length} results from ${ips.length} ips in ${(
+      (Date.now() - start) /
+      1000
+    ).toFixed(2)}s`
+  );
+
+  await mainDataBroker.UploadStatus(status);
+
+  const dataByType = data.reduce((acc, curr) => {
+    const requestType = curr.dataRequest.type;
+    if (!acc[requestType]) acc[requestType] = [];
+    acc[requestType].push(curr);
+    return acc;
+  }, {});
+  const dataByTypeKeys = Object.keys(dataByType);
+  for (let i = 0; i < dataByTypeKeys.length; i += 1) {
+    const dataType = dataByTypeKeys[i];
+    const dataOfType = dataByType[dataType];
+
+    switch (dataType) {
+      case "main":
+        await mainDataBroker.AddRoomsData(dataOfType);
+        break;
+      case "reactor":
+        await reactorDataBroker.AddRoomsData(dataOfType);
+        break;
+      default:
+        break;
+    }
+  }
+}
+
+async function requestRoomUpdater() {
+  if (!isOnline) return;
+  const start = Date.now();
+  await UpdateRooms();
+
+  const ips = getIps();
+  const roomsPerCycle = getRoomsPerCycle(ips.length);
+
+  // eslint-disable-next-line prefer-const
+  let { userCount, roomCount, types } = {
+    userCount: 0,
+    roomCount: 0,
+    types: {},
+  };
+  const dataTypes = process.env.DATA_TYPES.split(" ");
+  for (let dt = 0; dt < dataTypes.length; dt += 1) {
+    const dataType = dataTypes[dt];
+    switch (dataType) {
+      case "main": {
+        const roomsToCheck = mainDataBroker.getRoomsToCheck(
+          roomsPerCycle,
+          types
         );
-      } catch (error) {
-        logger.error(error);
-
-        if (error.message.includes("ECONNREFUSED")) {
-          removeIp(ip);
-        }
+        userCount += roomsToCheck.userCount;
+        roomCount += roomsToCheck.roomCount;
+        break;
       }
-    }
-
-    logger.info(
-      `Got ${data.length} results from ${ips.length} ips in ${(
-        (Date.now() - start) /
-        1000
-      ).toFixed(2)}s`
-    );
-
-    await mainDataBroker.UploadStatus(status);
-
-    const dataByType = data.reduce((acc, curr) => {
-      const requestType = curr.dataRequest.type;
-      if (!acc[requestType]) acc[requestType] = [];
-      acc[requestType].push(curr);
-      return acc;
-    }, {});
-    const dataByTypeKeys = Object.keys(dataByType);
-    for (let i = 0; i < dataByTypeKeys.length; i += 1) {
-      const dataType = dataByTypeKeys[i];
-      const dataOfType = dataByType[dataType];
-
-      switch (dataType) {
-        case "main":
-          await mainDataBroker.AddRoomsData(dataOfType);
-          break;
-        case "reactor":
-          await reactorDataBroker.AddRoomsData(dataOfType);
-          break;
-        default:
-          break;
-      }
-    }
-  },
-  null,
-  false,
-  "Europe/Amsterdam"
-);
-dataGetterJob.start();
-
-UpdateRooms();
-
-const requestRoomUpdaterJob = new CronJob(
-  !DEBUG ? "*/15 * * * *" : "* * * * *",
-  async () => {
-    if (!isOnline) return;
-    const start = Date.now();
-    await UpdateRooms();
-
-    const ips = getIps();
-    const roomsPerCycle = getRoomsPerCycle(ips.length);
-
-    // eslint-disable-next-line prefer-const
-    let { userCount, roomCount, types } = {
-      userCount: 0,
-      roomCount: 0,
-      types: {},
-    };
-    const dataTypes = process.env.DATA_TYPES.split(" ");
-    for (let dt = 0; dt < dataTypes.length; dt += 1) {
-      const dataType = dataTypes[dt];
-      switch (dataType) {
-        case "main": {
-          const roomsToCheck = mainDataBroker.getRoomsToCheck(
+      case "reactor":
+        if (process.env.SERVER_TYPE === "seasonal") {
+          roomCount = await reactorDataBroker.getRoomsToCheck(
             roomsPerCycle,
+            roomCount,
             types
           );
-          userCount += roomsToCheck.userCount;
-          roomCount += roomsToCheck.roomCount;
-          break;
         }
-        case "reactor":
-          if (process.env.SERVER_TYPE === "seasonal") {
-            roomCount = await reactorDataBroker.getRoomsToCheck(
-              roomsPerCycle,
-              roomCount,
-              types
-            );
-          }
-          break;
-        default:
-          break;
-      }
+        break;
+      default:
+        break;
     }
+  }
 
-    dataRequestsBroker.saveRoomsBeingChecked(types);
+  dataRequestsBroker.saveRoomsBeingChecked(types);
 
-    logger.info(
-      `Updated requested rooms with ${roomCount} rooms and ${userCount} users in ${(
-        (Date.now() - start) /
-        1000
-      ).toFixed(2)}s`
-    );
-  },
+  logger.info(
+    `Updated requested rooms with ${roomCount} rooms and ${userCount} users in ${(
+      (Date.now() - start) /
+      1000
+    ).toFixed(2)}s`
+  );
+}
+
+const dataGetterJob = new CronJob(
+  !DEBUG ? "*/10 * * * * * *" : "*/10 * * * * *",
+  dataGetter,
   null,
   false,
   "Europe/Amsterdam"
 );
-requestRoomUpdaterJob.start();
+
+const requestRoomUpdaterJob = new CronJob(
+  !DEBUG ? "*/5 * * * *" : "* * * * *",
+  requestRoomUpdater,
+  null,
+  false,
+  "Europe/Amsterdam"
+);
 
 app.listen(port, async () => {
   const ips = getIps();
@@ -254,4 +251,9 @@ app.listen(port, async () => {
 
   await dataRequestsBroker.constructorAsync();
   isOnline = true;
+
+  await requestRoomUpdater();
+  await dataGetter();
+  requestRoomUpdaterJob.start();
+  dataGetterJob.start();
 });

@@ -12,7 +12,7 @@ export default class ReactorDataBroker extends BaseDataBroker {
   static async UploadStatus(ipStatus) {
     const start = Date.now();
 
-    BaseDataBroker.Upload(
+    await BaseDataBroker.Upload(
       {
         status: { [ReactorDataBroker.Type]: ipStatus },
       },
@@ -64,23 +64,27 @@ export default class ReactorDataBroker extends BaseDataBroker {
             )[0];
 
             const username = GetUsernameById(
-              (Object.values(currentObjects).find((o) => o.user) || {}).user
+              (
+                Object.values(currentObjects).find(
+                  (o) => o.user && o.type === "reactor"
+                ) || {}
+              ).user
             );
             if (username) {
-              for (let t = 0; t < tickKeys.length; t += 1) {
-                const tick = tickKeys[t];
+              tickKeys.forEach((tick, index) => {
                 if (ticks[tick]) {
                   actionsArray = actionsArray.concat(
                     handleObjects(ticks[tick], {
-                      previousObjects: ticks[tickKeys[t - 1]],
+                      previousObjects: ticks[tickKeys[index - 1]],
                       currentObjects,
                       ticks,
                       tick,
                       type: ReactorDataBroker.Type,
+                      isFirstTick: index === 0,
                     })
                   );
                 }
-              }
+              });
 
               if (!usersStats[username])
                 usersStats[username] = getStatsObject();
@@ -107,17 +111,16 @@ export default class ReactorDataBroker extends BaseDataBroker {
       });
 
       const shards = Object.keys(this._users[oriUsername]);
-      for (let s = 0; s < shards.length; s += 1) {
-        const shard = shards[s];
+      shards.forEach((shard) => {
         const rooms = this._users[oriUsername][shard];
 
         const roomNames = Object.keys(rooms);
         this.AddRooms(oriUsername, shard, roomNames, true);
-      }
+      });
     });
 
     if (hasStatsGlobally) {
-      BaseDataBroker.Upload({ users: stats }, timestamp, {
+      await BaseDataBroker.Upload({ users: stats }, timestamp, {
         start,
         type: ReactorDataBroker.Type,
       });

@@ -23,6 +23,8 @@ export default class DataRequestsBroker {
 
   lastTickTimes = {};
 
+  knownTickTimes = {};
+
   async constructorAsync() {
     this.requests = DataRequestsBroker.getRequests();
     this.roomsBeingChecked = DataRequestsBroker.getRoomsBeingChecked();
@@ -52,6 +54,8 @@ export default class DataRequestsBroker {
     fs.writeFileSync(roomsCheckedPath, JSON.stringify(rooms));
 
     this.roomsBeingChecked = rooms;
+    this.saveRequests();
+    this.syncRequests();
   }
 
   static getRequests() {
@@ -74,17 +78,20 @@ export default class DataRequestsBroker {
       requestsToSend.push(request);
     }
 
-    this.saveRequests();
     return requestsToSend;
   }
 
-  async getCurrentTick(type, shard, knownTickTimes) {
-    if (knownTickTimes[shard]) return knownTickTimes[shard];
+  async getCurrentTick(type, shard) {
+    const time = Date.now();
+    if (this.knownTickTimes[shard]) {
+      const knownTick = this.knownTickTimes[shard];
+      if (time - knownTick.time < 60 * 1000) return knownTick.data;
+    }
 
     await wait(500);
     const tick = await GetGameTime(shard);
     if (tick) {
-      knownTickTimes[shard] = tick;
+      this.knownTickTimes[shard] = { data: tick, time };
       return tick;
     }
 
@@ -92,7 +99,7 @@ export default class DataRequestsBroker {
   }
 
   async syncRequests() {
-    const knownTickTimes = {};
+    let addedRequests = false;
     for (let i = 0; i < shards.length; i += 1) {
       const shard = shards[i];
 
@@ -102,7 +109,7 @@ export default class DataRequestsBroker {
         const currentTick = await this.getCurrentTick(
           type,
           shard,
-          knownTickTimes
+          this.knownTickTimes
         );
         let requestTick = Math.max(currentTick - (currentTick % 100) - 1000, 0);
 
@@ -126,15 +133,14 @@ export default class DataRequestsBroker {
               this.requests.push(dataRequest);
             });
             this.lastTickTimes[type][shard] = requestTick;
+            addedRequests = true;
           }
         }
       }
     }
 
-    this.saveRequests();
-    if (this.requests.length === 0) {
-      await wait(60 * 1000);
+    if (addedRequests) {
+      this.syncRequests();
     }
-    this.syncRequests();
   }
 }

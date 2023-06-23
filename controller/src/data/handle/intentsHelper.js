@@ -1,14 +1,14 @@
-import { getIntentEffect, findOriginalObject } from "../helper.js";
+import { getIntentEffect } from "../helper.js";
 
-export default function GetIntents(objects, currentObjects, ticks) {
+export default function GetIntents(objects, originalObjects) {
   const intents = [];
   const ids = Object.keys(objects);
   ids.forEach((id) => {
     const object = objects[id] || {};
-    let current = currentObjects[id];
+    let current = originalObjects[id];
     if (!current) {
-      currentObjects[id] = object;
-      current = currentObjects[id];
+      originalObjects[id] = object;
+      current = originalObjects[id];
     }
     if (!current.actionLog) {
       current.actionLog = {};
@@ -22,7 +22,7 @@ export default function GetIntents(objects, currentObjects, ticks) {
 
     const currentActions = Object.keys(current.actionLog);
     if (currentActions.length) {
-      const originalObject = findOriginalObject(id, ticks);
+      const originalObject = originalObjects[id];
       currentActions.forEach((intentName) => {
         const intentEffect = getIntentEffect(intentName, originalObject);
         if (intentEffect) intents.push(intentEffect);
