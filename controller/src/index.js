@@ -32,6 +32,7 @@ function getRoomsPerCycle(ipCount) {
 
 const settings = {
   serverType: process.env.SERVER_TYPE,
+  debug: DEBUG,
 };
 
 const getIps = () =>
@@ -41,10 +42,7 @@ const getIps = () =>
 
 async function ipIsOnline(ip) {
   try {
-    const pong = await axios.post(`${ip}/ping`, settings);
-    if (pong.data !== "pong") {
-      return false;
-    }
+    await axios.post(`${ip}/ping`, settings);
   } catch (error) {
     return false;
   }

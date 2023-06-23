@@ -4,19 +4,21 @@ import express from "express";
 import bodyParser from "body-parser";
 import axios from "axios";
 import Cron from "cron";
+import { publicIpv4 } from "public-ip";
 import DataRequestBroker from "./dataRequestBroker.js";
 import { mainLogger as logger, backlogLogger } from "./logger.js";
-import { writeSettings } from "./settings.js";
-import {publicIpv4} from 'public-ip';
+import settings, { writeSettings } from "./settings.js";
 
 dotenv.config();
 
 const { CronJob } = Cron;
 
-const controllerIp = process.env.CONTROLLER_IP || "http://localhost:5000";
+const hasExternalIp = process.env.CONTROLLER_IP !== undefined;
+const controllerIp = hasExternalIp
+  ? process.env.CONTROLLER_IP
+  : "http://localhost:5000";
 const port = 4000;
 let ip;
-const DEBUG = true;
 
 // terminate process on exit
 process.once("SIGINT", async () => {
@@ -89,7 +91,7 @@ async function connectToController() {
 }
 
 const job = new CronJob(
-  !DEBUG ? "0 * * * *" : "* * * * *",
+  !settings.debug ? "0 * * * *" : "* * * * *",
   () => {
     const requestCount = dataRequestBroker.getTotalDataRequests();
     const resultCount = dataRequestBroker.getTotalDataResults();
@@ -104,7 +106,7 @@ const job = new CronJob(
 job.start();
 
 app.listen(port, async () => {
-  ip = await publicIpv4();
+  ip = hasExternalIp ? await publicIpv4() : "http://localhost:4000";
 
   connectToController();
   console.log(`API listening on port ${port}`);
