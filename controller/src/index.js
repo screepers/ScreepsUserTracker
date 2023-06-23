@@ -126,7 +126,7 @@ async function dataGetter() {
       await axios.post(
         `${ip}/requests`,
         dataRequestsBroker.getRequestsToSend(
-          Math.min(roomsPerCycle * 5 - result.data.requestsCount, roomsPerCycle)
+          Math.min(roomsPerCycle - result.data.requestsCount, roomsPerCycle)
         )
       );
     } catch (error) {

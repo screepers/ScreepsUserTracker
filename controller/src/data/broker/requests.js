@@ -34,7 +34,7 @@ export default class DataRequestsBroker {
       for (let s = 0; s < shards.length; s += 1) {
         const shard = shards[s];
         this.lastTickTimes[dataType][shard] =
-          Number(process.env[`START_FROM_TICK_${dataType}`]) ||
+          Number(process.env[`START_FROM_TICK_${dataType.toUpperCase()}`]) ||
           (await GetGameTime(shard));
       }
     }
