@@ -13,7 +13,6 @@ switch (settings.serverType) {
 }
 
 const api = new ScreepsAPI({
-  token: settings.screepsToken,
   protocol: "https",
   hostname: "screeps.com",
   port: 443,
@@ -21,7 +20,6 @@ const api = new ScreepsAPI({
 });
 
 const historyApi = new ScreepsAPI({
-  token: settings.screepsToken,
   protocol: "https",
   hostname: "screeps.com",
   port: 443,

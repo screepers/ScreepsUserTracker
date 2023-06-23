@@ -32,7 +32,6 @@ function getRoomsPerCycle(ipCount) {
 
 const settings = {
   serverType: process.env.SERVER_TYPE,
-  screepsToken: process.env.SCREEPS_TOKEN,
 };
 
 const getIps = () =>
