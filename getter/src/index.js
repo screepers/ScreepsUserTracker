@@ -7,6 +7,7 @@ import Cron from "cron";
 import DataRequestBroker from "./dataRequestBroker.js";
 import { mainLogger as logger, backlogLogger } from "./logger.js";
 import { writeSettings } from "./settings.js";
+import {publicIpv4} from 'public-ip';
 
 dotenv.config();
 
@@ -14,7 +15,7 @@ const { CronJob } = Cron;
 
 const controllerIp = process.env.CONTROLLER_IP || "http://localhost:5000";
 const port = 4000;
-const ip = `http://localhost:${port}`;
+let ip;
 const DEBUG = true;
 
 // terminate process on exit
@@ -103,6 +104,8 @@ const job = new CronJob(
 job.start();
 
 app.listen(port, async () => {
+  ip = await publicIpv4();
+
   connectToController();
   console.log(`API listening on port ${port}`);
 });
