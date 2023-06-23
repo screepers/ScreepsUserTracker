@@ -223,7 +223,7 @@ async function requestRoomUpdater() {
 }
 
 const dataGetterJob = new CronJob(
-  !DEBUG ? "* * * * * *" : "* * * * *",
+  !DEBUG ? "* * * * *" : "* * * * *",
   dataGetter,
   null,
   false,
