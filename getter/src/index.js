@@ -29,8 +29,8 @@ process.once("SIGINT", async () => {
 const dataRequestBroker = new DataRequestBroker();
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '100mb'}));
+app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
 
 app.post("/ping", (req, res) => {
   writeSettings(req.body);

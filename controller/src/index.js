@@ -20,8 +20,8 @@ const mainDataBroker = new MainDataBroker();
 const reactorDataBroker = new ReactorDataBroker();
 const dataRequestsBroker = new DataRequestsBroker();
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '100mb'}));
+app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
 
 function getRoomsPerCycle(ipCount) {
   // tickSpeed * ticksPerCall * callsPerSecond
@@ -34,6 +34,8 @@ const settings = {
   serverType: process.env.SERVER_TYPE,
   debug: DEBUG,
 };
+
+let ips = [];
 
 const getIps = () =>
   fs.existsSync("./files/ips.json")
@@ -51,13 +53,12 @@ async function ipIsOnline(ip) {
 }
 
 function removeIp(ip) {
-  const ips = getIps().filter(i=>i!==ip)
+  ips = getIps().filter(i=>i!==ip)
   fs.writeFileSync("./files/ips.json", JSON.stringify(ips));
 }
 
 app.post("/ip", async (req, res) => {
   try {
-    const ips = getIps();
     const { ip } = req.body;
     const ipOnline = await ipIsOnline(ip);
     if (!ipOnline) {
@@ -97,7 +98,6 @@ app.delete("/ip", async (req, res) => {
 async function dataGetter() {
   if (!isOnline) return;
   const start = Date.now();
-  const ips = getIps();
   const roomsPerCycle = getRoomsPerCycle(ips.length);
 
   let data = [];
