@@ -20,8 +20,8 @@ const mainDataBroker = new MainDataBroker();
 const reactorDataBroker = new ReactorDataBroker();
 const dataRequestsBroker = new DataRequestsBroker();
 
-app.use(bodyParser.json({limit: '100mb'}));
-app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
+app.use(bodyParser.json({ limit: "100mb" }));
+app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
 
 function getRoomsPerCycle(ipCount) {
   // tickSpeed * ticksPerCall * callsPerSecond
@@ -53,7 +53,7 @@ async function ipIsOnline(ip) {
 }
 
 function removeIp(ip) {
-  ips = getIps().filter(i=>i!==ip)
+  ips = getIps().filter((i) => i !== ip);
   fs.writeFileSync("./files/ips.json", JSON.stringify(ips));
 }
 
@@ -172,7 +172,6 @@ async function requestRoomUpdater() {
   const start = Date.now();
   await UpdateRooms();
 
-  const ips = getIps();
   const roomsPerCycle = getRoomsPerCycle(ips.length);
 
   // eslint-disable-next-line prefer-const
@@ -235,7 +234,7 @@ const requestRoomUpdaterJob = new CronJob(
 );
 
 app.listen(port, async () => {
-  const ips = getIps();
+  ips = getIps();
   for (let i = 0; i < ips.length; i += 1) {
     const ip = ips[i];
     if (!(await ipIsOnline(ip))) {

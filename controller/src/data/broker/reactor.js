@@ -4,7 +4,11 @@ import {
 } from "../../rooms/userHelper.js";
 import BaseDataBroker from "./base.js";
 import handleObjects from "../handle/custom/reactorRoom.js";
-import { getStats, handleCombinedRoomStats } from "../handle/helper.js";
+import {
+  getStats,
+  handleCombinedRoomStats,
+  FindNewDefaultActions,
+} from "../handle/helper.js";
 
 export default class ReactorDataBroker extends BaseDataBroker {
   static Type = "reactor";
@@ -95,6 +99,8 @@ export default class ReactorDataBroker extends BaseDataBroker {
               userStats.shards[dataRequest.shard][dataRequest.room] =
                 getStats(actionsArray);
             }
+
+            FindNewDefaultActions(actionsArray, ReactorDataBroker.Type);
           }
         });
 

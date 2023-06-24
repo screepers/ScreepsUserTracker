@@ -29,8 +29,8 @@ process.once("SIGINT", async () => {
 const dataRequestBroker = new DataRequestBroker();
 const app = express();
 
-app.use(bodyParser.json({limit: '100mb'}));
-app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
+app.use(bodyParser.json({ limit: "100mb" }));
+app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
 
 app.post("/ping", (req, res) => {
   writeSettings(req.body);
@@ -106,7 +106,9 @@ const job = new CronJob(
 job.start();
 
 app.listen(port, async () => {
-  ip = hasExternalIp ? `http://${await publicIpv4()}:${port}` : "http://localhost:"+port;
+  ip = hasExternalIp
+    ? `http://${await publicIpv4()}:${port}`
+    : `http://localhost:${port}`;
 
   connectToController();
   console.log(`API listening on port ${port}`);

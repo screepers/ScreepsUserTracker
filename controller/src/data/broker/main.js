@@ -5,7 +5,11 @@ import {
   GetRoomTotal,
 } from "../../rooms/userHelper.js";
 import handleObjects from "../handle/objects.js";
-import { getStats, handleCombinedRoomStats } from "../handle/helper.js";
+import {
+  getStats,
+  handleCombinedRoomStats,
+  FindNewDefaultActions,
+} from "../handle/helper.js";
 
 export default class MainDataBroker extends BaseDataBroker {
   static Type = "main";
@@ -79,6 +83,8 @@ export default class MainDataBroker extends BaseDataBroker {
                 );
               }
             });
+
+            FindNewDefaultActions(actionsArray, MainDataBroker.Type);
 
             if (!userStats.shards[dataRequest.shard]) {
               userStats.shards[dataRequest.shard] = {};

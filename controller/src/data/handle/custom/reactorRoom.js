@@ -13,16 +13,17 @@ export default function handleObjects(objects, extras = {}) {
   const originalReactor = reactors[0];
 
   if (originalReactor) {
-    actions.push(
-      CreateAction(
-        "season.activeReactors",
-        originalReactor.launchTime ? 1 : 0,
-        ActionType.FirstTickOnly
-      )
-    );
+    const continuousTicks = currentTick - originalReactor.launchTime;
 
-    if (originalReactor.launchTime) {
-      const continuousTicks = currentTick - originalReactor.launchTime;
+    if (extras.firstTickOnly) {
+      actions.push(
+        CreateAction(
+          "season.activeReactors",
+          originalReactor.launchTime ? 1 : 0,
+          ActionType.FirstTickOnly
+        )
+      );
+
       actions.push(
         CreateAction(
           "season.continuousTicks",
@@ -30,14 +31,14 @@ export default function handleObjects(objects, extras = {}) {
           ActionType.FirstTickOnly
         )
       );
-
-      const score = 1 + Math.floor(Math.log10(continuousTicks));
-      actions.push(
-        CreateAction("season.scorePerTick", score, ActionType.FirstTickOnly)
-      );
     }
+
+    const score = 1 + Math.floor(Math.log10(continuousTicks));
+    actions.push(
+      CreateAction("season.scorePerTick", score, ActionType.FirstTickOnly)
+    );
   }
 
-  actions = actions.concat(ActionListDefaultValuesFiller(actions, extras.type));
+  actions = ActionListDefaultValuesFiller(actions, extras.type);
   return actions;
 }

@@ -7,8 +7,8 @@ export const ActionType = Object.freeze({
   FirstTickOnly: 1,
 });
 
-export function CreateAction(path, value, action) {
-  return { path, value, action };
+export function CreateAction(path, value, type) {
+  return { path, value, type };
 }
 
 export function finalizeActions(actions) {
@@ -90,20 +90,26 @@ function addNewDefaultAction(action, type) {
   defaultActionsPerType[type].data = file;
 }
 
+export function FindNewDefaultActions(actions, type) {
+  const defaultActions = getDefaultActions(type);
+
+  actions
+    .filter((v, i, a) => a.findIndex((v2) => v2.path === v.path) === i)
+    .forEach((action) => {
+      const defaultAction = defaultActions.find(
+        (a) => a.path === action.path && a.action === action.action
+      );
+      if (!defaultAction) {
+        addNewDefaultAction(action, type);
+      }
+    });
+}
+
 export function ActionListDefaultValuesFiller(actions, type) {
   getDefaultActions(type).forEach((defaultAction) => {
     const action = actions.find((a) => a.path === defaultAction.path);
     if (!action) {
       actions.push(defaultAction);
-    }
-  });
-
-  actions.forEach((action) => {
-    const defaultAction = getDefaultActions(type).find(
-      (a) => a.path === action.path && a.action === action.action
-    );
-    if (!defaultAction) {
-      addNewDefaultAction(action, type);
     }
   });
 

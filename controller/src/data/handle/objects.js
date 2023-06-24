@@ -22,19 +22,18 @@ export default function handleObjects(username, objects, extras = {}) {
         delete objects[objectKeys[o]];
     }
   }
-
-  const creeps = findAllByType(objects, "creep");
-  const structures = findAllByType(objects, "structure");
-  const constructionSites = findAllByType(objects, "constructionSite");
-  const minerals = findAllByType(objects, "mineral");
-  const intents = GetIntents(objects, originalObjects);
-
   let actions = [];
 
   // #region FirstTick
   const { isFirstTick } = extras;
+  const intents = GetIntents(objects, originalObjects);
 
   if (isFirstTick) {
+    const creeps = findAllByType(objects, "creep");
+    const structures = findAllByType(objects, "structure");
+    const constructionSites = findAllByType(objects, "constructionSite");
+    const minerals = findAllByType(objects, "mineral");
+
     // #region Totals
     actions.push(
       CreateAction("totals.creeps", creeps.length, ActionType.FirstTickOnly)
@@ -309,19 +308,17 @@ export default function handleObjects(username, objects, extras = {}) {
 
   // #region Controller
   const originalControllers = findAllByType(originalObjects, "controller");
+  let rclPerTick = 0;
   if (originalControllers && originalControllers.length > 0) {
     const originalController = originalControllers[0];
     const controller = objects[originalController._id] || {};
     if (controller._upgraded) {
-      actions.push(
-        CreateAction(
-          `controller.rclPerTick`,
-          controller._upgraded,
-          ActionType.Divide100
-        )
-      );
+      rclPerTick = controller._upgraded;
     }
   }
+  actions.push(
+    CreateAction(`controller.rclPerTick`, rclPerTick, ActionType.Divide100)
+  );
   // #endregion
 
   // #region IntentsCategories
@@ -383,15 +380,13 @@ export default function handleObjects(username, objects, extras = {}) {
         Math.min(spawn.spawning.spawnTime, maxSpawnTime) - currentTick;
     }
   });
-  if (spawnDuration > 0) {
-    actions.push(
-      CreateAction(
-        `spawning.spawnUptimePercentage`,
-        Math.round(spawnDuration / spawnCount),
-        ActionType.Divide100
-      )
-    );
-  }
+  actions.push(
+    CreateAction(
+      `spawning.spawnUptimePercentage`,
+      spawnDuration > 0 ? Math.round(spawnDuration / spawnCount) : 0,
+      ActionType.Divide100
+    )
+  );
   // #endregion
   // #endregion
 
@@ -399,6 +394,6 @@ export default function handleObjects(username, objects, extras = {}) {
     CreateAction("totals.intents", intents.length, ActionType.Divide100)
   );
 
-  actions = actions.concat(ActionListDefaultValuesFiller(actions, extras.type));
+  actions = ActionListDefaultValuesFiller(actions, extras.type);
   return actions;
 }
