@@ -60,8 +60,6 @@ export default class BaseDataBroker {
       this._users[username][shard] = {};
     }
 
-    if (force) this.RemoveUploadedData(username, shard, rooms);
-
     const knownRoomNames = Object.keys(this._users[username][shard]);
     knownRoomNames.forEach((roomName) => {
       if (!this._users[username][shard][roomName])
