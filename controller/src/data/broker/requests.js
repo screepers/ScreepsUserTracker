@@ -71,7 +71,7 @@ export default class DataRequestsBroker {
     const noDuplicatedRequests = [];
     const noDuplicatedRequestsAggregator = {};
     this.requests.forEach((r)=>{
-      if (!noDuplicatedRequestsAggregator[r.type]) noDuplicatedRequestsAggregator[type] = {};
+      if (!noDuplicatedRequestsAggregator[r.type]) noDuplicatedRequestsAggregator[r.type] = {};
       if (!noDuplicatedRequestsAggregator[r.type][r.tick]) noDuplicatedRequestsAggregator[r.type][r.tick] = {}
       if (!noDuplicatedRequestsAggregator[r.type][r.tick][r.shard]) noDuplicatedRequestsAggregator[r.type][r.tick][r.shard] = {}
       noDuplicatedRequestsAggregator[r.type][r.tick][r.shard][r.room] = null
