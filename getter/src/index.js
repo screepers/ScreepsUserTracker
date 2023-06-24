@@ -106,7 +106,7 @@ const job = new CronJob(
 job.start();
 
 app.listen(port, async () => {
-  ip = hasExternalIp ? await publicIpv4() : "http://localhost:4000";
+  ip = hasExternalIp ? `${await publicIpv4()}:${port}` : "http://localhost:"+port;
 
   connectToController();
   console.log(`API listening on port ${port}`);

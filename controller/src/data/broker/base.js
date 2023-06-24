@@ -16,8 +16,6 @@ const client = graphite.createClient(
 export default class BaseDataBroker {
   _users = {};
 
-  _data = {};
-
   _lastTickTimestamp = {};
 
   _shards = GetShards();
@@ -52,23 +50,6 @@ export default class BaseDataBroker {
         type: "Status",
       }
     );
-  }
-
-  RemoveUploadedData(username, shard, rooms) {
-    const knownRoomNames = Object.keys(this._data[username][shard]);
-    const removedRooms = knownRoomNames.filter((kr) => !rooms.includes(kr));
-
-    removedRooms.forEach((roomName) => {
-      delete this._data[username][shard][roomName];
-    });
-
-    const roomNames = Object.keys(this._users[username][shard]);
-    roomNames.forEach((roomName) => {
-      const userData = this._users[username][shard][roomName];
-      if (userData) {
-        this._data[username][shard][roomName].shift();
-      }
-    });
   }
 
   AddRooms(username, shard, rooms, force = false) {
@@ -131,15 +112,11 @@ export default class BaseDataBroker {
   }
 
   AddRoomData(username, shard, roomName, data) {
-    if (!this._data[username]) this._data[username] = {};
-    if (!this._data[username][shard]) this._data[username][shard] = {};
-    if (!this._data[username][shard][roomName])
-      this._data[username][shard][roomName] = [];
+    if (!this._users[username]) return;
+    if (!this._users[username][shard]) return;
+    if (this._users[username][shard][roomName] === undefined) return;
 
-    this._data[username][shard][roomName].push(data);
-    this._data[username][shard][roomName].sort(
-      (a, b) => a.dataRequest.tick - b.dataRequest.tick
-    );
+    this._users[username][shard][roomName] = data;
   }
 
   async CheckUsers() {
@@ -148,17 +125,9 @@ export default class BaseDataBroker {
     Object.entries(this._users).forEach(([username, shards]) => {
       let hasUndefinedData = false;
 
-      Object.entries(shards).forEach(([shard, rooms]) => {
-        Object.keys(rooms).forEach((roomName) => {
-          try {
-            const roomDataList = this._data[username][shard][roomName];
-            const roomData = roomDataList[0];
-            if (roomData) {
-              this._users[username][shard][roomName] = roomData;
-            } else hasUndefinedData = true;
-          } catch {
-            hasUndefinedData = true;
-          }
+      Object.values(shards).forEach((rooms) => {
+        Object.values(rooms).forEach((roomData) => {
+          if (!roomData) hasUndefinedData = true;
         });
       });
 

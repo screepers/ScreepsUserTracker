@@ -67,7 +67,28 @@ export default class DataRequestsBroker {
 
   saveRequests() {
     fs.mkdirSync(requestsFolderPath, { recursive: true });
+
+    const noDuplicatedRequests = [];
+    const noDuplicatedRequestsAggregator = {};
+    this.requests.forEach((r)=>{
+      if (!noDuplicatedRequestsAggregator[r.type]) noDuplicatedRequestsAggregator[type] = {};
+      if (!noDuplicatedRequestsAggregator[r.type][r.tick]) noDuplicatedRequestsAggregator[r.type][r.tick] = {}
+      if (!noDuplicatedRequestsAggregator[r.type][r.tick][r.shard]) noDuplicatedRequestsAggregator[r.type][r.tick][r.shard] = {}
+      noDuplicatedRequestsAggregator[r.type][r.tick][r.shard][r.room] = null
+    })
+
+    Object.keys(noDuplicatedRequestsAggregator).forEach((type)=>{
+      Object.keys(noDuplicatedRequestsAggregator[type]).forEach((tick)=>{
+        Object.keys(noDuplicatedRequestsAggregator[type][tick]).forEach((shard)=>{
+          Object.keys(noDuplicatedRequestsAggregator[type][tick][shard]).forEach((room)=>{
+            noDuplicatedRequests.push({type,tick,shard, room})
+          })
+        })
+      })
+    })
+
     fs.writeFileSync(requestsPath, JSON.stringify(this.requests));
+    this.requests = noDuplicatedRequests;
   }
 
   getRequestsToSend(count) {
