@@ -51,8 +51,7 @@ async function ipIsOnline(ip) {
 }
 
 function removeIp(ip) {
-  const ips = getIps();
-  ips.splice(ips.indexOf(ip), 1);
+  const ips = getIps().filter(i=>i!==ip)
   fs.writeFileSync("./files/ips.json", JSON.stringify(ips));
 }
 
