@@ -11,11 +11,12 @@ export default function handleObjects(objects, extras = {}) {
   let actions = [];
   const reactors = findAllByType(objects, "reactor");
   const originalReactor = reactors[0];
+  const { isFirstTick } = extras;
 
   if (originalReactor) {
     const continuousTicks = currentTick - originalReactor.launchTime;
 
-    if (extras.firstTickOnly) {
+    if (isFirstTick) {
       actions.push(
         CreateAction(
           "season.activeReactors",
@@ -39,6 +40,6 @@ export default function handleObjects(objects, extras = {}) {
     );
   }
 
-  actions = ActionListDefaultValuesFiller(actions, extras.type);
+  actions = ActionListDefaultValuesFiller(actions, extras.type, isFirstTick);
   return actions;
 }

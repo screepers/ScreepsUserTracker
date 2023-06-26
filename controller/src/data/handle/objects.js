@@ -124,22 +124,6 @@ export default function handleObjects(username, objects, extras = {}) {
         )
       );
     });
-
-    const intentsByType = intents.reduce((acc, obj) => {
-      if (!acc[obj.action]) acc[obj.action] = 0;
-      acc[obj.action] += 1;
-      return acc;
-    }, {});
-    const intentsByTypeKeys = Object.keys(intentsByType);
-    intentsByTypeKeys.forEach((type) => {
-      actions.push(
-        CreateAction(
-          `countByType.intents.${type}`,
-          intentsByType[type],
-          ActionType.Divide100
-        )
-      );
-    });
     // #endregion
 
     // #region Construction
@@ -366,6 +350,22 @@ export default function handleObjects(username, objects, extras = {}) {
       );
     });
   });
+
+  const intentsByType = intents.reduce((acc, obj) => {
+    if (!acc[obj.action]) acc[obj.action] = 0;
+    acc[obj.action] += 1;
+    return acc;
+  }, {});
+  const intentsByTypeKeys = Object.keys(intentsByType);
+  intentsByTypeKeys.forEach((type) => {
+    actions.push(
+      CreateAction(
+        `countByType.intents.${type}`,
+        intentsByType[type],
+        ActionType.Divide100
+      )
+    );
+  });
   // #endregion
 
   // #region Spawn
@@ -394,6 +394,5 @@ export default function handleObjects(username, objects, extras = {}) {
     CreateAction("totals.intents", intents.length, ActionType.Divide100)
   );
 
-  actions = ActionListDefaultValuesFiller(actions, extras.type);
-  return actions;
+  return ActionListDefaultValuesFiller(actions, extras.type, isFirstTick);
 }

@@ -16,30 +16,35 @@ export function finalizeActions(actions) {
 
   const actionsByPath = {};
   actions.forEach((action) => {
-    if (!actionsByPath[action.path]) actionsByPath[action.path] = [];
-    actionsByPath[action.path].push(action);
+    if (!actionsByPath[action.type]) actionsByPath[action.type] = {};
+    if (!actionsByPath[action.type][action.path])
+      actionsByPath[action.type][action.path] = [];
+    actionsByPath[action.type][action.path].push(action);
   });
 
-  Object.entries(actionsByPath).forEach(([path, _actions]) => {
-    const divide100 = _actions.filter(
-      (action) => action.action === ActionType.Divide100
-    );
-    if (divide100.length > 0) {
-      const action = divide100.reduce(
-        (acc, a) => {
-          acc.value += a.value;
-          return acc;
-        },
-        { path, value: 0 }
-      );
-      if (action.value > 0) action.value /= 100;
-      finalActions.push(action);
-    }
-
-    const firstTickOnly = _actions.filter(
-      (action) => action.action === ActionType.FirstTickOnly
-    )[0];
-    if (firstTickOnly) finalActions.push(firstTickOnly);
+  Object.entries(actionsByPath).forEach(([type, paths]) => {
+    Object.entries(paths).forEach(([path, _actions]) => {
+      switch (Number(type)) {
+        case ActionType.Divide100:
+          {
+            const action = _actions.reduce(
+              (acc, a) => {
+                acc.value += a.value;
+                return acc;
+              },
+              { path, value: 0 }
+            );
+            if (action.value > 0) action.value /= 100;
+            finalActions.push(action);
+          }
+          break;
+        case ActionType.FirstTickOnly:
+          if (_actions[0]) finalActions.push(_actions[0]);
+          break;
+        default:
+          break;
+      }
+    });
   });
 
   return finalActions;
@@ -63,11 +68,14 @@ export function getStats(actions) {
   return stats;
 }
 
-export function getDefaultActions(type) {
+export function getDefaultActions(type, isFirstTick) {
+  const getDivide100Data = (dataList) =>
+    dataList.filter((d) => d.type === ActionType.Divide100);
   const time = Date.now();
   if (defaultActionsPerType[type]) {
     const cached = defaultActionsPerType[type];
-    if (time - cached.time < 60 * 1000) return cached.data;
+    if (time - cached.time < 60 * 1000)
+      return !isFirstTick ? getDivide100Data(cached.data) : cached.data;
   }
 
   const fileName = `./files/defaultActions.${type}.json`;
@@ -76,7 +84,7 @@ export function getDefaultActions(type) {
   else fs.writeFileSync(fileName, JSON.stringify([]));
 
   defaultActionsPerType[type] = { data, time };
-  return data;
+  return !isFirstTick ? getDivide100Data(data) : data;
 }
 
 function addNewDefaultAction(action, type) {
@@ -90,14 +98,15 @@ function addNewDefaultAction(action, type) {
   defaultActionsPerType[type].data = file;
 }
 
-export function FindNewDefaultActions(actions, type) {
+export function FindNewDefaultActions(_actions, type) {
+  const actions = JSON.parse(JSON.stringify(_actions));
   const defaultActions = getDefaultActions(type);
 
   actions
     .filter((v, i, a) => a.findIndex((v2) => v2.path === v.path) === i)
     .forEach((action) => {
       const defaultAction = defaultActions.find(
-        (a) => a.path === action.path && a.action === action.action
+        (a) => a.path === action.path && a.type === action.type
       );
       if (!defaultAction) {
         addNewDefaultAction(action, type);
@@ -105,8 +114,8 @@ export function FindNewDefaultActions(actions, type) {
     });
 }
 
-export function ActionListDefaultValuesFiller(actions, type) {
-  getDefaultActions(type).forEach((defaultAction) => {
+export function ActionListDefaultValuesFiller(actions, type, isFirstTick) {
+  getDefaultActions(type, isFirstTick).forEach((defaultAction) => {
     const action = actions.find((a) => a.path === defaultAction.path);
     if (!action) {
       actions.push(defaultAction);
@@ -116,19 +125,19 @@ export function ActionListDefaultValuesFiller(actions, type) {
   return actions;
 }
 
-function groupBy(original, value) {
+function groupBy(original, value, obj) {
   // eslint-disable-next-line no-param-reassign
-  if (original === null) original = value;
+  if (!original) original = value;
   const typeofValue = typeof value;
 
   if (original !== null && value !== null) {
     if (Array.isArray(value)) {
       value.forEach((index) => {
-        original[index] = groupBy(original[index], value[index]).original;
+        original[index] = groupBy(original[index], value[index], obj).original;
       });
     } else if (typeofValue === "object") {
       Object.keys(value).forEach((key) => {
-        original[key] = groupBy(original[key], value[key]).original;
+        original[key] = groupBy(original[key], value[key],obj).original;
       });
     } else if (typeofValue === "number") {
       // eslint-disable-next-line no-param-reassign
@@ -147,7 +156,7 @@ export function handleCombinedRoomStats(shards, type) {
 
     // eslint-disable-next-line no-unused-vars
     Object.entries(rooms).forEach(([_, roomStats]) => {
-      stats[shard] = groupBy(stats[shard], roomStats).original;
+      stats[shard] = groupBy(stats[shard], roomStats,{base: stats[shard], roomStats}).original;
     });
   });
 
