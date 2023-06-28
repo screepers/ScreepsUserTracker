@@ -70,7 +70,7 @@ export default class ReactorDataBroker extends BaseDataBroker {
             const username = GetUsernameById(
               (
                 Object.values(currentObjects).find(
-                  (o) => o.user && o.type === "reactor"
+                  (o) => o.type === "reactor" && o.user && o.store.T > 0 && o.launchTime
                 ) || {}
               ).user
             );
