@@ -137,7 +137,7 @@ function groupBy(original, value, obj) {
       });
     } else if (typeofValue === "object") {
       Object.keys(value).forEach((key) => {
-        original[key] = groupBy(original[key], value[key],obj).original;
+        original[key] = groupBy(original[key], value[key], obj).original;
       });
     } else if (typeofValue === "number") {
       // eslint-disable-next-line no-param-reassign
@@ -156,7 +156,10 @@ export function handleCombinedRoomStats(shards, type) {
 
     // eslint-disable-next-line no-unused-vars
     Object.entries(rooms).forEach(([_, roomStats]) => {
-      stats[shard] = groupBy(stats[shard], roomStats,{base: stats[shard], roomStats}).original;
+      stats[shard] = groupBy(stats[shard], roomStats, {
+        base: stats[shard],
+        roomStats,
+      }).original;
     });
   });
 

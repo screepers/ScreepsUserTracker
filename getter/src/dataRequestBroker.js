@@ -57,9 +57,9 @@ export default class DataRequestBroker {
   }
 
   getDataResultsToSend() {
-    const toSend = this.dataResults.slice(0, 500)
+    const toSend = this.dataResults.slice(0, 500);
     const dataResults = JSON.parse(JSON.stringify(toSend));
-    this.resetDataResults(this.dataResults.slice(500, ));
+    this.resetDataResults(this.dataResults.slice(500));
 
     return dataResults;
   }

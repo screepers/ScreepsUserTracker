@@ -22,7 +22,7 @@ export default function handleObjects(username, objects, extras = {}) {
         delete objects[objectKeys[o]];
     }
   }
-  let actions = [];
+  const actions = [];
 
   // #region FirstTick
   const { isFirstTick } = extras;
