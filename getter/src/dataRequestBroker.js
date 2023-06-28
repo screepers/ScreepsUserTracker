@@ -52,13 +52,14 @@ export default class DataRequestBroker {
     this.dataResults.push({ dataResult, dataRequest, id: (resultId += 1) });
   }
 
-  resetDataResults() {
-    this.dataResults = [];
+  resetDataResults(newData) {
+    this.dataResults = newData;
   }
 
   getDataResultsToSend() {
-    const dataResults = JSON.parse(JSON.stringify(this.dataResults));
-    this.resetDataResults();
+    const toSend = this.dataResults.slice(0, 500)
+    const dataResults = JSON.parse(JSON.stringify(toSend));
+    this.resetDataResults(this.dataResults.slice(500, ));
 
     return dataResults;
   }
