@@ -19,7 +19,7 @@ const shards = GetShards();
 async function getRoomNames(shard) {
   const rooms = [];
   const size = await GetWorldSize(shard);
-  sleep(500);
+  await sleep(500);
 
   for (let x = 0; x < size.width / 2; x += 1) {
     for (let y = 0; y < size.height / 2; y += 1) {

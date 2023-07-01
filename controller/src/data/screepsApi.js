@@ -80,7 +80,7 @@ export async function GetGclOfUsers() {
           hasUsersLeft = false;
         }
       }
-      sleep(500);
+      await sleep(500);
     }
 
     return gcls;
@@ -117,7 +117,7 @@ export async function GetPowerOfUsers() {
       });
 
       if (list.length === 0) hasUsersLeft = false;
-      sleep(500);
+      await sleep(500);
     }
 
     return powers;
@@ -146,7 +146,7 @@ export async function GetScoresOfUsers() {
       });
 
       if (users.length === 0) hasUsersLeft = false;
-      sleep(500);
+      await sleep(500);
     }
 
     return scores;
@@ -157,7 +157,7 @@ export async function GetScoresOfUsers() {
 }
 
 export async function GetWorldSize(shard) {
-  sleep(500);
+  await sleep(500);
 
   try {
     const size = await api.raw.game.worldSize(shard);
@@ -171,7 +171,7 @@ export async function GetWorldSize(shard) {
 }
 
 export async function GetMapStats(shard, rooms) {
-  sleep(500);
+  await sleep(500);
 
   try {
     const mapStats = await api.raw.game.mapStats(rooms, "owner0", shard);
@@ -185,7 +185,7 @@ export async function GetMapStats(shard, rooms) {
 }
 
 export async function GetGameTime(shard) {
-  sleep(500);
+  await sleep(500);
 
   try {
     const time = await api.raw.game.time(shard);
