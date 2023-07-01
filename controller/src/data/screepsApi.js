@@ -45,10 +45,9 @@ function getSeason(getLastSeason) {
 export async function GetGclOfUsers() {
   try {
     const gcls = {};
-    let globalTries = 0;
 
     let offset = 0;
-    let season = getSeason();
+    const season = getSeason();
     const mode = "world";
     let hasUsersLeft = true;
 
@@ -67,19 +66,8 @@ export async function GetGclOfUsers() {
         gcls[user.username] = user.gcl;
       });
 
-      if (users.length === 0) {
-        if (globalTries > 1) {
-          hasUsersLeft = false;
-        }
-
-        if (offset === 0) {
-          globalTries += 1;
-          season = getSeason(true);
-          offset = 0;
-        } else {
-          hasUsersLeft = false;
-        }
-      }
+      if (users.length === 0) hasUsersLeft = false;
+      offset += 20;
       await sleep(500);
     }
 
@@ -94,6 +82,7 @@ export async function GetPowerOfUsers() {
   try {
     const powers = {};
 
+    let globalTries = 0;
     let offset = 0;
     const season = getSeason();
     const mode = "power";
@@ -116,7 +105,19 @@ export async function GetPowerOfUsers() {
         powers[user.username] = rank.score;
       });
 
-      if (list.length === 0) hasUsersLeft = false;
+      if (list.length === 0) {
+        if (globalTries > 1) {
+          hasUsersLeft = false;
+        }
+
+        if (offset === 0) {
+          globalTries += 1;
+          season = getSeason(true);
+          offset = 0;
+        } else {
+          hasUsersLeft = false;
+        }
+      }
       await sleep(500);
     }
 
