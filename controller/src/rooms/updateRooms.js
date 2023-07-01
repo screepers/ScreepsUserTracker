@@ -9,11 +9,18 @@ import {
 } from "../data/screepsApi.js";
 import { mainLogger as logger } from "../logger.js";
 
+function sleep(ms) {
+  // eslint-disable-next-line no-promise-executor-return
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 const shards = GetShards();
 
 async function getRoomNames(shard) {
   const rooms = [];
   const size = await GetWorldSize(shard);
+  sleep(500);
+
   for (let x = 0; x < size.width / 2; x += 1) {
     for (let y = 0; y < size.height / 2; y += 1) {
       rooms.push(`E${x}N${y}`);

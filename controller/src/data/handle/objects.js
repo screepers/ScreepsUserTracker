@@ -150,7 +150,10 @@ export default function handleObjects(username, objects, extras = {}) {
 
     // #region ResourcesStored & Minerals
     const resourcesStored = structures.reduce((acc, structure) => {
-      if (structure.store && ['storage','link', 'container','terminal'].includes(structure.type)) {
+      if (
+        structure.store &&
+        ["storage", "link", "container", "terminal"].includes(structure.type)
+      ) {
         Object.entries(structure.store).forEach(([resource, amount]) => {
           if (!acc[resource]) acc[resource] = 0;
           acc[resource] += amount;

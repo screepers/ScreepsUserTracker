@@ -29,7 +29,7 @@ function sleep(ms) {
 }
 
 function getSeason(getLastSeason) {
-  let today = new Date();
+  const today = new Date();
 
   if (getLastSeason) {
     today.setMonth(today.getMonth() - 1);
@@ -37,9 +37,9 @@ function getSeason(getLastSeason) {
 
   // add a zero in front of numbers<10
   if (today.getMonth() < 10) {
-    return today.getFullYear() + "-0" + (today.getMonth() + 1);
+    return `${today.getFullYear()}-0${today.getMonth() + 1}`;
   }
-  return today.getFullYear() + "-" + (today.getMonth());
+  return `${today.getFullYear()}-${today.getMonth()}`;
 }
 
 export async function GetGclOfUsers() {
@@ -53,7 +53,12 @@ export async function GetGclOfUsers() {
     let hasUsersLeft = true;
 
     while (hasUsersLeft) {
-      const leaderboard = await api.raw.leaderboard.list(20, mode, offset, season);
+      const leaderboard = await api.raw.leaderboard.list(
+        20,
+        mode,
+        offset,
+        season
+      );
       if (!leaderboard.ok) throw new Error(JSON.stringify(leaderboard));
       logger.debug(leaderboard);
 
@@ -67,12 +72,11 @@ export async function GetGclOfUsers() {
           hasUsersLeft = false;
         }
 
-          if (offset === 0) {
+        if (offset === 0) {
           globalTries += 1;
           season = getSeason(true);
           offset = 0;
-        }
-        else {
+        } else {
           hasUsersLeft = false;
         }
       }
@@ -91,12 +95,17 @@ export async function GetPowerOfUsers() {
     const powers = {};
 
     let offset = 0;
-    let season = getSeason();
+    const season = getSeason();
     const mode = "power";
     let hasUsersLeft = true;
 
     while (hasUsersLeft) {
-      const leaderboard = await api.raw.leaderboard.list(20, mode, offset, season);
+      const leaderboard = await api.raw.leaderboard.list(
+        20,
+        mode,
+        offset,
+        season
+      );
       if (!leaderboard.ok) throw new Error(JSON.stringify(leaderboard));
       logger.debug(leaderboard);
       offset += 20;
@@ -137,7 +146,7 @@ export async function GetScoresOfUsers() {
       });
 
       if (users.length === 0) hasUsersLeft = false;
-      sleep(250);
+      sleep(500);
     }
 
     return scores;
@@ -148,6 +157,8 @@ export async function GetScoresOfUsers() {
 }
 
 export async function GetWorldSize(shard) {
+  sleep(500);
+
   try {
     const size = await api.raw.game.worldSize(shard);
     if (!size.ok) throw new Error(JSON.stringify(size));
@@ -160,6 +171,8 @@ export async function GetWorldSize(shard) {
 }
 
 export async function GetMapStats(shard, rooms) {
+  sleep(500);
+
   try {
     const mapStats = await api.raw.game.mapStats(rooms, "owner0", shard);
     if (!mapStats.ok) throw new Error(JSON.stringify(mapStats));
@@ -172,6 +185,8 @@ export async function GetMapStats(shard, rooms) {
 }
 
 export async function GetGameTime(shard) {
+  sleep(500);
+
   try {
     const time = await api.raw.game.time(shard);
     if (typeof time !== "object" || !time.ok)

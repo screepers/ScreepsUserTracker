@@ -37,10 +37,11 @@ const settings = {
 
 let ips = [];
 
-const getIps = () =>
-  fs.existsSync("./files/ips.json")
+function getIps() {
+  return fs.existsSync("./files/ips.json")
     ? JSON.parse(fs.readFileSync("./files/ips.json"))
     : [];
+}
 
 async function ipIsOnline(ip) {
   try {
@@ -51,7 +52,6 @@ async function ipIsOnline(ip) {
 
   return true;
 }
-
 function removeIp(ip) {
   ips = getIps().filter((i) => i !== ip);
   fs.writeFileSync("./files/ips.json", JSON.stringify(ips));
