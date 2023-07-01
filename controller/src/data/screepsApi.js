@@ -28,26 +28,54 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function getSeason(getLastSeason) {
+  let today = new Date();
+
+  if (getLastSeason) {
+    today.setMonth(today.getMonth() - 1);
+  }
+
+  // add a zero in front of numbers<10
+  if (today.getMonth() < 10) {
+    return today.getFullYear() + "-0" + (today.getMonth() + 1);
+  }
+  return today.getFullYear() + "-" + (today.getMonth());
+}
+
 export async function GetGclOfUsers() {
   try {
     const gcls = {};
+    let globalTries = 0;
 
     let offset = 0;
+    let season = getSeason();
     const mode = "world";
     let hasUsersLeft = true;
 
     while (hasUsersLeft) {
-      const leaderboard = await api.raw.leaderboard.list(20, mode, offset);
+      const leaderboard = await api.raw.leaderboard.list(20, mode, offset, season);
       if (!leaderboard.ok) throw new Error(JSON.stringify(leaderboard));
       logger.debug(leaderboard);
-      offset += 20;
 
       const users = Object.values(leaderboard.users);
       users.forEach((user) => {
         gcls[user.username] = user.gcl;
       });
 
-      if (users.length === 0) hasUsersLeft = false;
+      if (users.length === 0) {
+        if (globalTries > 1) {
+          hasUsersLeft = false;
+        }
+
+          if (offset === 0) {
+          globalTries += 1;
+          season = getSeason(true);
+          offset = 0;
+        }
+        else {
+          hasUsersLeft = false;
+        }
+      }
       sleep(500);
     }
 
@@ -63,11 +91,12 @@ export async function GetPowerOfUsers() {
     const powers = {};
 
     let offset = 0;
+    let season = getSeason();
     const mode = "power";
     let hasUsersLeft = true;
 
     while (hasUsersLeft) {
-      const leaderboard = await api.raw.leaderboard.list(20, mode, offset);
+      const leaderboard = await api.raw.leaderboard.list(20, mode, offset, season);
       if (!leaderboard.ok) throw new Error(JSON.stringify(leaderboard));
       logger.debug(leaderboard);
       offset += 20;

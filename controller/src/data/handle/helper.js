@@ -156,7 +156,7 @@ export function handleCombinedRoomStats(shards, type) {
 
     // eslint-disable-next-line no-unused-vars
     Object.entries(rooms).forEach(([_, roomStats]) => {
-      stats[shard] = groupBy(stats[shard], roomStats, {
+      stats[shard] = groupBy(stats[shard], JSON.parse(JSON.stringify(roomStats)), {
         base: stats[shard],
         roomStats,
       }).original;
