@@ -56,7 +56,7 @@ export default class MainDataBroker extends BaseDataBroker {
                       this._lastTickTimestamp[dataRequest.shard]) /
                       100
                   )
-                : 0;
+                : undefined;
 
               this._lastTickTimestamp[dataRequest.shard] = dataResult.timestamp;
             }
