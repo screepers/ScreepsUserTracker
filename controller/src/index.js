@@ -226,7 +226,7 @@ const dataGetterJob = new CronJob(
 );
 
 const requestRoomUpdaterJob = new CronJob(
-  !DEBUG ? "0 * * * *" : "*/15 * * * *",
+  !DEBUG ? "0 * * * *" : "*/5 * * * *",
   requestRoomUpdater,
   null,
   false,
