@@ -376,12 +376,11 @@ export default function handleObjects(username, objects, extras = {}) {
   const spawnCount = originalSpawns.length;
   let spawnDuration = 0;
   originalSpawns.forEach((originalSpawn) => {
-    const maxSpawnTime = Math.floor(100 * currentTick) / 100 + 100;
+    const maxSpawnTime = Math.floor(currentTick / 100) * 100 + 100;
+
     const spawn = objects[originalSpawn._id] || {};
-    if (spawn.spawning) {
-      spawnDuration +=
+    if (spawn.spawning) spawnDuration +=
         Math.min(spawn.spawning.spawnTime, maxSpawnTime) - currentTick;
-    }
   });
   actions.push(
     CreateAction(
