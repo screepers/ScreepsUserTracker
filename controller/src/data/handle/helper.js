@@ -68,7 +68,7 @@ export function getStats(actions) {
   return stats;
 }
 
-export function getDefaultActions(type, isFirstTick) {
+export function getDefaultActions(type, isFirstTick = true) {
   const getDivide100Data = (dataList) =>
     dataList.filter((d) => d.type === ActionType.Divide100);
   const time = Date.now();
@@ -127,7 +127,7 @@ export function ActionListDefaultValuesFiller(actions, type, isFirstTick) {
 
 function groupBy(original, value, obj) {
   // eslint-disable-next-line no-param-reassign
-  if (!original) original = value;
+  if (original === undefined || original === null) original = JSON.parse(JSON.stringify(value));
   const typeofValue = typeof value;
 
   if (original !== null && value !== null) {
