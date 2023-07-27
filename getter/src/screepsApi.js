@@ -1,10 +1,8 @@
-import * as dotenv from "dotenv";
 import { ScreepsAPI } from "screeps-api";
-
-dotenv.config();
+import settings from "./settings.js";
 
 let path;
-switch (process.env.SERVER_TYPE) {
+switch (settings.serverType) {
   case "seasonal":
     path = "/season/";
     break;
@@ -15,7 +13,6 @@ switch (process.env.SERVER_TYPE) {
 }
 
 const api = new ScreepsAPI({
-  token: process.env.SCREEPS_TOKEN,
   protocol: "https",
   hostname: "screeps.com",
   port: 443,
@@ -23,7 +20,6 @@ const api = new ScreepsAPI({
 });
 
 const historyApi = new ScreepsAPI({
-  token: process.env.SCREEPS_TOKEN,
   protocol: "https",
   hostname: "screeps.com",
   port: 443,

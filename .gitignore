@@ -5,3 +5,6 @@ logs
 # Files
 ips.json
 users.json
+requests.json
+roomsBeingChecked.json
+settings.json

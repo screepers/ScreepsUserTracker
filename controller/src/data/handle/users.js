@@ -11,9 +11,12 @@ async function handleUser(username) {
   const user = GetUserData(username);
   const { shards, gcl, power, score } = user;
 
+  if (!gcl) delete user.gcl;
+  if (!power) delete user.power;
+  if (!score) delete user.score;
   const stats = {
     shards: {},
-    overview: { gcl: gcl || 0, power: power || 0, score },
+    overview: { gcl, power, score },
   };
 
   shardNames.forEach((shard) => {

@@ -10,8 +10,7 @@ import {
 import GetIntents from "./intentsHelper.js";
 
 export default function handleObjects(username, objects, extras = {}) {
-  const currentObjects = extras.currentObjects || {};
-  const ticks = extras.ticks || {};
+  const originalObjects = extras.originalObjects || {};
   const currentTick = parseInt(extras.tick, 10);
 
   const objectKeys = Object.keys(objects);
@@ -23,177 +22,290 @@ export default function handleObjects(username, objects, extras = {}) {
         delete objects[objectKeys[o]];
     }
   }
+  const actions = [];
 
-  const creeps = findAllByType(objects, "creep");
-  const structures = findAllByType(objects, "structure");
-  const constructionSites = findAllByType(objects, "constructionSite");
-  const minerals = findAllByType(objects, "mineral");
-  const intents = GetIntents(objects, currentObjects, ticks);
+  // #region FirstTick
+  const { isFirstTick } = extras;
+  const intents = GetIntents(objects, originalObjects);
 
-  let actions = [];
+  if (isFirstTick) {
+    const creeps = findAllByType(objects, "creep");
+    const structures = findAllByType(objects, "structure");
+    const constructionSites = findAllByType(objects, "constructionSite");
+    const minerals = findAllByType(objects, "mineral");
 
-  // #region Totals
-  actions.push(
-    CreateAction("totals.creeps", creeps.length, ActionType.FirstTickOnly)
-  );
-  actions.push(
-    CreateAction(
-      "totals.structures",
-      structures.length,
-      ActionType.FirstTickOnly
-    )
-  );
-  actions.push(
-    CreateAction(
-      "totals.constructionSites",
-      constructionSites.length,
-      ActionType.FirstTickOnly
-    )
-  );
-  actions.push(
-    CreateAction(
-      "totals.resourcesStored",
-      structures.reduce((acc, structure) => {
-        if (structure.store) {
-          Object.values(structure.store).forEach((amount) => {
-            acc += amount;
-          });
-        }
-        return acc;
-      }, 0),
-      ActionType.FirstTickOnly
-    )
-  );
-  actions.push(
-    CreateAction(
-      "totals.minerals",
-      minerals.reduce((acc, mineral) => {
-        acc += mineral.amount || 0;
-        return acc;
-      }, 0),
-      ActionType.FirstTickOnly
-    )
-  );
-  actions.push(
-    CreateAction("totals.intents", intents.length, ActionType.Divide100)
-  );
-  // #endregion
+    // #region Totals
+    actions.push(
+      CreateAction("totals.creeps", creeps.length, ActionType.FirstTickOnly)
+    );
+    actions.push(
+      CreateAction(
+        "totals.structures",
+        structures.length,
+        ActionType.FirstTickOnly
+      )
+    );
+    actions.push(
+      CreateAction(
+        "totals.constructionSites",
+        constructionSites.length,
+        ActionType.FirstTickOnly
+      )
+    );
+    actions.push(
+      CreateAction(
+        "totals.resourcesStored",
+        structures.reduce((acc, structure) => {
+          if (structure.store) {
+            Object.values(structure.store).forEach((amount) => {
+              acc += amount;
+            });
+          }
+          return acc;
+        }, 0),
+        ActionType.FirstTickOnly
+      )
+    );
+    actions.push(
+      CreateAction(
+        "totals.minerals",
+        minerals.reduce((acc, mineral) => {
+          acc += mineral.amount || 0;
+          return acc;
+        }, 0),
+        ActionType.FirstTickOnly
+      )
+    );
+    // #endregion
 
-  // #region CountByType
-  const creepPartsByType = creeps.reduce((acc, creep) => {
-    Object.entries(creep.body).forEach(([part, count]) => {
-      if (!acc[part]) acc[part] = 0;
-      acc[part] += count;
+    // #region CountByType
+    const creepPartsByType = creeps.reduce((acc, creep) => {
+      Object.entries(creep.body).forEach(([part, count]) => {
+        if (!acc[part]) acc[part] = 0;
+        acc[part] += count;
+      });
+      return acc;
+    }, {});
+    const creepPartsByTypeKeys = Object.keys(creepPartsByType);
+    creepPartsByTypeKeys.forEach((part) => {
+      actions.push(
+        CreateAction(
+          `countByType.creepParts.${part}`,
+          creepPartsByType[part],
+          ActionType.FirstTickOnly
+        )
+      );
     });
-    return acc;
-  }, {});
-  const creepPartsByTypeKeys = Object.keys(creepPartsByType);
-  creepPartsByTypeKeys.forEach((part) => {
+
+    const structuresByType = groupBy(structures, "type");
+    const structuresByTypeKeys = Object.keys(structuresByType);
+    structuresByTypeKeys.forEach((type) => {
+      actions.push(
+        CreateAction(
+          `countByType.structures.${type}`,
+          structuresByType[type].length,
+          ActionType.FirstTickOnly
+        )
+      );
+    });
+
+    const constructionSitesByType = constructionSites.reduce((acc, obj) => {
+      if (!acc[obj.structureType]) acc[obj.structureType] = 0;
+      acc[obj.structureType] += 1;
+      return acc;
+    }, {});
+    const constructionSitesByTypeKeys = Object.keys(constructionSitesByType);
+    constructionSitesByTypeKeys.forEach((type) => {
+      actions.push(
+        CreateAction(
+          `countByType.constructionSites.${type}`,
+          constructionSitesByType[type].length,
+          ActionType.FirstTickOnly
+        )
+      );
+    });
+    // #endregion
+
+    // #region Construction
     actions.push(
       CreateAction(
-        `countByType.creepParts.${part}`,
-        creepPartsByType[part],
+        `constructionSites.progressPercentage`,
+        constructionSites.length > 0
+          ? constructionSites.reduce((acc, site) => {
+              acc += site.progress / site.progressTotal;
+              return acc;
+            }, 0) / constructionSites.length
+          : 0,
         ActionType.FirstTickOnly
       )
     );
-  });
-
-  const structuresByType = groupBy(structures, "type");
-  const structuresByTypeKeys = Object.keys(structuresByType);
-  structuresByTypeKeys.forEach((type) => {
     actions.push(
       CreateAction(
-        `countByType.structures.${type}`,
-        structuresByType[type].length,
+        `constructionSites.count`,
+        constructionSites.length,
         ActionType.FirstTickOnly
       )
     );
-  });
+    // #endregion
 
-  const constructionSitesByType = constructionSites.reduce((acc, obj) => {
-    if (!acc[obj.structureType]) acc[obj.structureType] = 0;
-    acc[obj.structureType] += 1;
-    return acc;
-  }, {});
-  const constructionSitesByTypeKeys = Object.keys(constructionSitesByType);
-  constructionSitesByTypeKeys.forEach((type) => {
-    actions.push(
-      CreateAction(
-        `countByType.constructionSites.${type}`,
-        constructionSitesByType[type].length,
-        ActionType.FirstTickOnly
-      )
-    );
-  });
+    // #region ResourcesStored & Minerals
+    const resourcesStored = structures.reduce((acc, structure) => {
+      if (
+        structure.store &&
+        ["storage", "link", "container", "terminal"].includes(structure.type)
+      ) {
+        Object.entries(structure.store).forEach(([resource, amount]) => {
+          if (!acc[resource]) acc[resource] = 0;
+          acc[resource] += amount;
+        });
+      }
+      return acc;
+    }, {});
+    const resourcesStoredKeys = Object.keys(resourcesStored);
+    resourcesStoredKeys.forEach((resource) => {
+      actions.push(
+        CreateAction(
+          `resourcesStored.${resource}`,
+          resourcesStored[resource],
+          ActionType.FirstTickOnly
+        )
+      );
+    });
+    minerals.forEach((mineral) => {
+      actions.push(
+        CreateAction(
+          `minerals.${mineral.mineralType}`,
+          mineral.mineralAmount,
+          ActionType.FirstTickOnly
+        )
+      );
+    });
+    // #endregion
 
-  const intentsByType = intents.reduce((acc, obj) => {
-    if (!acc[obj.action]) acc[obj.action] = 0;
-    acc[obj.action] += 1;
-    return acc;
-  }, {});
-  const intentsByTypeKeys = Object.keys(intentsByType);
-  intentsByTypeKeys.forEach((type) => {
-    actions.push(
-      CreateAction(
-        `countByType.intents.${type}`,
-        intentsByType[type],
-        ActionType.Divide100
-      )
-    );
-  });
-  // #endregion
+    // #region Controller
+    const controllers = structuresByType.controller;
+    if (controllers && controllers.length > 0) {
+      const controller = controllers[0];
+      actions.push(
+        CreateAction(
+          `controller.level`,
+          controller.level,
+          ActionType.FirstTickOnly
+        )
+      );
 
-  // #region Construction
-  actions.push(
-    CreateAction(
-      `constructionSites.progressPercentage`,
-      constructionSites.length > 0
-        ? constructionSites.reduce((acc, site) => {
-            acc += site.progress / site.progressTotal;
-            return acc;
-          }, 0) / constructionSites.length
-        : 0,
-      ActionType.FirstTickOnly
-    )
-  );
-  actions.push(
-    CreateAction(
-      `constructionSites.count`,
-      constructionSites.length,
-      ActionType.FirstTickOnly
-    )
-  );
-  // #endregion
+      if (controller.level < 8) {
+        actions.push(
+          CreateAction(
+            `controller.progress`,
+            controller.progress,
+            ActionType.FirstTickOnly
+          )
+        );
+        actions.push(
+          CreateAction(
+            `controller.progressTotal`,
+            controller.progressTotal,
+            ActionType.FirstTickOnly
+          )
+        );
+      }
 
-  // #region ResourcesStored & Minerals
-  const resourcesStored = structures.reduce((acc, structure) => {
-    if (structure.store) {
-      Object.entries(structure.store).forEach(([resource, amount]) => {
-        if (!acc[resource]) acc[resource] = 0;
-        acc[resource] += amount;
+      actions.push(
+        CreateAction(
+          `controller.ticksToDowngrade`,
+          controller.ticksToDowngrade || -1,
+          ActionType.FirstTickOnly
+        )
+      );
+      actions.push(
+        CreateAction(
+          `controller.safeModeAvailable`,
+          controller.safeModeAvailable,
+          ActionType.FirstTickOnly
+        )
+      );
+    }
+
+    // #region Spawning
+    let storedSpawningEnergy = 0;
+    let capacitySpawningEnergy = 0;
+
+    if (structuresByType.spawn) {
+      structuresByType.spawn.forEach((spawn) => {
+        if (spawn.store) storedSpawningEnergy += spawn.store.energy || 0;
+        if (spawn.storeCapacityResource)
+          capacitySpawningEnergy += spawn.storeCapacityResource.energy || 0;
       });
     }
-    return acc;
-  }, {});
-  const resourcesStoredKeys = Object.keys(resourcesStored);
-  resourcesStoredKeys.forEach((resource) => {
+
+    if (structuresByType.extension) {
+      structuresByType.extension.forEach((extension) => {
+        if (extension.store)
+          storedSpawningEnergy += extension.store.energy || 0;
+        if (extension.storeCapacityResource)
+          capacitySpawningEnergy += extension.storeCapacityResource.energy || 0;
+      });
+    }
     actions.push(
       CreateAction(
-        `resourcesStored.${resource}`,
-        resourcesStored[resource],
+        `spawning.storedSpawningEnergy`,
+        storedSpawningEnergy,
         ActionType.FirstTickOnly
       )
     );
-  });
-  minerals.forEach((mineral) => {
     actions.push(
       CreateAction(
-        `minerals.${mineral.mineralType}`,
-        mineral.mineralAmount,
+        `spawning.capacitySpawningEnergy`,
+        capacitySpawningEnergy,
         ActionType.FirstTickOnly
       )
     );
-  });
+    // #endregion
+
+    // #region StructureHits
+    const structureHitsByType = {};
+    structuresByTypeKeys.forEach((structureKey) => {
+      if (structureKey !== "controller") {
+        structureHitsByType[structureKey] = structuresByType[
+          structureKey
+        ].reduce((acc, structure) => {
+          acc += structure.hits || 0;
+          return acc;
+        }, 0);
+      }
+    });
+
+    const structureHitsByTypeKeys = Object.keys(structureHitsByType);
+    structureHitsByTypeKeys.forEach((structureKey) => {
+      actions.push(
+        CreateAction(
+          `structureHits.${structureKey}`,
+          structureHitsByType[structureKey],
+          ActionType.FirstTickOnly
+        )
+      );
+    });
+  }
+  // #endregion
+
+  // #endregion
+
+  // #region Divide100
+
+  // #region Controller
+  const originalControllers = findAllByType(originalObjects, "controller");
+  let rclPerTick = 0;
+  if (originalControllers && originalControllers.length > 0) {
+    const originalController = originalControllers[0];
+    const controller = objects[originalController._id] || {};
+    if (controller._upgraded) {
+      rclPerTick = controller._upgraded;
+    }
+  }
+  actions.push(
+    CreateAction(`controller.rclPerTick`, rclPerTick, ActionType.Divide100)
+  );
   // #endregion
 
   // #region IntentsCategories
@@ -241,136 +353,48 @@ export default function handleObjects(username, objects, extras = {}) {
       );
     });
   });
-  // #endregion
 
-  // #region Controller
-  const controllers = structuresByType.controller;
-  if (controllers && controllers.length > 0) {
-    const controller = controllers[0];
+  const intentsByType = intents.reduce((acc, obj) => {
+    if (!acc[obj.action]) acc[obj.action] = 0;
+    acc[obj.action] += 1;
+    return acc;
+  }, {});
+  const intentsByTypeKeys = Object.keys(intentsByType);
+  intentsByTypeKeys.forEach((type) => {
     actions.push(
       CreateAction(
-        `controller.level`,
-        controller.level,
-        ActionType.FirstTickOnly
-      )
-    );
-
-    if (controller.level < 8) {
-      actions.push(
-        CreateAction(
-          `controller.progress`,
-          controller.progress,
-          ActionType.FirstTickOnly
-        )
-      );
-      actions.push(
-        CreateAction(
-          `controller.progressTotal`,
-          controller.progressTotal,
-          ActionType.FirstTickOnly
-        )
-      );
-    }
-
-    actions.push(
-      CreateAction(
-        `controller.ticksToDowngrade`,
-        controller.ticksToDowngrade || -1,
-        ActionType.FirstTickOnly
-      )
-    );
-    actions.push(
-      CreateAction(
-        `controller.safeModeAvailable`,
-        controller.safeModeAvailable,
-        ActionType.FirstTickOnly
-      )
-    );
-    actions.push(
-      CreateAction(
-        `controller.rclPerTick`,
-        controller._upgraded || 0,
-        ActionType.FirstTickOnly
-      )
-    );
-  }
-
-  // #region Spawning
-  let storedSpawningEnergy = 0;
-  let capacitySpawningEnergy = 0;
-
-  if (structuresByType.spawn) {
-    const spawnCount = structuresByType.spawn.length;
-    let spawnDuration = 0;
-    const maxSpawnTime = Math.floor(100 * currentTick) / 100 + 100;
-    structuresByType.spawn.forEach((spawn) => {
-      if (spawn.store) storedSpawningEnergy += spawn.store.energy || 0;
-      if (spawn.storeCapacityResource)
-        capacitySpawningEnergy += spawn.storeCapacityResource.energy || 0;
-
-      if (spawn.spawning) {
-        spawnDuration +=
-          Math.min(spawn.spawning.spawnTime, maxSpawnTime) - currentTick;
-      }
-    });
-
-    actions.push(
-      CreateAction(
-        `spawning.spawnUptimePercentage`,
-        Math.round(spawnDuration / spawnCount),
-        ActionType.FirstTickOnly
-      )
-    );
-  }
-  if (structuresByType.extension) {
-    structuresByType.extension.forEach((extension) => {
-      if (extension.store) storedSpawningEnergy += extension.store.energy || 0;
-      if (extension.storeCapacityResource)
-        capacitySpawningEnergy += extension.storeCapacityResource.energy || 0;
-    });
-  }
-  actions.push(
-    CreateAction(
-      `spawning.storedSpawningEnergy`,
-      storedSpawningEnergy,
-      ActionType.FirstTickOnly
-    )
-  );
-  actions.push(
-    CreateAction(
-      `spawning.capacitySpawningEnergy`,
-      capacitySpawningEnergy,
-      ActionType.FirstTickOnly
-    )
-  );
-  // #endregion
-
-  // #region StructureHits
-  const structureHitsByType = {};
-  structuresByTypeKeys.forEach((structureKey) => {
-    if (structureKey !== "controller") {
-      structureHitsByType[structureKey] = structuresByType[structureKey].reduce(
-        (acc, structure) => {
-          acc += structure.hits || 0;
-          return acc;
-        },
-        0
-      );
-    }
-  });
-
-  const structureHitsByTypeKeys = Object.keys(structureHitsByType);
-  structureHitsByTypeKeys.forEach((structureKey) => {
-    actions.push(
-      CreateAction(
-        `structureHits.${structureKey}`,
-        structureHitsByType[structureKey],
-        ActionType.FirstTickOnly
+        `countByType.intents.${type}`,
+        intentsByType[type],
+        ActionType.Divide100
       )
     );
   });
   // #endregion
 
-  actions = actions.concat(ActionListDefaultValuesFiller(actions, extras.type));
-  return actions;
+  // #region Spawn
+  const originalSpawns = findAllByType(originalObjects, "spawn");
+  const spawnCount = originalSpawns.length;
+  let spawnDuration = 0;
+  originalSpawns.forEach((originalSpawn) => {
+    const maxSpawnTime = Math.floor(currentTick / 100) * 100 + 100;
+
+    const spawn = objects[originalSpawn._id] || {};
+    if (spawn.spawning) spawnDuration +=
+        Math.min(spawn.spawning.spawnTime, maxSpawnTime) - currentTick;
+  });
+  actions.push(
+    CreateAction(
+      `spawning.spawnUptimePercentage`,
+      spawnDuration > 0 ? Math.round(spawnDuration / spawnCount) : 0,
+      ActionType.Divide100
+    )
+  );
+  // #endregion
+  // #endregion
+
+  actions.push(
+    CreateAction("totals.intents", intents.length, ActionType.Divide100)
+  );
+
+  return ActionListDefaultValuesFiller(actions, extras.type, isFirstTick);
 }

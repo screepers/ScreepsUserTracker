@@ -5,44 +5,14 @@ import {
   GetRoomTotal,
 } from "../../rooms/userHelper.js";
 import handleObjects from "../handle/objects.js";
-import handleUsers from "../handle/users.js";
-import { GetGameTime } from "../screepsApi.js";
-import { getStats, handleCombinedRoomStats } from "../handle/helper.js";
+import {
+  getStats,
+  handleCombinedRoomStats,
+  FindNewDefaultActions,
+} from "../handle/helper.js";
 
 export default class MainDataBroker extends BaseDataBroker {
   static Type = "main";
-
-  async UploadStatus(ipStatus) {
-    const start = Date.now();
-    const usernames = GetUsernames();
-
-    const stats = {};
-    const handledUsernames = await handleUsers(usernames);
-    Object.entries(handledUsernames).forEach(([username, userStats]) => {
-      stats[username] = { info: userStats };
-    });
-
-    const liveTicks = {};
-    for (let t = 0; t < this._shards.length; t += 1) {
-      const shardName = this._shards[t];
-      liveTicks[shardName] = await GetGameTime(shardName);
-    }
-
-    BaseDataBroker.Upload(
-      {
-        status: { [MainDataBroker.Type]: ipStatus },
-        ticks: {
-          live: liveTicks,
-        },
-        users: stats,
-      },
-      undefined,
-      {
-        start,
-        type: `${MainDataBroker.Type}Status`,
-      }
-    );
-  }
 
   async UploadUsers(usernames) {
     const start = Date.now();
@@ -57,6 +27,7 @@ export default class MainDataBroker extends BaseDataBroker {
         },
       };
     }
+    let hasStatsGlobally = false;
 
     const historyTicks = {};
     const tickRates = {};
@@ -69,6 +40,7 @@ export default class MainDataBroker extends BaseDataBroker {
           const { dataResult, dataRequest } = roomData;
           if (dataResult) {
             hasStats = true;
+            hasStatsGlobally = true;
 
             if (!timestamp) {
               timestamp = dataResult.timestamp;
@@ -84,7 +56,7 @@ export default class MainDataBroker extends BaseDataBroker {
                       this._lastTickTimestamp[dataRequest.shard]) /
                       100
                   )
-                : 0;
+                : undefined;
 
               this._lastTickTimestamp[dataRequest.shard] = dataResult.timestamp;
             }
@@ -93,24 +65,26 @@ export default class MainDataBroker extends BaseDataBroker {
             const { ticks } = dataResult;
             const tickKeys = Object.keys(ticks);
 
-            const currentObjects = Object.values(ticks).filter(
+            const originalObjects = Object.values(ticks).filter(
               (tl) => tl !== null
             )[0];
 
-            for (let t = 0; t < tickKeys.length; t += 1) {
-              const tick = tickKeys[t];
+            tickKeys.forEach((tick, index) => {
               if (ticks[tick]) {
                 actionsArray = actionsArray.concat(
                   handleObjects(username, ticks[tick], {
-                    previousObjects: ticks[tickKeys[t - 1]],
-                    currentObjects,
+                    previousObjects: ticks[tickKeys[index - 1]],
+                    originalObjects,
                     ticks,
                     tick,
                     type: MainDataBroker.Type,
+                    isFirstTick: index === 0,
                   })
                 );
               }
-            }
+            });
+
+            FindNewDefaultActions(actionsArray, MainDataBroker.Type);
 
             if (!userStats.shards[dataRequest.shard]) {
               userStats.shards[dataRequest.shard] = {};
@@ -121,39 +95,41 @@ export default class MainDataBroker extends BaseDataBroker {
         });
 
         if (hasStats) {
-          userStats.combined.shards = handleCombinedRoomStats(userStats.shards, MainDataBroker.Type);
+          userStats.combined.shards = handleCombinedRoomStats(
+            userStats.shards,
+            MainDataBroker.Type
+          );
           stats[username] = { stats: userStats };
         }
       });
 
       const shards = Object.keys(this._users[username]);
-      for (let s = 0; s < shards.length; s += 1) {
-        const shard = shards[s];
+      shards.forEach((shard) => {
         const rooms = this._users[username][shard];
 
         const roomNames = Object.keys(rooms);
         this.AddRooms(username, shard, roomNames, true);
-      }
+      });
     });
 
-    BaseDataBroker.Upload(
-      { users: stats, ticks: { history: historyTicks, tickRates } },
-      timestamp,
-      {
-        start,
-        type: MainDataBroker.Type,
-      }
-    );
+    if (hasStatsGlobally) {
+      await BaseDataBroker.Upload(
+        { users: stats, ticks: { history: historyTicks, tickRates } },
+        timestamp,
+        {
+          start,
+          type: MainDataBroker.Type,
+        }
+      );
+    }
   }
 
-  getRoomsToCheck(roomsPerCycle) {
+  getRoomsToCheck(roomsPerCycle, types) {
     const usernames = GetUsernames();
-    const types = {};
     let userCount = 0;
     let roomCount = 0;
 
-    for (let i = 0; i < usernames.length; i += 1) {
-      const username = usernames[i];
+    usernames.forEach((username) => {
       const userData = GetUserData(username);
 
       userData.total = GetRoomTotal(userData.shards);
@@ -171,9 +147,9 @@ export default class MainDataBroker extends BaseDataBroker {
           shardRooms[shard].push(...data.owned);
           this.AddRooms(username, shard, data.owned);
         });
-      } else break;
-    }
+      }
+    });
 
-    return { types, userCount, roomCount };
+    return { userCount, roomCount };
   }
 }

@@ -1,16 +1,24 @@
+import * as dotenv from "dotenv";
+
 import express from "express";
 import bodyParser from "body-parser";
 import axios from "axios";
 import Cron from "cron";
+import { publicIpv4 } from "public-ip";
 import DataRequestBroker from "./dataRequestBroker.js";
 import { mainLogger as logger, backlogLogger } from "./logger.js";
+import settings, { writeSettings } from "./settings.js";
+
+dotenv.config();
 
 const { CronJob } = Cron;
 
-const controllerIp = "http://localhost:5000";
+const hasExternalIp = process.env.CONTROLLER_IP !== undefined;
+const controllerIp = hasExternalIp
+  ? process.env.CONTROLLER_IP
+  : "http://localhost:5000";
 const port = 4000;
-const ip = `http://localhost:${port}`;
-const DEBUG = true;
+let ip;
 
 // terminate process on exit
 process.once("SIGINT", async () => {
@@ -21,88 +29,49 @@ process.once("SIGINT", async () => {
 const dataRequestBroker = new DataRequestBroker();
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: "100mb" }));
+app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
 
-app.get("/ping", (req, res) => {
+app.post("/ping", (req, res) => {
+  writeSettings(req.body);
+
   logger.info(`${req.ip}: Received ping`);
   return res.send("pong");
 });
 
-app.put("/rooms", (req, res) => {
+app.post("/requests", (req, res) => {
   const start = Date.now();
   try {
-    const roomCount = Object.entries(req.body.rooms).reduce(
-      // eslint-disable-next-line no-unused-vars
-      (acc, [_, value]) => {
-        Object.values(value).forEach((shard) => {
-          // eslint-disable-next-line no-param-reassign
-          acc += shard.length;
-        });
-        return acc;
-      },
-      0
+    dataRequestBroker.addDataRequests(req.body);
+
+    logger.info(
+      `Request:post took ${((Date.now() - start) / 1000).toFixed(2)}s`
     );
-    logger.info(`${req.ip}: Updating rooms, received ${roomCount} rooms`);
-
-    const { rooms } = req.body;
-    const types = Object.keys(rooms);
-    types.forEach((type) => {
-      dataRequestBroker.forceUpdateRooms(rooms[type], type);
-    });
-
-    logger.info(`Room:put took ${((Date.now() - start) / 1000).toFixed(2)}s`);
     return res.json("Success");
   } catch (e) {
     logger.error(
-      `${req.ip}: Failed to update rooms with ${JSON.stringify(
-        req.body
-      )} and error ${e}`
+      `${req.ip}: Failed to save requests with ${e.message} and stack of ${e.stack}`
     );
-    return res.status(500).json("Failed to update rooms");
+    return res.status(500).json("Failed to save requests");
   }
 });
-app.get("/data/main", (req, res) => {
+app.get("/data", (req, res) => {
   const start = Date.now();
   try {
-    logger.info(`${req.ip}: Received main data request`);
+    logger.info(`${req.ip}: Received data request`);
 
-    const results = dataRequestBroker.getDataResultsToSend("main");
-    const activeRequests = dataRequestBroker.getDataRequests("main");
-    const roomCount = Object.values(dataRequestBroker.getRooms("main"))
-      .map((x) => x.length)
-      .reduce((a, b) => a + b, 0);
+    const results = dataRequestBroker.getDataResultsToSend();
+    const requestsCount = dataRequestBroker.getTotalDataRequests();
 
     logger.info(`Data:get took ${((Date.now() - start) / 1000).toFixed(2)}s`);
     return res.json({
       results,
-      activeRequestsCount: activeRequests.length,
-      roomCount,
+      requestsCount,
     });
   } catch (e) {
-    logger.error(`${req.ip}: Failed to get data with ${e}`);
-    return res.status(500).json("Failed to get data");
-  }
-});
-app.get("/data/reactor", (req, res) => {
-  const start = Date.now();
-  try {
-    logger.info(`${req.ip}: Received reactor data request`);
-
-    const results = dataRequestBroker.getDataResultsToSend("reactor");
-    const activeRequests = dataRequestBroker.getDataRequests("reactor");
-    const roomCount = Object.values(dataRequestBroker.getRooms("reactor"))
-      .map((x) => x.length)
-      .reduce((a, b) => a + b, 0);
-
-    logger.info(`Data:get took ${((Date.now() - start) / 1000).toFixed(2)}s`);
-    return res.json({
-      results,
-      activeRequestsCount: activeRequests.length,
-      roomCount,
-    });
-  } catch (e) {
-    logger.error(`${req.ip}: Failed to get data with ${e}`);
+    logger.error(
+      `${req.ip}: Failed to get data with ${e.message} and stack of ${e.stack}`
+    );
     return res.status(500).json("Failed to get data");
   }
 });
@@ -112,38 +81,35 @@ async function connectToController() {
     const result = await axios.post(`${controllerIp}/ip`, { ip });
     if (result.status === 200) {
       logger.info(`Connected to controller at ${controllerIp}`);
-      return;
     }
   } catch (e) {
     logger.error(`Failed to connect to controller, trying again in 60 seconds`);
+    // eslint-disable-next-line no-promise-executor-return
+    await new Promise((resolve) => setTimeout(resolve, 60 * 1000));
+    connectToController();
   }
-  // eslint-disable-next-line no-promise-executor-return
-  await new Promise((resolve) => setTimeout(resolve, 60 * 1000));
-  connectToController();
 }
 
-app.listen(port, async () => {
-  connectToController();
-  console.log(`API listening on port ${port}`);
-});
-
 const job = new CronJob(
-  !DEBUG ? "0 * * * *" : "* * * * *",
+  !settings.debug ? "0 * * * *" : "* * * * *",
   () => {
-    const roomCount = Object.values(dataRequestBroker.getRooms("main"))
-      .map((x) => x.length)
-      .reduce((a, b) => a + b, 0);
-
-    const activeRequestCount = dataRequestBroker.getDataRequests("main").length;
-    const resultCount = dataRequestBroker.getTotalDataResults("main");
+    const requestCount = dataRequestBroker.getTotalDataRequests();
+    const resultCount = dataRequestBroker.getTotalDataResults();
     backlogLogger.info(
-      `Room count: ${roomCount}, Active request count: ${activeRequestCount}, Result count: ${resultCount}`
+      `Request count: ${requestCount}, Result count: ${resultCount}`
     );
-
-    if (resultCount > 5000) dataRequestBroker.resetDataResults();
   },
   null,
   false,
   "Europe/Amsterdam"
 );
 job.start();
+
+app.listen(port, async () => {
+  ip = hasExternalIp
+    ? `http://${await publicIpv4()}:${port}`
+    : `http://localhost:${port}`;
+
+  connectToController();
+  console.log(`API listening on port ${port}`);
+});

@@ -1,5 +1,4 @@
 import { GetRoomHistory } from "./screepsApi.js";
-import RoomRequests from "./roomRequests.js";
 import { dataRequestBroker as logger } from "./logger.js";
 
 let resultId = 0;
@@ -14,26 +13,12 @@ export default class DataRequestBroker {
 
   dataResults = [];
 
-  roomRequests = null;
-
   constructor() {
-    this.roomRequests = new RoomRequests(this);
-
-    this.roomRequests.sync();
     this.executeSingle();
   }
 
-  forceUpdateRooms(rooms, type) {
-    this.roomRequests.forceUpdateRooms(rooms, type);
-  }
-
-  getRooms(type) {
-    return this.roomRequests.getRooms(type);
-  }
-
-  addDataRequests(dataRequests, addAtStart = false) {
-    if (!addAtStart) this.dataRequests = this.dataRequests.concat(dataRequests);
-    else this.dataRequests = dataRequests.concat(this.dataRequests);
+  addDataRequests(dataRequests) {
+    this.dataRequests = dataRequests.concat(this.dataRequests);
   }
 
   getDataRequest() {
@@ -67,63 +52,24 @@ export default class DataRequestBroker {
     this.dataResults.push({ dataResult, dataRequest, id: (resultId += 1) });
   }
 
-  removeDataResults(ids) {
-    this.dataResults = this.dataResults.filter(
-      (dataResult) => !ids.includes(dataResult.id)
-    );
+  resetDataResults(newData) {
+    this.dataResults = newData;
   }
 
-  getDataResultsToSend(type) {
-    const dataResults = this.dataResults.filter(
-      (dr) => dr.dataRequest.type === type
-    );
-    const dataRequests = this.dataRequests.filter((dr) => dr.type === type);
+  getDataResultsToSend() {
+    const toSend = this.dataResults.slice(0, 500);
+    const dataResults = JSON.parse(JSON.stringify(toSend));
+    this.resetDataResults(this.dataResults.slice(500));
 
-    const perTickResults = {};
-    dataResults.forEach(({ dataResult, dataRequest, id }) => {
-      if (!perTickResults[dataRequest.shard])
-        perTickResults[dataRequest.shard] = {};
-      if (!perTickResults[dataRequest.shard][dataRequest.tick])
-        perTickResults[dataRequest.shard][dataRequest.tick] = [];
-      perTickResults[dataRequest.shard][dataRequest.tick].push({
-        dataResult,
-        dataRequest,
-        id,
-      });
-    });
-
-    const perTickRequests = {};
-    dataRequests.forEach((dataRequest) => {
-      if (!perTickRequests[dataRequest.shard])
-        perTickRequests[dataRequest.shard] = {};
-      if (!perTickRequests[dataRequest.shard][dataRequest.tick])
-        perTickRequests[dataRequest.shard][dataRequest.tick] = [];
-      perTickRequests[dataRequest.shard][dataRequest.tick].push(dataRequest);
-    });
-
-    let dataResultsToSend = [];
-    Object.entries(perTickResults).forEach(([shard, perTick]) => {
-      Object.entries(perTick).forEach(([tick, data]) => {
-        if (!perTickRequests[shard] || !perTickRequests[shard][tick])
-          dataResultsToSend = dataResultsToSend.concat(data);
-      });
-    });
-
-    const dataResultsIdsToRemove = [];
-    dataResultsToSend.forEach(({ id }) => {
-      dataResultsIdsToRemove.push(id);
-    });
-    this.removeDataResults(dataResultsIdsToRemove);
-
-    return dataResultsToSend;
-  }
-
-  resetDataResults() {
-    this.dataResults = [];
+    return dataResults;
   }
 
   getTotalDataResults() {
     return this.dataResults.length;
+  }
+
+  getTotalDataRequests() {
+    return this.dataRequests.length;
   }
 
   async executeSingle() {
@@ -153,7 +99,7 @@ export default class DataRequestBroker {
         ? (dataRequest.retries += 1)
         : 1;
 
-      if (dataRequest.retries < 3) this.addDataRequests([dataRequest], true);
+      if (dataRequest.retries < 3) this.addDataRequests([dataRequest]);
       else if (dataResult.status === "Not found")
         this.addDataResult(dataResult.result, dataRequest, true);
       else

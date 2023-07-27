@@ -11,18 +11,20 @@ export default function handleObjects(objects, extras = {}) {
   let actions = [];
   const reactors = findAllByType(objects, "reactor");
   const originalReactor = reactors[0];
+  const { isFirstTick } = extras;
 
   if (originalReactor) {
-    actions.push(
-      CreateAction(
-        "season.activeReactors",
-        originalReactor.launchTime ? 1 : 0,
-        ActionType.FirstTickOnly
-      )
-    );
+    const continuousTicks = currentTick - originalReactor.launchTime;
 
-    if (originalReactor.launchTime) {
-      const continuousTicks = currentTick - originalReactor.launchTime;
+    if (isFirstTick) {
+      actions.push(
+        CreateAction(
+          "season.activeReactors",
+          originalReactor.launchTime ? 1 : 0,
+          ActionType.FirstTickOnly
+        )
+      );
+
       actions.push(
         CreateAction(
           "season.continuousTicks",
@@ -30,14 +32,14 @@ export default function handleObjects(objects, extras = {}) {
           ActionType.FirstTickOnly
         )
       );
-
-      const score = 1 + Math.floor(Math.log10(continuousTicks));
-      actions.push(
-        CreateAction("season.scorePerTick", score, ActionType.FirstTickOnly)
-      );
     }
+
+    const score = 1 + Math.floor(Math.log10(continuousTicks));
+    actions.push(
+      CreateAction("season.scorePerTick", score, ActionType.FirstTickOnly)
+    );
   }
 
-  actions = actions.concat(ActionListDefaultValuesFiller(actions, extras.type));
+  actions = ActionListDefaultValuesFiller(actions, extras.type, isFirstTick);
   return actions;
 }
