@@ -16,6 +16,11 @@ const app = express();
 const port = 5000;
 let isOnline = false;
 
+let healthCheck = {
+  lastDataReceived: Date.now(),
+  lastRequestSent: Date.now(),
+}
+
 const mainDataBroker = new MainDataBroker();
 const reactorDataBroker = new ReactorDataBroker();
 const dataRequestsBroker = new DataRequestsBroker();
@@ -56,6 +61,25 @@ function removeIp(ip) {
   ips = getIps().filter((i) => i !== ip);
   fs.writeFileSync("./files/ips.json", JSON.stringify(ips));
 }
+
+app.get("/healthCheck", (req, res) => {
+  logger.info(`${req.ip}: Received health check`);
+  const success = Date.now() - healthCheck.lastDataReceived < 600 * 1000 && Date.now() - healthCheck.lastRequestSent < 600 * 1000;
+  const lastDataReceivedMinutesAgo = Math.floor(
+    (Date.now() - healthCheck.lastDataReceived) / 60000
+  );
+  const lastRequestSentMinutesAgo = Math.floor(
+    (Date.now() - healthCheck.lastRequestSent) / 60000
+  );
+
+  return res.json({
+    success,
+    lastDataReceived: healthCheck.lastDataReceived,
+    lastRequestSent: healthCheck.lastRequestSent,
+    lastDataReceivedMinutesAgo,
+    lastRequestSentMinutesAgo
+  });
+});
 
 app.post("/ip", async (req, res) => {
   try {
@@ -119,12 +143,18 @@ async function dataGetter() {
         dataCount: result.data.results.length,
       };
 
+
+      const requestsToSend = dataRequestsBroker.getRequestsToSend(
+        Math.min(roomsPerCycle - result.data.requestsCount, roomsPerCycle)
+      )
+
       await axios.post(
         `${ip}/requests`,
-        dataRequestsBroker.getRequestsToSend(
-          Math.min(roomsPerCycle - result.data.requestsCount, roomsPerCycle)
-        )
+        requestsToSend
       );
+
+      if (requestsToSend.length > 0) healthCheck.lastRequestSent = Date.now();
+      if (result.data.results.length > 0) healthCheck.lastDataReceived = Date.now();
     } catch (error) {
       logger.error(`${error.message}\nStack of ${error.stack}`);
 

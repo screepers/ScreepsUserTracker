@@ -9,6 +9,7 @@ import DataRequestBroker from "./dataRequestBroker.js";
 import { mainLogger as logger, backlogLogger } from "./logger.js";
 import settings, { writeSettings } from "./settings.js";
 
+let lastDataSend = Date.now();
 dotenv.config();
 
 const { CronJob } = Cron;
@@ -31,6 +32,13 @@ const app = express();
 
 app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
+
+app.get("/healthCheck", (req, res) => {
+  logger.info(`${req.ip}: Received health check`);
+  const success = Date.now() - lastDataSend < 600 * 1000;
+  const minutesAgo = Math.floor((Date.now() - lastDataSend) / 60000);
+  return res.json({ success, lastDataSend, minutesAgo });
+});
 
 app.post("/ping", (req, res) => {
   writeSettings(req.body);
@@ -62,6 +70,10 @@ app.get("/data", (req, res) => {
 
     const results = dataRequestBroker.getDataResultsToSend();
     const requestsCount = dataRequestBroker.getTotalDataRequests();
+
+    if (results.length > 0) {
+      lastDataSend = Date.now();
+    }
 
     logger.info(`Data:get took ${((Date.now() - start) / 1000).toFixed(2)}s`);
     return res.json({
