@@ -1,89 +1,45 @@
 import { createLogger, format, transports } from "winston";
+import 'winston-daily-rotate-file';
 
-const { simple, combine, timestamp, prettyPrint, colorize, errors } = format;
 
-const baseFormat = () =>
-  combine(
-    errors({ stack: true }), // <-- use errors format
-    colorize(),
-    timestamp(),
-    prettyPrint()
-  );
-
-const _mainLogger = createLogger({
-  level: "info",
-  format: baseFormat(),
-  transports: [
-    new transports.File({ filename: "logs/error.log", level: "error" }),
-    new transports.File({ filename: "logs/combined.log" }),
-  ],
-});
-
-if (process.env.NODE_ENV !== "production") {
-  _mainLogger.add(
-    new transports.Console({
-      format: simple(),
-    })
-  );
+function createCustomLogger(type) {
+  return createLogger({
+    level: 'info',
+    format: format.combine(
+      format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+      format.printf(info => `${info.timestamp} ${info.level}: ${info.message} ${info.stack || ''}`),
+      format.errors({ stack: true })
+    ),
+    transports: [
+      new transports.DailyRotateFile({
+        filename: `logs/${type}/application-%DATE%.log`,
+        auditFile: `logs/${type}/audit.json`,
+        datePattern: 'YYYY-MM-DD',
+        zippedArchive: true,
+        maxSize: '20m',
+        maxFiles: '14d'
+      })
+    ],
+  });
 }
 
-const _apiLogger = createLogger({
-  level: "info",
-  format: baseFormat(),
-  transports: [
-    new transports.File({ filename: "logs/api/error.log", level: "error" }),
-    new transports.File({ filename: "logs/api/combined.log" }),
-  ],
-});
+const mainLogger = createCustomLogger('main');
+const apiLogger = createCustomLogger('api');
+const graphiteLogger = createCustomLogger('graphite');
 
-if (process.env.NODE_ENV !== "production") {
-  _apiLogger.add(
-    new transports.Console({
-      format: simple(),
-    })
-  );
+if (process.env.NODE_ENV !== 'production') {
+  mainLogger.add(new transports.Console({
+    format: format.combine(
+    )
+  }));
+  apiLogger.add(new transports.Console({
+    format: format.combine(
+    )
+  }));
+  graphiteLogger.add(new transports.Console({
+    format: format.combine(
+    )
+  }));
 }
 
-const _graphiteLogger = createLogger({
-  level: "info",
-  format: baseFormat(),
-  transports: [new transports.File({ filename: "logs/graphite.log" })],
-});
-
-if (process.env.NODE_ENV !== "production") {
-  _graphiteLogger.add(
-    new transports.Console({
-      format: simple(),
-    })
-  );
-}
-
-export const mainLogger = {
-  info(log) {
-    _mainLogger.info(log);
-  },
-  error(log) {
-    _mainLogger.error(log);
-  },
-};
-
-export const apiLogger = {
-  info(log) {
-    _apiLogger.info(log);
-  },
-  error(log) {
-    _apiLogger.error(log);
-  },
-  debug(log) {
-    _apiLogger.debug(log);
-  },
-};
-
-export const graphiteLogger = {
-  info(log) {
-    _graphiteLogger.info(log);
-  },
-  error(log) {
-    _graphiteLogger.error(log);
-  },
-};
+export { mainLogger, apiLogger, graphiteLogger };

@@ -19,6 +19,7 @@
     "forever-monitor": "^3.0.3",
     "graphite": "^0.1.5",
     "screeps-api": "^1.16.0",
-    "winston": "^3.8.2"
+    "winston": "^3.8.2",
+    "winston-daily-rotate-file": "^4.7.1"
   }
 }
