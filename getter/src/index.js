@@ -1,4 +1,4 @@
-import * as dotenv from "dotenv";
+import "dotenv/config";
 
 import express from "express";
 import bodyParser from "body-parser";
@@ -10,14 +10,10 @@ import { mainLogger as logger, backlogLogger } from "./logger.js";
 import settings, { writeSettings } from "./settings.js";
 
 let lastDataSend = Date.now();
-dotenv.config();
 
 const { CronJob } = Cron;
 
-const hasExternalIp = process.env.CONTROLLER_IP !== undefined;
-const controllerIp = hasExternalIp
-  ? process.env.CONTROLLER_IP
-  : "http://localhost:5000";
+const controllerIp = process.env.CONTROLLER_IP || "http://localhost:5000";
 const port = 4000;
 let ip;
 
@@ -96,6 +92,7 @@ async function connectToController() {
     }
   } catch (e) {
     logger.error(`Failed to connect to controller, trying again in 60 seconds`);
+    logger.error(e)
     // eslint-disable-next-line no-promise-executor-return
     await new Promise((resolve) => setTimeout(resolve, 60 * 1000));
     connectToController();
@@ -118,10 +115,14 @@ const job = new CronJob(
 job.start();
 
 app.listen(port, async () => {
-  ip = hasExternalIp
-    ? `http://${await publicIpv4()}:${port}`
-    : `http://localhost:${port}`;
+  if (!process.env.GETTER_IP) {
+    ip = process.env.CONTROLLER_IP
+      ? `http://${await publicIpv4()}:${port}`
+      : `http://localhost:${port}`;
+  }
+  else ip = process.env.GETTER_IP
 
   connectToController();
+  console.log(`Starting API on ${ip}`)
   console.log(`API listening on port ${port}`);
 });
