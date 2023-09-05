@@ -7,7 +7,9 @@ import {
   GetPowerOfUsers,
   GetScoresOfUsers,
 } from "../data/screepsApi.js";
-import { mainLogger as logger } from "../logger.js";
+import { ownedLogger as logger } from "../logger.js";
+
+fs.mkdirSync("./files", { recursive: true });
 
 function sleep(ms) {
   // eslint-disable-next-line no-promise-executor-return
@@ -55,12 +57,23 @@ async function getUsers(shard, rooms) {
     }
   });
 
+  if (process.env.USERNAMES) {
+    const usernames = process.env.USERNAMES.split(",");
+    Object.keys(roomsByUsername).forEach((username) => {
+      if (!usernames.includes(username)) {
+        delete roomsByUsername[username];
+      }
+    });
+  }
+
+  delete roomsByUsername.Invader;
+
   return roomsByUsername;
 }
 
 async function UpdateRooms() {
   try {
-    const users = {};
+    let users = [];
     const gcls = await GetGclOfUsers();
     const powers = await GetPowerOfUsers();
     const scores = shards[0] === "shardSeason" ? await GetScoresOfUsers() : {};
@@ -75,23 +88,33 @@ async function UpdateRooms() {
         const username = usernames[u];
         const userData = usersPerShard[username];
 
-        users[username] = {
+        users.push({
+          username,
           shards: {},
           id: userData.id,
           gcl: gcls[username],
           power: powers[username],
-        };
-        if (scores[username]) users[username].score = scores[username];
+        });
+        if (scores[username]) users[users.length - 1].score = scores[username];
 
-        users[username].shards[shard] = {
+        users[users.length - 1].shards[shard] = {
           owned: userData.owned,
           reserved: userData.reserved,
         };
       }
     }
 
-    delete users.Invader;
+    function roomCount(shards) {
+      let count = 0;
+      Object.values(shards).forEach(({ owned }) => {
+        count += owned.length;
+      });
+      return count;
+    }
+    users.sort((a, b) => roomCount(b.shards) - roomCount(a.shards));
+
     fs.writeFileSync("./files/users.json", JSON.stringify(users));
+    await sleep(30 * 1000);
   } catch (error) {
     if (error.message && error.message.startsWith("Rate limit exceeded"))
       return;

@@ -1,14 +1,14 @@
 import {
   GetUsernameById,
   GetReactorRoomNames,
-} from "../../rooms/userHelper.js";
-import BaseDataBroker from "./base.js";
-import handleObjects from "../handle/custom/reactorRoom.js";
+} from "../../../rooms/userHelper.js";
+import BaseDataBroker from "../base.js";
+import handleObjects from "../../handle/custom/reactorRoom.js";
 import {
   getStats,
   handleCombinedRoomStats,
   FindNewDefaultActions,
-} from "../handle/helper.js";
+} from "../../handle/helper.js";
 
 export default class ReactorDataBroker extends BaseDataBroker {
   static Type = "reactor";
@@ -16,19 +16,19 @@ export default class ReactorDataBroker extends BaseDataBroker {
   static async UploadStatus(ipStatus) {
     const start = Date.now();
 
-    await BaseDataBroker.Upload(
+    await super.Upload(
       {
-        status: { [ReactorDataBroker.Type]: ipStatus },
+        status: { [this.Type]: ipStatus },
       },
       undefined,
       {
         start,
-        type: `${ReactorDataBroker.Type}Status`,
+        type: `${this.Type}Status`,
       }
     );
   }
 
-  async UploadUsers(usernames) {
+  static async UploadUsers(usernames) {
     const start = Date.now();
     let timestamp;
 
@@ -87,7 +87,7 @@ export default class ReactorDataBroker extends BaseDataBroker {
                       currentObjects,
                       ticks,
                       tick,
-                      type: ReactorDataBroker.Type,
+                      type: this.Type,
                       isFirstTick: index === 0,
                     })
                   );
@@ -104,7 +104,7 @@ export default class ReactorDataBroker extends BaseDataBroker {
                 getStats(actionsArray);
             }
 
-            FindNewDefaultActions(actionsArray, ReactorDataBroker.Type);
+            FindNewDefaultActions(actionsArray, this.Type);
           }
         });
 
@@ -113,7 +113,7 @@ export default class ReactorDataBroker extends BaseDataBroker {
             const userStats = usersStats[username];
             userStats.combined.shards = handleCombinedRoomStats(
               userStats.shards,
-              ReactorDataBroker.Type
+              this.Type
             );
             stats[username] = { stats: userStats };
           });
@@ -130,14 +130,14 @@ export default class ReactorDataBroker extends BaseDataBroker {
     });
 
     if (hasStatsGlobally) {
-      await BaseDataBroker.Upload({ users: stats }, timestamp, {
+      await super.Upload({ users: stats }, timestamp, {
         start,
-        type: ReactorDataBroker.Type,
+        type: this.Type,
       });
     }
   }
 
-  async getRoomsToCheck(roomsPerCycle, roomCount, types) {
+  static async getRoomsToCheck(roomsPerCycle, roomCount, types) {
     let _roomCount = roomCount;
     for (let s = 0; s < this._shards.length; s += 1) {
       const shard = this._shards[s];
@@ -146,11 +146,11 @@ export default class ReactorDataBroker extends BaseDataBroker {
       if (reactorRooms.length + roomCount <= roomsPerCycle) {
         _roomCount += reactorRooms.length;
 
-        if (!types[ReactorDataBroker.Type]) types[ReactorDataBroker.Type] = {};
-        if (!types[ReactorDataBroker.Type][shard]) {
-          types[ReactorDataBroker.Type][shard] = reactorRooms;
+        if (!types[this.Type]) types[this.Type] = {};
+        if (!types[this.Type][shard]) {
+          types[this.Type][shard] = reactorRooms;
         }
-        this.AddRooms("reactor", shard, reactorRooms);
+        this.AddRooms(this.Type, shard, reactorRooms);
       }
     }
 

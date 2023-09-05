@@ -1,8 +1,6 @@
+import "dotenv/config";
 import { ScreepsAPI } from "screeps-api";
-import * as dotenv from "dotenv";
 import { apiLogger as logger } from "../logger.js";
-
-dotenv.config();
 
 let path;
 switch (process.env.SERVER_TYPE) {

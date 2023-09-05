@@ -6,7 +6,7 @@ import axios from "axios";
 import Cron from "cron";
 import { publicIpv4 } from "public-ip";
 import DataRequestBroker from "./dataRequestBroker.js";
-import { mainLogger as logger, backlogLogger } from "./logger.js";
+import { ownedLogger as logger, backlogLogger } from "./logger.js";
 import settings, { writeSettings } from "./settings.js";
 
 let lastDataSend = Date.now();
@@ -17,7 +17,6 @@ const controllerIp = process.env.CONTROLLER_IP || "http://localhost:5000";
 const port = 4000;
 let ip;
 
-// terminate process on exit
 process.once("SIGINT", async () => {
   await axios.delete(`${controllerIp}/ip`, { data: { ip } });
   process.exit(0);

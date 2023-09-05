@@ -4,25 +4,24 @@ import axios from "axios";
 import fs from "fs";
 import Cron from "cron";
 import UpdateRooms from "./rooms/updateRooms.js";
-import MainDataBroker from "./data/broker/main.js";
-import ReactorDataBroker from "./data/broker/reactor.js";
+import OwnedDataBroker from "./data/broker/owned.js";
+import ReactorDataBroker from "./data/broker/custom/reactor.js";
+import ReservedDataBroker from "./data/broker/custom/reserved.js";
 import DataRequestsBroker from "./data/broker/requests.js";
-import { mainLogger as logger } from "./logger.js";
+import { ownedLogger as logger } from "./logger.js";
 
 const { CronJob } = Cron;
 const DEBUG = process.env.DEBUG === "TRUE";
 
 const app = express();
 const port = 5000;
-let isOnline = false;
+let isOnlineMode = 0;
 
 let healthCheck = {
   lastDataReceived: Date.now(),
   lastRequestSent: Date.now(),
 }
 
-const mainDataBroker = new MainDataBroker();
-const reactorDataBroker = new ReactorDataBroker();
 const dataRequestsBroker = new DataRequestsBroker();
 
 app.use(bodyParser.json({ limit: "100mb" }));
@@ -120,7 +119,8 @@ app.delete("/ip", async (req, res) => {
 });
 
 async function dataGetter() {
-  if (!isOnline) return;
+  console.log("hit")
+  if (isOnlineMode < 2) return;
   const start = Date.now();
   const roomsPerCycle = getRoomsPerCycle(ips.length);
 
@@ -171,7 +171,7 @@ async function dataGetter() {
     ).toFixed(2)}s`
   );
 
-  await mainDataBroker.UploadStatus(status);
+  await OwnedDataBroker.UploadStatus(status);
 
   const dataByType = data.reduce((acc, curr) => {
     const requestType = curr.dataRequest.type;
@@ -185,11 +185,14 @@ async function dataGetter() {
     const dataOfType = dataByType[dataType];
 
     switch (dataType) {
-      case "main":
-        await mainDataBroker.AddRoomsData(dataOfType);
+      case "owned":
+        await OwnedDataBroker.AddRoomsData(dataOfType);
         break;
       case "reactor":
-        await reactorDataBroker.AddRoomsData(dataOfType);
+        await ReactorDataBroker.AddRoomsData(dataOfType);
+        break;
+      case "reserved":
+        await ReservedDataBroker.AddRoomsData(dataOfType);
         break;
       default:
         break;
@@ -198,7 +201,7 @@ async function dataGetter() {
 }
 
 async function requestRoomUpdater() {
-  if (!isOnline) return;
+  if (isOnlineMode < 1) return;
   const start = Date.now();
   await UpdateRooms();
 
@@ -210,31 +213,35 @@ async function requestRoomUpdater() {
     roomCount: 0,
     types: {},
   };
-  const dataTypes = process.env.DATA_TYPES.split(" ");
-  for (let dt = 0; dt < dataTypes.length; dt += 1) {
-    const dataType = dataTypes[dt];
-    switch (dataType) {
-      case "main": {
-        const roomsToCheck = mainDataBroker.getRoomsToCheck(
-          roomsPerCycle,
-          types
-        );
-        userCount += roomsToCheck.userCount;
-        roomCount += roomsToCheck.roomCount;
-        break;
-      }
-      case "reactor":
-        if (process.env.SERVER_TYPE === "seasonal") {
-          roomCount = await reactorDataBroker.getRoomsToCheck(
-            roomsPerCycle,
-            roomCount,
-            types
-          );
-        }
-        break;
-      default:
-        break;
+  const dataTypes = process.env.DATA_TYPES;
+
+  if (dataTypes.includes("reactor")) {
+    if (process.env.SERVER_TYPE === "seasonal") {
+      roomCount = await ReactorDataBroker.getRoomsToCheck(
+        roomsPerCycle,
+        roomCount,
+        types
+      );
     }
+  }
+
+  if (dataTypes.includes("owned")) {
+    const roomsToCheck = OwnedDataBroker.getRoomsToCheck(
+      roomsPerCycle,
+      types,
+      dataTypes.includes("reserved"),
+      ReservedDataBroker
+    );
+    userCount += roomsToCheck.userCount;
+    roomCount += roomsToCheck.roomCount;
+  }
+  else if (dataTypes.includes("reserved")) {
+    const roomsToCheck = ReservedDataBroker.getRoomsToCheck(
+      roomsPerCycle,
+      types
+    );
+    userCount += roomsToCheck.userCount;
+    roomCount += roomsToCheck.roomCount;
   }
 
   dataRequestsBroker.saveRoomsBeingChecked(types);
@@ -256,7 +263,7 @@ const dataGetterJob = new CronJob(
 );
 
 const requestRoomUpdaterJob = new CronJob(
-  !DEBUG ? "0 * * * *" : "*/5 * * * *",
+  "0 * * * *",
   requestRoomUpdater,
   null,
   false,
@@ -275,10 +282,18 @@ app.listen(port, async () => {
   console.log(`API listening on port ${port}`);
 
   await dataRequestsBroker.constructorAsync();
-  isOnline = true;
+  isOnlineMode = 1;
 
+  logger.info("Starting initial room update!");
   await requestRoomUpdater();
+  logger.info("Finished initial room update!");
+  isOnlineMode = 2;
+
+  logger.info("Starting initial data get!");
   await dataGetter();
+  logger.info("Finished initial data get!");
+
+
   requestRoomUpdaterJob.start();
   dataGetterJob.start();
 });

@@ -23,13 +23,13 @@ function createCustomLogger(type) {
   });
 }
 
-const mainLogger = createCustomLogger('main');
+const ownedLogger = createCustomLogger('owned');
 const apiLogger = createCustomLogger('api');
 const dataRequestBroker = createCustomLogger('dataRequestBroker');
 const backlogLogger = createCustomLogger('backlog');
 
 if (process.env.NODE_ENV !== 'production') {
-  mainLogger.add(new transports.Console({
+  ownedLogger.add(new transports.Console({
     format: format.combine(
     )
   }));
@@ -47,4 +47,4 @@ if (process.env.NODE_ENV !== 'production') {
   }));
 }
 
-export { mainLogger, apiLogger, dataRequestBroker, backlogLogger };
+export { ownedLogger, apiLogger, dataRequestBroker, backlogLogger };

@@ -23,25 +23,23 @@ export async function GetReactorRoomNames(shard) {
   return rooms;
 }
 
-function updateCache() {
-  if (Date.now() - roomsCache.lastUpdate > 1000 * 60) {
-    if (fs.existsSync(`files/users.json`)) {
-      const rooms = fs.readFileSync(`files/users.json`);
-      roomsCache.data = JSON.parse(rooms);
-    }
-    roomsCache.lastUpdate = Date.now();
+function updateCacheIfRequired() {
+  if (Date.now() - roomsCache.lastUpdate < 1000 * 600) return;
+
+  if (fs.existsSync(`files/users.json`)) {
+    const rooms = fs.readFileSync(`files/users.json`);
+    roomsCache.data = JSON.parse(rooms);
   }
+  roomsCache.lastUpdate = Date.now();
 }
 
-export function GetRoomTotal(shards, type = "owned") {
+export function GetRoomTotal(shards, type) {
   let total = 0;
   Object.values(shards).forEach((rooms) => {
     switch (type) {
       case "owned":
-        total += rooms.owned.length;
-        break;
       case "reserved":
-        total += rooms.reserved.length;
+        total += rooms[type].length;
         break;
       case "total":
         total += rooms.owned.length + rooms.reserved.length;
@@ -55,27 +53,25 @@ export function GetRoomTotal(shards, type = "owned") {
 }
 
 export function GetUserData(username) {
-  updateCache();
+  updateCacheIfRequired();
 
-  const rooms = roomsCache.data;
-  if (!rooms[username]) return { shards: [] };
-
-  return rooms[username];
+  const user = roomsCache.data.find((user) => user.username === username);
+  if (!user) return { shards: [] };
+  return user
 }
 
 export function GetUsername(room, shard) {
-  updateCache();
+  updateCacheIfRequired();
 
-  const rooms = roomsCache.data;
+  const usernames = GetUsernames();
 
-  const usernames = Object.keys(rooms);
   for (let u = 0; u < usernames.length; u += 1) {
     const username = usernames[u];
-    const data = rooms[username];
+    const user = GetUserData(username);
     if (
-      data.shards[shard] &&
-      (data.shards[shard].owned.includes(room) ||
-        data.shards[shard].reserved.includes(room))
+      user.shards[shard] &&
+      (user.shards[shard].owned.includes(room) ||
+        user.shards[shard].reserved.includes(room))
     ) {
       return username;
     }
@@ -83,22 +79,20 @@ export function GetUsername(room, shard) {
 }
 
 export function GetUsernameById(id) {
-  updateCache();
+  updateCacheIfRequired();
 
-  const rooms = roomsCache.data;
-
-  const usernames = Object.keys(rooms);
+  const usernames = GetUsernames()
   for (let u = 0; u < usernames.length; u += 1) {
     const username = usernames[u];
-    const data = rooms[username];
-    if (data.id === id) {
+    const user = GetUserData(username);
+    if (user.id === id) {
       return username;
     }
   }
 }
 
 export function GetUsernames() {
-  updateCache();
+  updateCacheIfRequired();
 
-  return Object.keys(roomsCache.data);
+  return roomsCache.data.map((user) => user.username);
 }

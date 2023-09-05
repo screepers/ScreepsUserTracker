@@ -1,4 +1,5 @@
 import BaseDataBroker from "./base.js";
+import ReservedDataBroker from "./custom/reserved.js";
 import {
   GetUsernames,
   GetUserData,
@@ -11,10 +12,10 @@ import {
   FindNewDefaultActions,
 } from "../handle/helper.js";
 
-export default class MainDataBroker extends BaseDataBroker {
-  static Type = "main";
+export default class OwnedDataBroker extends BaseDataBroker {
+  static Type = "owned";
 
-  async UploadUsers(usernames) {
+  static async UploadUsers(usernames) {
     const start = Date.now();
     let timestamp;
 
@@ -52,10 +53,10 @@ export default class MainDataBroker extends BaseDataBroker {
                 dataRequest.shard
               ]
                 ? Math.round(
-                    (dataResult.timestamp -
-                      this._lastTickTimestamp[dataRequest.shard]) /
-                      100
-                  )
+                  (dataResult.timestamp -
+                    this._lastTickTimestamp[dataRequest.shard]) /
+                  100
+                )
                 : undefined;
 
               this._lastTickTimestamp[dataRequest.shard] = dataResult.timestamp;
@@ -77,14 +78,14 @@ export default class MainDataBroker extends BaseDataBroker {
                     originalObjects,
                     ticks,
                     tick,
-                    type: MainDataBroker.Type,
+                    type: this.Type,
                     isFirstTick: index === 0,
                   })
                 );
               }
             });
 
-            FindNewDefaultActions(actionsArray, MainDataBroker.Type);
+            FindNewDefaultActions(actionsArray, this.Type);
 
             if (!userStats.shards[dataRequest.shard]) {
               userStats.shards[dataRequest.shard] = {};
@@ -97,7 +98,7 @@ export default class MainDataBroker extends BaseDataBroker {
         if (hasStats) {
           userStats.combined.shards = handleCombinedRoomStats(
             userStats.shards,
-            MainDataBroker.Type
+            this.Type
           );
           stats[username] = { stats: userStats };
         }
@@ -113,18 +114,18 @@ export default class MainDataBroker extends BaseDataBroker {
     });
 
     if (hasStatsGlobally) {
-      await BaseDataBroker.Upload(
+      await super.Upload(
         { users: stats, ticks: { history: historyTicks, tickRates } },
         timestamp,
         {
           start,
-          type: MainDataBroker.Type,
+          type: this.Type,
         }
       );
     }
   }
 
-  getRoomsToCheck(roomsPerCycle, types) {
+  static getRoomsToCheck(roomsPerCycle, types, addReservedRooms, reservedDataBroker) {
     const usernames = GetUsernames();
     let userCount = 0;
     let roomCount = 0;
@@ -132,13 +133,13 @@ export default class MainDataBroker extends BaseDataBroker {
     usernames.forEach((username) => {
       const userData = GetUserData(username);
 
-      userData.total = GetRoomTotal(userData.shards);
+      userData.total = !addReservedRooms ? GetRoomTotal(userData.shards, this.Type) : GetRoomTotal(userData.shards, "total");
       if (userData.total + roomCount <= roomsPerCycle) {
         userCount += 1;
         roomCount += userData.total;
 
-        if (!types[MainDataBroker.Type]) types[MainDataBroker.Type] = {};
-        const shardRooms = types[MainDataBroker.Type];
+        if (!types[this.Type]) types[this.Type] = {};
+        const shardRooms = types[this.Type];
 
         Object.entries(userData.shards).forEach(([shard, data]) => {
           if (!shardRooms[shard]) {
@@ -147,6 +148,8 @@ export default class MainDataBroker extends BaseDataBroker {
           shardRooms[shard].push(...data.owned);
           this.AddRooms(username, shard, data.owned);
         });
+
+        if (addReservedRooms) ReservedDataBroker.getRoomsToCheckByUsername(username, types, userData);
       }
     });
 

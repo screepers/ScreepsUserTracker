@@ -92,7 +92,7 @@ export default class DataRequestBroker {
       this.addDataResult(
         dataResult.result,
         dataRequest,
-        dataRequest.type !== "main"
+        dataRequest.type !== "owned"
       );
     else {
       dataRequest.retries = dataRequest.retries

@@ -1,6 +1,4 @@
-import * as dotenv from "dotenv";
-
-dotenv.config();
+import "dotenv/config";
 
 export function GetShards() {
   return process.env.SHARDS.split(" ");
@@ -63,18 +61,14 @@ export function getIntentEffect(action, originalObject) {
       case "build":
         return { action, energy: originalObject.body.work * 5 };
       case "repair":
-        if (originalObject.type === "tower") {
-          return { action, energy: 10 };
-        }
+        if (originalObject.type === "tower") return { action, energy: 10 };
         return { action, energy: originalObject.body.work * 1 };
       case "upgradeController":
         return { action, energy: originalObject.body.work * 1 };
       case "dismantle":
         return { action, energy: originalObject.body.work * 0.25 };
       case "attack":
-        if (originalObject.type === "tower") {
-          return { action, energy: 10, damage: 300 };
-        }
+        if (originalObject.type === "tower") return { action, energy: 10, damage: 300 };
         return { action, damage: originalObject.body.attack * 30 };
       case "rangedAttack":
         return { action, damage: originalObject.body.rangedAttack * 10 };

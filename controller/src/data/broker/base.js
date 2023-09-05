@@ -14,13 +14,13 @@ const client = graphite.createClient(
 );
 
 export default class BaseDataBroker {
-  _users = {};
+  static _users = {};
 
-  _lastTickTimestamp = {};
+  static _lastTickTimestamp = {};
 
-  _shards = GetShards();
+  static _shards = GetShards();
 
-  async UploadStatus(ipStatus) {
+  static async UploadStatus(ipStatus) {
     const start = Date.now();
     const usernames = GetUsernames();
 
@@ -36,7 +36,7 @@ export default class BaseDataBroker {
       liveTicks[shardName] = await GetGameTime(shardName);
     }
 
-    await BaseDataBroker.Upload(
+    await this.Upload(
       {
         status: ipStatus,
         ticks: {
@@ -52,7 +52,7 @@ export default class BaseDataBroker {
     );
   }
 
-  AddRooms(username, shard, rooms, force = false) {
+  static AddRooms(username, shard, rooms, force = false) {
     if (!this._users[username]) {
       this._users[username] = {};
     }
@@ -72,7 +72,7 @@ export default class BaseDataBroker {
     });
   }
 
-  async AddRoomsData(dataList) {
+  static async AddRoomsData(dataList) {
     if (dataList.length === 0) return;
 
     dataList.sort((a, b) => a.dataRequest.tick - b.dataRequest.tick);
@@ -88,7 +88,8 @@ export default class BaseDataBroker {
 
       let username;
       switch (dataRequest.type) {
-        case "main":
+        case "owned":
+        case "reserved":
           username = GetUsername(dataRequest.room, dataRequest.shard);
           break;
         case "reactor":
@@ -109,7 +110,7 @@ export default class BaseDataBroker {
     await this.CheckUsers();
   }
 
-  AddRoomData(username, shard, roomName, data) {
+  static AddRoomData(username, shard, roomName, data) {
     if (!this._users[username]) return;
     if (!this._users[username][shard]) return;
     if (this._users[username][shard][roomName] === undefined) return;
@@ -117,7 +118,7 @@ export default class BaseDataBroker {
     this._users[username][shard][roomName] = data;
   }
 
-  async CheckUsers() {
+  static async CheckUsers() {
     const usernamesToUpload = [];
 
     Object.entries(this._users).forEach(([username, shards]) => {
@@ -141,7 +142,8 @@ export default class BaseDataBroker {
     return new Promise((resolve) => {
       const _timestamp = timestamp || Date.now();
 
-      if (process.env.GRAPHITE_ONLINE !== "TRUE") return;
+      if (process.env.GRAPHITE_ONLINE !== "TRUE") return resolve();
+
       client.write(
         { screeps: { userTracker: { [process.env.SERVER_TYPE]: data } } },
         _timestamp,

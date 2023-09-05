@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "start:always": "node src/fm.js"
+    "start": "node src/index.js"
   },
   "author": "",
   "license": "ISC",
@@ -15,7 +14,6 @@
     "cron": "^2.3.0",
     "dotenv": "^16.1.1",
     "express": "^4.18.2",
-    "forever-monitor": "^3.0.3",
     "public-ip": "^6.0.1",
     "screeps-api": "^1.16.0",
     "winston": "^3.8.2",

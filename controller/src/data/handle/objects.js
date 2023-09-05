@@ -132,9 +132,9 @@ export default function handleObjects(username, objects, extras = {}) {
         `constructionSites.progressPercentage`,
         constructionSites.length > 0
           ? constructionSites.reduce((acc, site) => {
-              acc += site.progress / site.progressTotal;
-              return acc;
-            }, 0) / constructionSites.length
+            acc += site.progress / site.progressTotal;
+            return acc;
+          }, 0) / constructionSites.length
           : 0,
         ActionType.FirstTickOnly
       )
@@ -267,12 +267,15 @@ export default function handleObjects(username, objects, extras = {}) {
     const structureHitsByType = {};
     structuresByTypeKeys.forEach((structureKey) => {
       if (structureKey !== "controller") {
-        structureHitsByType[structureKey] = structuresByType[
+        const strs = structuresByType[
           structureKey
-        ].reduce((acc, structure) => {
+        ];
+        const hitsTotal = strs.reduce((acc, structure) => {
           acc += structure.hits || 0;
           return acc;
         }, 0);
+
+        structureHitsByType[structureKey] = hitsTotal / strs.length;
       }
     });
 
@@ -380,7 +383,7 @@ export default function handleObjects(username, objects, extras = {}) {
 
     const spawn = objects[originalSpawn._id] || {};
     if (spawn.spawning) spawnDuration +=
-        Math.min(spawn.spawning.spawnTime, maxSpawnTime) - currentTick;
+      Math.min(spawn.spawning.spawnTime, maxSpawnTime) - currentTick;
   });
   actions.push(
     CreateAction(
