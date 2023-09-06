@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { ScreepsAPI } from "screeps-api";
 import settings from "./settings.js";
 
@@ -13,18 +14,20 @@ switch (settings.serverType) {
 }
 
 const api = new ScreepsAPI({
-  protocol: "https",
-  hostname: "screeps.com",
-  port: 443,
+  protocol: process.env.PRIVATE_SERVER_PROTOCOL || "https",
+  hostname: process.env.PRIVATE_SERVER_HOST || "screeps.com",
+  port: process.env.PRIVATE_SERVER_PORT || 443,
   path,
 });
+if (process.env.PRIVATE_SERVER_USERNAME) await api.auth(process.env.PRIVATE_SERVER_USERNAME, process.env.PRIVATE_SERVER_PASSWORD);
 
 const historyApi = new ScreepsAPI({
-  protocol: "https",
-  hostname: "screeps.com",
-  port: 443,
+  protocol: process.env.PRIVATE_SERVER_PROTOCOL || "https",
+  hostname: process.env.PRIVATE_SERVER_HOST || "screeps.com",
+  port: process.env.PRIVATE_SERVER_PORT || 443,
   path: "/",
 });
+if (process.env.PRIVATE_SERVER_USERNAME) await historyApi.auth(process.env.PRIVATE_SERVER_USERNAME, process.env.PRIVATE_SERVER_PASSWORD);
 
 export async function GetGameTime(shard) {
   try {
