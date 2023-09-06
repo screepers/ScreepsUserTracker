@@ -27,10 +27,11 @@ export default function handleObjects(username, objects, extras = {}) {
   // #region FirstTick
   const { isFirstTick } = extras;
   const intents = GetIntents(objects, originalObjects);
-
+  
+  const structures = findAllByType(objects, "structure");
+  const structuresByType = groupBy(structures, "type");
   if (isFirstTick) {
     const creeps = findAllByType(objects, "creep");
-    const structures = findAllByType(objects, "structure");
     const constructionSites = findAllByType(objects, "constructionSite");
     const minerals = findAllByType(objects, "mineral");
 
@@ -97,7 +98,6 @@ export default function handleObjects(username, objects, extras = {}) {
       );
     });
 
-    const structuresByType = groupBy(structures, "type");
     const structuresByTypeKeys = Object.keys(structuresByType);
     structuresByTypeKeys.forEach((type) => {
       actions.push(
@@ -291,6 +291,15 @@ export default function handleObjects(username, objects, extras = {}) {
     });
   }
   // #endregion
+  if (!firstTick) {
+        // #region Terminal storage changes
+        const terminals = structuresByType.terminal
+        if (terminals.length > 0) {
+          const terminal = terminals[0];
+          // Pass to webhook(terminal.store, currentTick)
+        }
+        // #endregion
+  }
 
   // #endregion
 
