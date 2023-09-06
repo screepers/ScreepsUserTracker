@@ -15,11 +15,12 @@ switch (process.env.SERVER_TYPE) {
 
 const api = new ScreepsAPI({
   token: process.env.SCREEPS_TOKEN,
-  protocol: "https",
-  hostname: "screeps.com",
-  port: 443,
+  protocol: process.env.PRIVATE_SERVER_PROTOCOL || "https",
+  hostname: process.env.PRIVATE_SERVER_HOST || "screeps.com",
+  port: process.env.PRIVATE_SERVER_PORT || 443,
   path,
 });
+
 
 function sleep(ms) {
   // eslint-disable-next-line no-promise-executor-return
