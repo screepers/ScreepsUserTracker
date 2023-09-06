@@ -296,7 +296,7 @@ export default function handleObjects(username, objects, extras = {}) {
         const terminals = structuresByType.terminal
         if (terminals.length > 0) {
           const terminal = terminals[0];
-          
+          // Pass to webhook(terminal.store, currentTick)
         }
         // #endregion
   }
