@@ -119,7 +119,6 @@ app.delete("/ip", async (req, res) => {
 });
 
 async function dataGetter() {
-  console.log("hit")
   if (isOnlineMode < 2) return;
   const start = Date.now();
   const roomsPerCycle = getRoomsPerCycle(ips.length);
