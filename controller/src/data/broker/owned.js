@@ -80,6 +80,7 @@ export default class OwnedDataBroker extends BaseDataBroker {
                     tick,
                     type: this.Type,
                     isFirstTick: index === 0,
+                    shard: dataRequest.shard,
                   })
                 );
               }
