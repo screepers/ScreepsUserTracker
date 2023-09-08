@@ -1,5 +1,25 @@
 import { GetRoomHistory } from "./screepsApi.js";
 import { dataRequestBroker as logger } from "./logger.js";
+import axios from "axios";
+
+let proxies = [];
+async function getProxies() {
+  try {
+    const proxiesResponse = await axios.get('https://proxy.webshare.io/api/v2/proxy/list/?mode=direct&page=1&page_size=100', {
+      headers: {
+        Authorization: `Token ${process.env.WEBSHARE_TOKEN}`
+      }
+    });
+
+    // proxies = proxiesResponse.data.results.filter(p => p.country_code === "DE");
+    proxies = proxiesResponse.data.results;
+    console.log(`Loaded ${proxies.length} proxies`)
+    return proxies;
+  } catch (error) {
+    console.log(`Failed to load proxies: ${error.message}`)
+    return;
+  }
+}
 
 let resultId = 0;
 
@@ -14,7 +34,12 @@ export default class DataRequestBroker {
   dataResults = [];
 
   constructor() {
-    this.executeSingle();
+    getProxies()
+      .then((proxies) => {
+        proxies.forEach((proxy) => {
+          this.executeSingle(proxy);
+        })
+      });
   }
 
   addDataRequests(dataRequests) {
@@ -74,18 +99,18 @@ export default class DataRequestBroker {
     return this.dataRequests.length;
   }
 
-  async executeSingle() {
+  async executeSingle(proxy) {
     const dataRequest = this.getDataRequest();
     if (!dataRequest) {
       await wait(100);
-      return this.executeSingle();
+      return this.executeSingle(proxy);
     }
 
     const { shard } = dataRequest;
     const { room } = dataRequest;
     const { tick } = dataRequest;
 
-    const dataResult = await GetRoomHistory(shard, room, tick);
+    const dataResult = await GetRoomHistory(proxy, shard, room, tick);
     if (dataResult.status === "Success")
       logger.debug(`Got data for ${shard}/${room}/${tick}`);
     else logger.debug(`Failed to get data for ${shard}/${room}/${tick}`);
@@ -109,6 +134,6 @@ export default class DataRequestBroker {
           `Failed to get data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick} after 3 retries`
         );
     }
-    return this.executeSingle();
+    return this.executeSingle(proxy);
   }
 }

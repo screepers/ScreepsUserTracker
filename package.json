@@ -17,5 +17,6 @@
     "eslint-plugin-prettier": "^4.2.1"
   },
   "dependencies": {
+    "screeps-advanced-api": "^1.0.0"
   }
 }

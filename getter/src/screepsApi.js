@@ -29,27 +29,6 @@ function averageResult(proxySettings, timeTaken) {
 }
 //#endregion
 
-
-let proxies = [];
-async function getProxies() {
-  try {
-    const proxiesResponse = await axios.get('https://proxy.webshare.io/api/v2/proxy/list/?mode=direct&page=1&page_size=100', {
-      headers: {
-        Authorization: `Token ${process.env.WEBSHARE_TOKEN}`
-      }
-    });
-
-    // proxies = proxiesResponse.data.results.filter(p => p.country_code === "DE");
-    proxies = proxiesResponse.data.results;
-    console.log(`Loaded ${proxies.length} proxies`)
-  } catch (error) {
-    console.log(`Failed to load proxies: ${error.message}`)
-    return;
-  }
-
-}
-getProxies();
-
 let lastProxyIndex = 0;
 function getProxy() {
   if (lastProxyIndex === proxies.length) lastProxyIndex = 0;
@@ -70,13 +49,14 @@ switch (settings.serverType) {
 }
 const baseHistoryPath = `${process.env.PRIVATE_SERVER_PROTOCOL || "https"}://${process.env.PRIVATE_SERVER_HOST || "screeps.com"}:${process.env.PRIVATE_SERVER_PORT || 443}${path}`
 
-async function getHistory(room, tick, shard) {
-  if (proxies.length === 0) {
+async function getHistory(proxy, room, tick, shard) {
+  if (!proxy) {
     return await historyApi.raw.history(room, tick, shard);
   }
 
   const start = Date.now();
-  const proxySettings = getProxy();
+  // const proxySettings = getProxy();
+  const proxySettings = proxy;
 
   const timeout = new Promise((resolve, reject) => {
     setTimeout(resolve, 5000,);
@@ -95,7 +75,7 @@ async function getHistory(room, tick, shard) {
       averageResult(proxySettings, end - start);
       resolve({ history: response.data });
     } catch (error) {
-      reject();
+      resolve();
     }
   });
 
@@ -112,9 +92,9 @@ const historyApi = new ScreepsAPI({
 });
 if (process.env.PRIVATE_SERVER_USERNAME) await historyApi.auth(process.env.PRIVATE_SERVER_USERNAME, process.env.PRIVATE_SERVER_PASSWORD);
 
-export async function GetRoomHistory(shard, room, tick) {
+export async function GetRoomHistory(proxy, shard, room, tick) {
   try {
-    const historyResponse = await getHistory(room, tick, shard);
+    const historyResponse = await getHistory(proxy, room, tick, shard);
     if (!historyResponse) return { status: "Error" };
     const history = historyResponse.history;
 
@@ -134,4 +114,10 @@ export async function GetRoomHistory(shard, room, tick) {
 setInterval(() => {
   console.log(`${(total - lastTotal) / 10} requests per second`)
   lastTotal = total;
+
+  // averaged by country, give array of countries with average time, sorted by average time
+  const averagedOverCountryArray = Object.keys(averagedOverCountry).map((key) => {
+    return { country: key, ...averagedOverCountry[key] };
+  }).sort((a, b) => a.perResult - b.perResult);
+  let a = 1
 }, 1000 * 10);
