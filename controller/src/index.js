@@ -284,7 +284,7 @@ app.listen(port, async () => {
   isOnlineMode = 1;
 
   logger.info("Starting initial room update!");
-  await requestRoomUpdater();
+  // await requestRoomUpdater();
   logger.info("Finished initial room update!");
   isOnlineMode = 2;
 

@@ -22,7 +22,8 @@ export default class DataRequestBroker {
   }
 
   getDataRequest() {
-    return this.dataRequests.shift();
+    return this.dataRequests[0]
+    // return this.dataRequests.shift();
   }
 
   getDataRequests(type) {
@@ -53,7 +54,8 @@ export default class DataRequestBroker {
   }
 
   resetDataResults(newData) {
-    this.dataResults = newData;
+    this.dataResults = [];
+    // this.dataResults = newData;
   }
 
   getDataResultsToSend() {
