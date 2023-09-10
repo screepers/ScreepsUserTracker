@@ -1,0 +1,3145 @@
+{
+  "timestamp": 1694163142925,
+  "room": "E12S4",
+  "base": 56909800,
+  "ticks": {
+    "56909800": {
+      "55c34a6b5be41a0a6e80c2d0": {
+        "_id": "55c34a6b5be41a0a6e80c2d0",
+        "room": "E12S4",
+        "type": "source",
+        "x": 25,
+        "y": 31,
+        "energy": 3000,
+        "energyCapacity": 3000,
+        "ticksToRegeneration": 300,
+        "nextRegenerationTime": 56910088,
+        "invaderHarvested": 997560,
+        "_updated": 13051271,
+        "effects": {
+          "0": { "effect": 13, "power": 13, "level": 5, "endTime": 56909905 }
+        }
+      },
+      "55c34a6b5be41a0a6e80c2cf": {
+        "_id": "55c34a6b5be41a0a6e80c2cf",
+        "room": "E12S4",
+        "type": "source",
+        "x": 9,
+        "y": 15,
+        "energy": 3000,
+        "energyCapacity": 3000,
+        "ticksToRegeneration": 300,
+        "nextRegenerationTime": null,
+        "invaderHarvested": 1204920,
+        "_updated": 13051271,
+        "effects": {
+          "0": { "effect": 13, "power": 13, "level": 5, "endTime": 56910007 }
+        }
+      },
+      "56e14bf91f7d4167346e10ca": {
+        "_id": "56e14bf91f7d4167346e10ca",
+        "type": "mineral",
+        "mineralType": "H",
+        "mineralAmount": 53110,
+        "x": 7,
+        "y": 39,
+        "room": "E12S4",
+        "_updated": 13051271,
+        "density": 3,
+        "nextRegenerationTime": null
+      },
+      "6237a7f8a03c724b9203e985": {
+        "_id": "6237a7f8a03c724b9203e985",
+        "type": "road",
+        "x": 5,
+        "y": 15,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "hits": 4800,
+        "hitsMax": 5000,
+        "nextDecayTime": 56910391
+      },
+      "62387e6e915309143e49a902": {
+        "_id": "62387e6e915309143e49a902",
+        "type": "road",
+        "x": 1,
+        "y": 17,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "hits": 4700,
+        "hitsMax": 5000,
+        "nextDecayTime": 56910112
+      },
+      "62387e88ffb67c54a7220800": {
+        "_id": "62387e88ffb67c54a7220800",
+        "type": "road",
+        "x": 2,
+        "y": 17,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "hits": 4700,
+        "hitsMax": 5000,
+        "nextDecayTime": 56910157
+      },
+      "64f2e74d723af87b1d677875": {
+        "_id": "64f2e74d723af87b1d677875",
+        "type": "road",
+        "x": 4,
+        "y": 16,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "hits": 4100,
+        "hitsMax": 5000,
+        "nextDecayTime": 56910101
+      },
+      "64fa65349e546c7d11e8542a": {
+        "_id": "64fa65349e546c7d11e8542a",
+        "type": "road",
+        "x": 3,
+        "y": 17,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "hits": 4200,
+        "hitsMax": 5000,
+        "nextDecayTime": 56910785
+      },
+      "64fa93dd50522af287a8b6d6": {
+        "_id": "64fa93dd50522af287a8b6d6",
+        "type": "energy",
+        "x": 24,
+        "y": 32,
+        "room": "E12S4",
+        "energy": 6280,
+        "resourceType": "energy"
+      },
+      "55c34a6b5be41a0a6e80c2ce": {
+        "_id": "55c34a6b5be41a0a6e80c2ce",
+        "room": "E12S4",
+        "type": "controller",
+        "x": 9,
+        "y": 14,
+        "level": 8,
+        "user": "54c0000233bcf50a41045d05",
+        "progress": 0,
+        "downgradeTime": 57109801,
+        "hits": 0,
+        "hitsMax": 0,
+        "progressTotal": 0,
+        "_updated": 13051271,
+        "safeMode": null,
+        "safeModeAvailable": 7,
+        "upgradeBlocked": null,
+        "safeModeCooldown": 40056431,
+        "sign": {
+          "user": "5ef6286a1f108d7e4ac043e5",
+          "text": "E12S40",
+          "time": 40002117,
+          "datetime": 1602432592860
+        },
+        "reservation": null,
+        "isPowerEnabled": true,
+        "_upgraded": 15
+      },
+      "6236c830e27f57fd451afb0c": {
+        "_id": "6236c830e27f57fd451afb0c",
+        "type": "storage",
+        "x": 10,
+        "y": 35,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": {
+          "energy": 1050310,
+          "LH2O": 66715,
+          "H": 1559853,
+          "O": 288244,
+          "OH": 147847,
+          "battery": 3492321,
+          "ops": 88,
+          "G": 0,
+          "GH": 0,
+          "GH2O": 0,
+          "X": 0,
+          "ZHO2": 45018,
+          "XZHO2": 430372,
+          "XLHO2": 275160,
+          "XGHO2": 196812,
+          "XLH2O": 13333,
+          "XKHO2": 202350,
+          "XUH2O": 122610,
+          "XGH2O": 0,
+          "XKH2O": 58560,
+          "GO": 0,
+          "power": 0,
+          "reductant": 0,
+          "LHO2": 3800,
+          "LH": 0
+        },
+        "storeCapacity": 1000000,
+        "hits": 10000,
+        "hitsMax": 10000,
+        "effects": {
+          "0": { "effect": 4, "power": 4, "level": 5, "endTime": 56905541 }
+        }
+      },
+      "6236eb3ce4eb1654f5da02bf": {
+        "_id": "6236eb3ce4eb1654f5da02bf",
+        "type": "terminal",
+        "x": 8,
+        "y": 37,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": {
+          "energy": 74301,
+          "LH2O": 5000,
+          "H": 30000,
+          "O": 18500,
+          "OH": 5000,
+          "battery": 101200,
+          "ops": 76,
+          "G": 0,
+          "GH": 5000,
+          "GH2O": 0,
+          "X": 77,
+          "ZHO2": 5000,
+          "XZHO2": 5400,
+          "KH2O": 0,
+          "XLHO2": 5000,
+          "XGHO2": 5000,
+          "XLH2O": 5000,
+          "XKHO2": 5000,
+          "XUH2O": 5000,
+          "XGH2O": 0,
+          "XKH2O": 5000,
+          "GO": 0,
+          "power": 0,
+          "reductant": 0,
+          "LHO2": 5000,
+          "LH": 0
+        },
+        "storeCapacity": 300000,
+        "hits": 3000,
+        "hitsMax": 3000,
+        "cooldownTime": 55985541,
+        "send": null,
+        "effects": {
+          "0": { "effect": 8, "power": 8, "level": 4, "endTime": 56905304 }
+        }
+      },
+      "6236ecaf91530904ab491819": {
+        "_id": "6236ecaf91530904ab491819",
+        "type": "rampart",
+        "x": 8,
+        "y": 37,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 273599700,
+        "hitsMax": 300000000,
+        "nextDecayTime": 56909826
+      },
+      "6236ecdefab02b6e664f67e4": {
+        "_id": "6236ecdefab02b6e664f67e4",
+        "type": "rampart",
+        "x": 10,
+        "y": 35,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 273453300,
+        "hitsMax": 300000000,
+        "nextDecayTime": 56909826
+      },
+      "6236f81560ae50ee4c2ceade": {
+        "_id": "6236f81560ae50ee4c2ceade",
+        "type": "link",
+        "x": 23,
+        "y": 33,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 800 },
+        "storeCapacityResource": { "energy": 800 },
+        "cooldown": 0,
+        "hits": 1000,
+        "hitsMax": 1000,
+        "actionLog": { "transferEnergy": null },
+        "_actionLog": { "transferEnergy": null }
+      },
+      "6236fec564144f67dfe91aac": {
+        "_id": "6236fec564144f67dfe91aac",
+        "type": "link",
+        "x": 7,
+        "y": 15,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 800 },
+        "storeCapacityResource": { "energy": 800 },
+        "cooldown": 0,
+        "hits": 1000,
+        "hitsMax": 1000,
+        "actionLog": { "transferEnergy": null },
+        "_actionLog": { "transferEnergy": null }
+      },
+      "6236ff8c3d1d8b0cb24b948c": {
+        "_id": "6236ff8c3d1d8b0cb24b948c",
+        "type": "link",
+        "x": 11,
+        "y": 36,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 777 },
+        "storeCapacityResource": { "energy": 800 },
+        "cooldown": 0,
+        "hits": 1000,
+        "hitsMax": 1000,
+        "actionLog": { "transferEnergy": null },
+        "_actionLog": { "transferEnergy": null }
+      },
+      "6237001ce23f0a3d9a51cd57": {
+        "_id": "6237001ce23f0a3d9a51cd57",
+        "type": "extension",
+        "x": 11,
+        "y": 39,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 0 },
+        "storeCapacityResource": { "energy": 200 },
+        "hits": 1000,
+        "hitsMax": 1000,
+        "off": false,
+        "_off": false
+      },
+      "6237001ce23f0a76be51cd58": {
+        "_id": "6237001ce23f0a76be51cd58",
+        "type": "extension",
+        "x": 12,
+        "y": 40,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 0 },
+        "storeCapacityResource": { "energy": 200 },
+        "hits": 1000,
+        "hitsMax": 1000,
+        "off": false,
+        "_off": false
+      },
+      "6237010781f8447dcb326ded": {
+        "_id": "6237010781f8447dcb326ded",
+        "type": "extension",
+        "x": 14,
+        "y": 40,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 0 },
+        "storeCapacityResource": { "energy": 200 },
+        "hits": 1000,
+        "hitsMax": 1000,
+        "off": false,
+        "_off": false
+      },
+      "6237012e2791a435658021e9": {
+        "_id": "6237012e2791a435658021e9",
+        "type": "extension",
+        "x": 15,
+        "y": 39,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 0 },
+        "storeCapacityResource": { "energy": 200 },
+        "hits": 1000,
+        "hitsMax": 1000,
+        "off": false,
+        "_off": false
+      },
+      "6237019b71a5721298c9b5f6": {
+        "_id": "6237019b71a5721298c9b5f6",
+        "type": "extension",
+        "x": 12,
+        "y": 39,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 0 },
+        "storeCapacityResource": { "energy": 200 },
+        "hits": 1000,
+        "hitsMax": 1000,
+        "off": false,
+        "_off": false
+      },
+      "623701b1b6200be7b82e3557": {
+        "_id": "623701b1b6200be7b82e3557",
+        "type": "link",
+        "x": 13,
+        "y": 38,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 784 },
+        "storeCapacityResource": { "energy": 800 },
+        "cooldown": 0,
+        "hits": 1000,
+        "hitsMax": 1000,
+        "actionLog": { "transferEnergy": null },
+        "_actionLog": { "transferEnergy": null }
+      },
+      "62370217933453bfe4683bcc": {
+        "_id": "62370217933453bfe4683bcc",
+        "type": "extension",
+        "x": 14,
+        "y": 39,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 0 },
+        "storeCapacityResource": { "energy": 200 },
+        "hits": 1000,
+        "hitsMax": 1000,
+        "off": false,
+        "_off": false
+      },
+      "6237027deb443a58ded7960c": {
+        "_id": "6237027deb443a58ded7960c",
+        "type": "extension",
+        "x": 13,
+        "y": 40,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 0 },
+        "storeCapacityResource": { "energy": 200 },
+        "hits": 1000,
+        "hitsMax": 1000,
+        "off": false,
+        "_off": false
+      },
+      "62370342eb443a4d3bd79651": {
+        "_id": "62370342eb443a4d3bd79651",
+        "type": "extension",
+        "x": 14,
+        "y": 37,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 0 },
+        "storeCapacityResource": { "energy": 200 },
+        "hits": 1000,
+        "hitsMax": 1000,
+        "off": false,
+        "_off": false
+      },
+      "62370348314bcf5d5cb8d15f": {
+        "_id": "62370348314bcf5d5cb8d15f",
+        "type": "extension",
+        "x": 13,
+        "y": 36,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 0 },
+        "storeCapacityResource": { "energy": 200 },
+        "hits": 1000,
+        "hitsMax": 1000,
+        "off": false,
+        "_off": false
+      },
+      "623703b019551a2820c6d388": {
+        "_id": "623703b019551a2820c6d388",
+        "type": "extension",
+        "x": 15,
+        "y": 38,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 0 },
+        "storeCapacityResource": { "energy": 200 },
+        "hits": 1000,
+        "hitsMax": 1000,
+        "off": false,
+        "_off": false
+      },
+      "6237043219551a55fec6d3ad": {
+        "_id": "6237043219551a55fec6d3ad",
+        "type": "extension",
+        "x": 14,
+        "y": 36,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 0 },
+        "storeCapacityResource": { "energy": 200 },
+        "hits": 1000,
+        "hitsMax": 1000,
+        "off": false,
+        "_off": false
+      },
+      "62370441b4cd46f866b4e34c": {
+        "_id": "62370441b4cd46f866b4e34c",
+        "type": "extension",
+        "x": 15,
+        "y": 37,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 0 },
+        "storeCapacityResource": { "energy": 200 },
+        "hits": 1000,
+        "hitsMax": 1000,
+        "off": false,
+        "_off": false
+      },
+      "623704ffae4f9a7f885ea9b0": {
+        "_id": "623704ffae4f9a7f885ea9b0",
+        "type": "extension",
+        "x": 12,
+        "y": 37,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 0 },
+        "storeCapacityResource": { "energy": 200 },
+        "hits": 1000,
+        "hitsMax": 1000,
+        "off": false,
+        "_off": false
+      },
+      "6237053b11ec706d06930624": {
+        "_id": "6237053b11ec706d06930624",
+        "type": "extension",
+        "x": 11,
+        "y": 38,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 0 },
+        "storeCapacityResource": { "energy": 200 },
+        "hits": 1000,
+        "hitsMax": 1000,
+        "off": false,
+        "_off": false
+      },
+      "623705404c2989bb1b96ccf2": {
+        "_id": "623705404c2989bb1b96ccf2",
+        "type": "extension",
+        "x": 11,
+        "y": 37,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 0 },
+        "storeCapacityResource": { "energy": 200 },
+        "hits": 1000,
+        "hitsMax": 1000,
+        "off": false,
+        "_off": false
+      },
+      "6237076bb911f5e908f0df4c": {
+        "_id": "6237076bb911f5e908f0df4c",
+        "type": "spawn",
+        "x": 11,
+        "y": 34,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "name": "Spawn2",
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 71 },
+        "storeCapacityResource": { "energy": 300 },
+        "hits": 5000,
+        "hitsMax": 5000,
+        "off": false,
+        "spawning": null,
+        "_off": false
+      },
+      "623707a66f43a49c4ff157d7": {
+        "_id": "623707a66f43a49c4ff157d7",
+        "type": "spawn",
+        "x": 12,
+        "y": 35,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "name": "Spawn9",
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 120 },
+        "storeCapacityResource": { "energy": 300 },
+        "hits": 5000,
+        "hitsMax": 5000,
+        "off": false,
+        "spawning": null,
+        "_off": false
+      },
+      "623708b36aa9202c1f58a748": {
+        "_id": "623708b36aa9202c1f58a748",
+        "type": "spawn",
+        "x": 12,
+        "y": 34,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "name": "Spawn6",
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 111 },
+        "storeCapacityResource": { "energy": 300 },
+        "hits": 5000,
+        "hitsMax": 5000,
+        "off": false,
+        "spawning": null,
+        "_off": false
+      },
+      "62370bcd8bd3eb428b529a5f": {
+        "_id": "62370bcd8bd3eb428b529a5f",
+        "type": "lab",
+        "x": 8,
+        "y": 35,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 500,
+        "hitsMax": 500,
+        "mineralAmount": 0,
+        "cooldown": 0,
+        "store": {
+          "energy": 2000,
+          "LH2O": 0,
+          "KH2O": 0,
+          "XZHO2": 0,
+          "GO": 0,
+          "GH": 0,
+          "OH": 0,
+          "GH2O": 0
+        },
+        "storeCapacity": 5000,
+        "storeCapacityResource": {
+          "energy": 2000,
+          "LH2O": null,
+          "KH2O": null,
+          "XZHO2": null,
+          "GO": null,
+          "GH": null,
+          "OH": null,
+          "GH2O": null
+        },
+        "actionLog": { "runReaction": null, "reverseReaction": null },
+        "effects": {
+          "0": { "effect": 5, "power": 5, "level": 5, "endTime": 56910515 }
+        },
+        "cooldownTime": 55555078,
+        "_actionLog": { "runReaction": null, "reverseReaction": null }
+      },
+      "62372aac60ae500f9f2cfc40": {
+        "_id": "62372aac60ae500f9f2cfc40",
+        "type": "extractor",
+        "x": 7,
+        "y": 39,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 500,
+        "hitsMax": 500,
+        "cooldown": 0
+      },
+      "62372f5da03c72181703c1a9": {
+        "_id": "62372f5da03c72181703c1a9",
+        "type": "lab",
+        "x": 7,
+        "y": 37,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 500,
+        "hitsMax": 500,
+        "mineralAmount": 0,
+        "cooldown": 0,
+        "store": {
+          "energy": 2000,
+          "OH": 0,
+          "GH": 0,
+          "GH2O": 0,
+          "XZHO2": 0,
+          "GO": 0,
+          "LH2O": 0,
+          "XUH2O": 0
+        },
+        "storeCapacity": 5000,
+        "storeCapacityResource": {
+          "energy": 2000,
+          "OH": null,
+          "GH": null,
+          "GH2O": null,
+          "XZHO2": null,
+          "GO": null,
+          "LH2O": null,
+          "XUH2O": null
+        },
+        "actionLog": { "runReaction": null, "reverseReaction": null },
+        "cooldownTime": 55550945,
+        "effects": {
+          "0": { "effect": 5, "power": 5, "level": 5, "endTime": 56910071 }
+        },
+        "_actionLog": { "runReaction": null, "reverseReaction": null }
+      },
+      "62372fae5bef2f73e9bd6266": {
+        "_id": "62372fae5bef2f73e9bd6266",
+        "type": "lab",
+        "x": 5,
+        "y": 36,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 500,
+        "hitsMax": 500,
+        "mineralAmount": 0,
+        "cooldown": 0,
+        "store": {
+          "energy": 0,
+          "OH": 0,
+          "GH": 0,
+          "GH2O": 0,
+          "XZHO2": 0,
+          "GO": 0,
+          "LH2O": 0
+        },
+        "storeCapacity": 5000,
+        "storeCapacityResource": {
+          "energy": 2000,
+          "OH": null,
+          "GH": null,
+          "GH2O": null,
+          "XZHO2": null,
+          "GO": null,
+          "LH2O": null
+        },
+        "actionLog": { "runReaction": null, "reverseReaction": null },
+        "cooldownTime": 55554927,
+        "effects": {
+          "0": { "effect": 5, "power": 5, "level": 5, "endTime": 56910004 }
+        },
+        "_actionLog": { "runReaction": null, "reverseReaction": null }
+      },
+      "6237346ee23f0a2ab751de5f": {
+        "_id": "6237346ee23f0a2ab751de5f",
+        "type": "lab",
+        "x": 7,
+        "y": 34,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 500,
+        "hitsMax": 500,
+        "mineralAmount": 0,
+        "cooldown": 0,
+        "store": {
+          "energy": 0,
+          "OH": 0,
+          "GH": 0,
+          "GH2O": 0,
+          "XZHO2": 0,
+          "GO": 3,
+          "LH2O": 0
+        },
+        "storeCapacity": null,
+        "storeCapacityResource": {
+          "energy": 2000,
+          "OH": null,
+          "GH": null,
+          "GH2O": null,
+          "XZHO2": null,
+          "GO": 3000,
+          "LH2O": null
+        },
+        "actionLog": { "runReaction": null, "reverseReaction": null },
+        "cooldownTime": 55552210,
+        "effects": {
+          "0": { "effect": 5, "power": 5, "level": 5, "endTime": 56910690 }
+        },
+        "_actionLog": { "runReaction": null, "reverseReaction": null }
+      },
+      "623734b4b6200bebf82e4567": {
+        "_id": "623734b4b6200bebf82e4567",
+        "type": "lab",
+        "x": 6,
+        "y": 36,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 500,
+        "hitsMax": 500,
+        "mineralAmount": 0,
+        "cooldown": 0,
+        "store": {
+          "energy": 2000,
+          "O": 0,
+          "G": 125,
+          "GH": 0,
+          "ZHO2": 0,
+          "LH": 0,
+          "XGHO2": 0
+        },
+        "storeCapacity": null,
+        "storeCapacityResource": {
+          "energy": 2000,
+          "O": null,
+          "G": 3000,
+          "GH": null,
+          "ZHO2": null,
+          "LH": null,
+          "XGHO2": null
+        },
+        "actionLog": { "runReaction": null, "reverseReaction": null },
+        "_actionLog": { "runReaction": null, "reverseReaction": null }
+      },
+      "623739a72791a41c9180353c": {
+        "_id": "623739a72791a41c9180353c",
+        "type": "lab",
+        "x": 6,
+        "y": 34,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 500,
+        "hitsMax": 500,
+        "mineralAmount": 0,
+        "cooldown": 0,
+        "store": {
+          "energy": 0,
+          "OH": 0,
+          "GH": 0,
+          "GH2O": 0,
+          "XZHO2": 0,
+          "GO": 0,
+          "LH2O": 0
+        },
+        "storeCapacity": 5000,
+        "storeCapacityResource": {
+          "energy": 2000,
+          "OH": null,
+          "GH": null,
+          "GH2O": null,
+          "XZHO2": null,
+          "GO": null,
+          "LH2O": null
+        },
+        "actionLog": { "runReaction": null, "reverseReaction": null },
+        "cooldownTime": 55550934,
+        "effects": {
+          "0": { "effect": 5, "power": 5, "level": 5, "endTime": 56910790 }
+        },
+        "_actionLog": { "runReaction": null, "reverseReaction": null }
+      },
+      "62373a6bfab02b03544f7fa3": {
+        "_id": "62373a6bfab02b03544f7fa3",
+        "type": "lab",
+        "x": 5,
+        "y": 34,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 500,
+        "hitsMax": 500,
+        "mineralAmount": 0,
+        "cooldown": 0,
+        "store": {
+          "energy": 0,
+          "OH": 0,
+          "GH": 0,
+          "GH2O": 0,
+          "XZHO2": 0,
+          "GO": 0,
+          "LH2O": 0
+        },
+        "storeCapacity": 5000,
+        "storeCapacityResource": {
+          "energy": 2000,
+          "OH": null,
+          "GH": null,
+          "GH2O": null,
+          "XZHO2": null,
+          "GO": null,
+          "LH2O": null
+        },
+        "actionLog": { "runReaction": null, "reverseReaction": null },
+        "cooldownTime": 55550934,
+        "effects": {
+          "0": { "effect": 5, "power": 5, "level": 5, "endTime": 56909817 }
+        },
+        "_actionLog": { "runReaction": null, "reverseReaction": null }
+      },
+      "62373e5c9334533308685031": {
+        "_id": "62373e5c9334533308685031",
+        "type": "lab",
+        "x": 5,
+        "y": 35,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 500,
+        "hitsMax": 500,
+        "mineralAmount": 0,
+        "cooldown": 0,
+        "store": {
+          "energy": 0,
+          "OH": 0,
+          "GH": 0,
+          "GH2O": 0,
+          "XZHO2": 0,
+          "GO": 2,
+          "LH2O": 0
+        },
+        "storeCapacity": null,
+        "storeCapacityResource": {
+          "energy": 2000,
+          "OH": null,
+          "GH": null,
+          "GH2O": null,
+          "XZHO2": null,
+          "GO": 3000,
+          "LH2O": null
+        },
+        "actionLog": { "runReaction": null, "reverseReaction": null },
+        "cooldownTime": 55551253,
+        "effects": {
+          "0": { "effect": 5, "power": 5, "level": 5, "endTime": 56909903 }
+        },
+        "_actionLog": { "runReaction": null, "reverseReaction": null }
+      },
+      "62373eb88bd3eb21b552ab7e": {
+        "_id": "62373eb88bd3eb21b552ab7e",
+        "type": "lab",
+        "x": 8,
+        "y": 36,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 500,
+        "hitsMax": 500,
+        "mineralAmount": 0,
+        "cooldown": 0,
+        "store": {
+          "energy": 2000,
+          "OH": 0,
+          "GH": 0,
+          "GH2O": 0,
+          "XZHO2": 0,
+          "GO": 1,
+          "LH2O": 0,
+          "XKH2O": 0
+        },
+        "storeCapacity": null,
+        "storeCapacityResource": {
+          "energy": 2000,
+          "OH": null,
+          "GH": null,
+          "GH2O": null,
+          "XZHO2": null,
+          "GO": 3000,
+          "LH2O": null,
+          "XKH2O": null
+        },
+        "actionLog": { "runReaction": null, "reverseReaction": null },
+        "cooldownTime": 55550945,
+        "effects": {
+          "0": { "effect": 5, "power": 5, "level": 5, "endTime": 56910131 }
+        },
+        "_actionLog": { "runReaction": null, "reverseReaction": null }
+      },
+      "62373ef19ca7e21af909262e": {
+        "_id": "62373ef19ca7e21af909262e",
+        "type": "lab",
+        "x": 7,
+        "y": 35,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 500,
+        "hitsMax": 500,
+        "mineralAmount": 0,
+        "cooldown": 0,
+        "store": {
+          "energy": 2000,
+          "H": 0,
+          "OH": 0,
+          "X": 0,
+          "O": 125,
+          "XLHO2": 0
+        },
+        "storeCapacity": null,
+        "storeCapacityResource": {
+          "energy": 2000,
+          "H": null,
+          "OH": null,
+          "X": null,
+          "O": 3000,
+          "XLHO2": null
+        },
+        "actionLog": { "runReaction": null, "reverseReaction": null },
+        "_actionLog": { "runReaction": null, "reverseReaction": null }
+      },
+      "623888e1048dbe85df7a53a8": {
+        "_id": "623888e1048dbe85df7a53a8",
+        "type": "powerSpawn",
+        "x": 10,
+        "y": 34,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 4333, "power": 0 },
+        "storeCapacityResource": { "energy": 5000, "power": 100 },
+        "hits": 5000,
+        "hitsMax": 5000
+      },
+      "6238892f8e119b7b32b4767a": {
+        "_id": "6238892f8e119b7b32b4767a",
+        "name": "Sup03",
+        "className": "operator",
+        "user": "54c0000233bcf50a41045d05",
+        "level": 25,
+        "hitsMax": 26000,
+        "store": { "ops": 4 },
+        "storeCapacity": 2600,
+        "spawnCooldownTime": null,
+        "powers": {
+          "1": { "level": 4, "cooldownTime": 56909839 },
+          "4": { "level": 5, "cooldownTime": 56905341 },
+          "5": { "level": 5, "cooldownTime": 56909840 },
+          "8": { "level": 4, "cooldownTime": 56904804 },
+          "13": { "level": 5, "cooldownTime": 56909807 },
+          "19": { "level": 2, "cooldownTime": 56910390 }
+        },
+        "shard": "shard0",
+        "deleteTime": null,
+        "type": "powerCreep",
+        "room": "E12S4",
+        "x": 9,
+        "y": 34,
+        "hits": 26000,
+        "ageTime": 56912720,
+        "actionLog": {
+          "spawned": null,
+          "attack": null,
+          "attacked": null,
+          "healed": null,
+          "power": null,
+          "say": null
+        },
+        "notifyWhenAttacked": true,
+        "fatigue": 0,
+        "interRoom": null,
+        "_oldFatigue": 0
+      },
+      "62388c646aa92031a859367b": {
+        "_id": "62388c646aa92031a859367b",
+        "type": "tower",
+        "x": 9,
+        "y": 17,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 1000 },
+        "storeCapacityResource": { "energy": 1000 },
+        "hits": 3000,
+        "hitsMax": 3000,
+        "actionLog": { "attack": null, "heal": null, "repair": null },
+        "_actionLog": { "attack": null, "heal": null, "repair": null }
+      },
+      "62388de5e27f57f4d61b8e26": {
+        "_id": "62388de5e27f57f4d61b8e26",
+        "type": "factory",
+        "x": 10,
+        "y": 36,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 10250, "battery": 9600, "reductant": 55, "H": 0 },
+        "storeCapacity": 50000,
+        "hits": 1000,
+        "hitsMax": 1000,
+        "cooldown": 0,
+        "actionLog": { "produce": null },
+        "effects": {
+          "0": { "effect": 19, "power": 19, "level": 2, "endTime": 56910590 }
+        },
+        "level": 2,
+        "cooldownTime": 55986874,
+        "_actionLog": { "produce": null }
+      },
+      "626bc60c17de8c5c9d51e93e": {
+        "_id": "626bc60c17de8c5c9d51e93e",
+        "name": "pE12S4_1135_7066",
+        "x": 11,
+        "y": 35,
+        "body": [
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 }
+        ],
+        "store": { "energy": 800, "power": 0 },
+        "storeCapacity": 800,
+        "type": "creep",
+        "room": "E12S4",
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 1700,
+        "hitsMax": 1700,
+        "spawning": false,
+        "fatigue": 0,
+        "notifyWhenAttacked": true,
+        "actionLog": {
+          "attacked": null,
+          "healed": null,
+          "attack": null,
+          "rangedAttack": null,
+          "rangedMassAttack": null,
+          "rangedHeal": null,
+          "harvest": null,
+          "heal": null,
+          "repair": null,
+          "build": null,
+          "say": null,
+          "upgradeController": null,
+          "reserveController": null
+        },
+        "ageTime": 56911246,
+        "_fatigue": -2
+      },
+      "6400e9bc452a8685c851c2e9": {
+        "_id": "6400e9bc452a8685c851c2e9",
+        "type": "nuker",
+        "x": 24,
+        "y": 33,
+        "room": "E12S4",
+        "notifyWhenAttacked": true,
+        "user": "54c0000233bcf50a41045d05",
+        "store": { "energy": 300000 },
+        "storeCapacityResource": { "energy": 300000, "G": 5000 },
+        "hits": 1000,
+        "hitsMax": 1000,
+        "cooldownTime": 54043888
+      },
+      "64fac227ece3cb42b19c99d8": {
+        "_id": "64fac227ece3cb42b19c99d8",
+        "name": "rlE12S4_8383",
+        "x": 13,
+        "y": 39,
+        "body": [
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 }
+        ],
+        "store": { "energy": 200 },
+        "storeCapacity": 200,
+        "type": "creep",
+        "room": "E12S4",
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 500,
+        "hitsMax": 500,
+        "spawning": false,
+        "fatigue": 0,
+        "notifyWhenAttacked": true,
+        "actionLog": {
+          "attacked": null,
+          "healed": null,
+          "attack": null,
+          "rangedAttack": null,
+          "rangedMassAttack": null,
+          "rangedHeal": null,
+          "harvest": null,
+          "heal": null,
+          "repair": null,
+          "build": null,
+          "say": null,
+          "upgradeController": null,
+          "reserveController": null
+        },
+        "ageTime": 56909897,
+        "_fatigue": -2
+      },
+      "64fac4231e69521ff77950c6": {
+        "_id": "64fac4231e69521ff77950c6",
+        "name": "rlE12S4_8482",
+        "x": 14,
+        "y": 38,
+        "body": [
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 }
+        ],
+        "store": { "energy": 200 },
+        "storeCapacity": 200,
+        "type": "creep",
+        "room": "E12S4",
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 500,
+        "hitsMax": 500,
+        "spawning": false,
+        "fatigue": 0,
+        "notifyWhenAttacked": true,
+        "actionLog": {
+          "attacked": null,
+          "healed": null,
+          "attack": null,
+          "rangedAttack": null,
+          "rangedMassAttack": null,
+          "rangedHeal": null,
+          "harvest": null,
+          "heal": null,
+          "repair": null,
+          "build": null,
+          "say": null,
+          "upgradeController": null,
+          "reserveController": null
+        },
+        "ageTime": 56909996,
+        "_fatigue": -2
+      },
+      "64fac54f785f7848f537bbc3": {
+        "_id": "64fac54f785f7848f537bbc3",
+        "name": "rfE11S4toE12S4_8539",
+        "x": 6,
+        "y": 16,
+        "body": [
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "move", "hits": 100 }
+        ],
+        "store": { "energy": 1382 },
+        "storeCapacity": 1400,
+        "type": "creep",
+        "room": "E12S4",
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 4400,
+        "hitsMax": 4400,
+        "spawning": false,
+        "fatigue": 0,
+        "notifyWhenAttacked": true,
+        "actionLog": {
+          "attacked": null,
+          "healed": null,
+          "attack": null,
+          "rangedAttack": null,
+          "rangedMassAttack": null,
+          "rangedHeal": null,
+          "harvest": null,
+          "heal": null,
+          "repair": null,
+          "build": null,
+          "say": null,
+          "upgradeController": null,
+          "reserveController": null
+        },
+        "ageTime": 56910170,
+        "interRoom": null,
+        "_fatigue": -30
+      },
+      "64fac7bbfd730750930b15c2": {
+        "_id": "64fac7bbfd730750930b15c2",
+        "name": "rlE12S4_8641",
+        "x": 12,
+        "y": 38,
+        "body": [
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 }
+        ],
+        "store": { "energy": 200 },
+        "storeCapacity": 200,
+        "type": "creep",
+        "room": "E12S4",
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 500,
+        "hitsMax": 500,
+        "spawning": false,
+        "fatigue": 0,
+        "notifyWhenAttacked": true,
+        "actionLog": {
+          "attacked": null,
+          "healed": null,
+          "attack": null,
+          "rangedAttack": null,
+          "rangedMassAttack": null,
+          "rangedHeal": null,
+          "harvest": null,
+          "heal": null,
+          "repair": null,
+          "build": null,
+          "say": null,
+          "upgradeController": null,
+          "reserveController": null
+        },
+        "ageTime": 56910155,
+        "_fatigue": -2
+      },
+      "64facc3061e83b4f1d4ac921": {
+        "_id": "64facc3061e83b4f1d4ac921",
+        "name": "bnE12S4_0736_8872",
+        "x": 7,
+        "y": 36,
+        "body": [
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "move", "hits": 100 }
+        ],
+        "store": { "energy": 0 },
+        "storeCapacity": 500,
+        "type": "creep",
+        "room": "E12S4",
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 1500,
+        "hitsMax": 1500,
+        "spawning": false,
+        "fatigue": 0,
+        "notifyWhenAttacked": true,
+        "actionLog": {
+          "attacked": null,
+          "healed": null,
+          "attack": null,
+          "rangedAttack": null,
+          "rangedMassAttack": null,
+          "rangedHeal": null,
+          "harvest": null,
+          "heal": null,
+          "repair": null,
+          "build": null,
+          "say": null,
+          "upgradeController": null,
+          "reserveController": null
+        },
+        "ageTime": 56910416,
+        "_fatigue": -10
+      },
+      "64fad76a319d1b0bd8d09929": {
+        "_id": "64fad76a319d1b0bd8d09929",
+        "name": "hE12S4_0816_9460",
+        "x": 8,
+        "y": 16,
+        "body": [
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "move", "hits": 100 }
+        ],
+        "store": { "energy": 252 },
+        "storeCapacity": 300,
+        "type": "creep",
+        "room": "E12S4",
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 2900,
+        "hitsMax": 2900,
+        "spawning": false,
+        "fatigue": 0,
+        "notifyWhenAttacked": true,
+        "actionLog": {
+          "attacked": null,
+          "healed": null,
+          "attack": null,
+          "rangedAttack": null,
+          "rangedMassAttack": null,
+          "rangedHeal": null,
+          "harvest": { "x": 9, "y": 15 },
+          "heal": null,
+          "repair": null,
+          "build": null,
+          "say": null,
+          "upgradeController": { "x": 9, "y": 14 },
+          "reserveController": null
+        },
+        "ageTime": 56911046,
+        "_fatigue": -16
+      },
+      "64fad7cf1d122810135914d8": {
+        "_id": "64fad7cf1d122810135914d8",
+        "name": "hE12S4_2432_9481",
+        "x": 24,
+        "y": 32,
+        "body": [
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "move", "hits": 100 }
+        ],
+        "store": { "energy": 300 },
+        "storeCapacity": 300,
+        "type": "creep",
+        "room": "E12S4",
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 2900,
+        "hitsMax": 2900,
+        "spawning": false,
+        "fatigue": 0,
+        "notifyWhenAttacked": true,
+        "actionLog": {
+          "attacked": null,
+          "healed": null,
+          "attack": null,
+          "rangedAttack": null,
+          "rangedMassAttack": null,
+          "rangedHeal": null,
+          "harvest": null,
+          "heal": null,
+          "repair": null,
+          "build": null,
+          "say": null,
+          "upgradeController": null,
+          "reserveController": null
+        },
+        "ageTime": 56911067,
+        "_fatigue": -16
+      },
+      "64fad9db3efc187e421805f0": {
+        "_id": "64fad9db3efc187e421805f0",
+        "name": "pE12S4_0936_9589",
+        "x": 9,
+        "y": 37,
+        "body": [
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 }
+        ],
+        "store": { "energy": 0 },
+        "storeCapacity": 800,
+        "type": "creep",
+        "room": "E12S4",
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 1700,
+        "hitsMax": 1700,
+        "spawning": false,
+        "fatigue": 0,
+        "notifyWhenAttacked": true,
+        "actionLog": {
+          "attacked": null,
+          "healed": null,
+          "attack": null,
+          "rangedAttack": null,
+          "rangedMassAttack": null,
+          "rangedHeal": null,
+          "harvest": null,
+          "heal": null,
+          "repair": null,
+          "build": null,
+          "say": null,
+          "upgradeController": null,
+          "reserveController": null
+        },
+        "ageTime": 56911139,
+        "_fatigue": -2
+      },
+      "64fada351a1c52b51726ae1d": {
+        "_id": "64fada351a1c52b51726ae1d",
+        "name": "rlE12S4_9607",
+        "x": 13,
+        "y": 37,
+        "body": [
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 }
+        ],
+        "store": { "energy": 200 },
+        "storeCapacity": 200,
+        "type": "creep",
+        "room": "E12S4",
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 500,
+        "hitsMax": 500,
+        "spawning": false,
+        "fatigue": 0,
+        "notifyWhenAttacked": true,
+        "actionLog": {
+          "attacked": null,
+          "healed": null,
+          "attack": null,
+          "rangedAttack": null,
+          "rangedMassAttack": null,
+          "rangedHeal": null,
+          "harvest": null,
+          "heal": null,
+          "repair": null,
+          "build": null,
+          "say": null,
+          "upgradeController": null,
+          "reserveController": null
+        },
+        "ageTime": 56911121,
+        "_fatigue": -2
+      }
+    },
+    "56909801": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2970,
+        "nextRegenerationTime": 56910101,
+        "invaderHarvested": 1204950
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 6273 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109802 },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": null },
+      "64fad76a319d1b0bd8d09929": { "store": { "energy": 267 } }
+    },
+    "56909802": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2940,
+        "invaderHarvested": 1204980
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 6266 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109803 },
+      "6238892f8e119b7b32b4767a": { "x": 8, "y": 33, "_oldFatigue": 0 },
+      "64fad76a319d1b0bd8d09929": { "store": { "energy": 282 } }
+    },
+    "56909803": {
+      "64fa93dd50522af287a8b6d6": { "energy": 6259 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109804 },
+      "6238892f8e119b7b32b4767a": { "x": 9, "y": 34 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909804": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2910,
+        "invaderHarvested": 1205010
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 6252 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109805 },
+      "6238892f8e119b7b32b4767a": { "x": 8, "y": 33 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909805": {
+      "64fa93dd50522af287a8b6d6": { "energy": 6245 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109806 },
+      "6238892f8e119b7b32b4767a": { "x": 9, "y": 34 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909806": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2880,
+        "invaderHarvested": 1205040
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 6238 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109807 },
+      "6238892f8e119b7b32b4767a": { "x": 8, "y": 33 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909807": {
+      "64fa93dd50522af287a8b6d6": { "energy": 6231 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109808 },
+      "6238892f8e119b7b32b4767a": { "x": 9, "y": 34 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909808": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2850,
+        "invaderHarvested": 1205070
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 6224 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109809 },
+      "6238892f8e119b7b32b4767a": { "x": 8, "y": 33 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909809": {
+      "64fa93dd50522af287a8b6d6": { "energy": 6217 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109810 },
+      "6238892f8e119b7b32b4767a": { "x": 9, "y": 34 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909810": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2820,
+        "invaderHarvested": 1205100
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 6210 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109811 },
+      "6238892f8e119b7b32b4767a": { "x": 8, "y": 33 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909811": {
+      "55c34a6b5be41a0a6e80c2cf": { "energy": 3000 },
+      "64fa93dd50522af287a8b6d6": { "energy": 6203 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109812 },
+      "6238892f8e119b7b32b4767a": { "x": 9, "y": 34 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909812": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2970,
+        "invaderHarvested": 1205130
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 6196 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109813 },
+      "6238892f8e119b7b32b4767a": { "x": 8, "y": 33 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909813": {
+      "64fa93dd50522af287a8b6d6": { "energy": 6189 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109814 },
+      "6238892f8e119b7b32b4767a": { "x": 9, "y": 34 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909814": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2940,
+        "invaderHarvested": 1205160
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 6182 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109815 },
+      "6238892f8e119b7b32b4767a": { "x": 8, "y": 33 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909815": {
+      "64fa93dd50522af287a8b6d6": { "energy": 6175 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109816 },
+      "6238892f8e119b7b32b4767a": { "x": 9, "y": 34 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909816": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2910,
+        "invaderHarvested": 1205190
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 6168 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109817 },
+      "6238892f8e119b7b32b4767a": { "x": 8, "y": 33 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909817": {
+      "64fa93dd50522af287a8b6d6": { "energy": 6161 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109818 },
+      "6238892f8e119b7b32b4767a": { "x": 9, "y": 34 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909818": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2880,
+        "invaderHarvested": 1205220
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 6154 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109819 },
+      "6238892f8e119b7b32b4767a": { "x": 8, "y": 33 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909819": {
+      "64fa93dd50522af287a8b6d6": { "energy": 6147 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109820 },
+      "6238892f8e119b7b32b4767a": { "x": 9, "y": 34 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909820": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2850,
+        "invaderHarvested": 1205250
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 6140 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109821 },
+      "6238892f8e119b7b32b4767a": { "x": 8, "y": 33 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909821": {
+      "64fa93dd50522af287a8b6d6": { "energy": 6133 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109822 },
+      "6238892f8e119b7b32b4767a": { "x": 9, "y": 34 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909822": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2820,
+        "invaderHarvested": 1205280
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 6126 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109823 },
+      "6238892f8e119b7b32b4767a": { "x": 8, "y": 33 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909823": {
+      "64fa93dd50522af287a8b6d6": { "energy": 6119 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109824 },
+      "6238892f8e119b7b32b4767a": { "x": 9, "y": 34 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909824": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2790,
+        "invaderHarvested": 1205310
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 6112 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109825 },
+      "6238892f8e119b7b32b4767a": { "x": 8, "y": 33 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909825": {
+      "64fa93dd50522af287a8b6d6": { "energy": 6105 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109826 },
+      "6236ecaf91530904ab491819": {
+        "hits": 273599400,
+        "nextDecayTime": 56909925
+      },
+      "6236ecdefab02b6e664f67e4": {
+        "hits": 273453000,
+        "nextDecayTime": 56909925
+      },
+      "6238892f8e119b7b32b4767a": { "x": 9, "y": 34 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909826": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 3000,
+        "invaderHarvested": 1205340
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 6098 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109827 },
+      "6238892f8e119b7b32b4767a": { "x": 8, "y": 33 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909827": {
+      "64fa93dd50522af287a8b6d6": { "energy": 6091 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109828 },
+      "6238892f8e119b7b32b4767a": { "x": 9, "y": 34 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909828": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2970,
+        "invaderHarvested": 1205370
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 6084 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109829 },
+      "6238892f8e119b7b32b4767a": { "x": 8, "y": 33 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909829": {
+      "64fa93dd50522af287a8b6d6": { "energy": 6077 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109830 },
+      "6238892f8e119b7b32b4767a": { "x": 9, "y": 34 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909830": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2940,
+        "invaderHarvested": 1205400
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 6070 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109831 },
+      "6238892f8e119b7b32b4767a": { "x": 8, "y": 33 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909831": {
+      "64fa93dd50522af287a8b6d6": { "energy": 6063 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109832 },
+      "6238892f8e119b7b32b4767a": { "x": 9, "y": 34 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909832": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2910,
+        "invaderHarvested": 1205430
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 6056 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109833 },
+      "6238892f8e119b7b32b4767a": { "x": 8, "y": 33 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909833": {
+      "64fa93dd50522af287a8b6d6": { "energy": 6049 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109834 },
+      "6238892f8e119b7b32b4767a": { "x": 9, "y": 34 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909834": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2880,
+        "invaderHarvested": 1205460
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 6042 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109835 },
+      "6238892f8e119b7b32b4767a": { "x": 8, "y": 33 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909835": {
+      "64fa93dd50522af287a8b6d6": { "energy": 6035 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109836 },
+      "6238892f8e119b7b32b4767a": { "x": 9, "y": 34 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909836": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2850,
+        "invaderHarvested": 1205490
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 6028 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109837 },
+      "6238892f8e119b7b32b4767a": { "x": 8, "y": 33 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909837": {
+      "64fa93dd50522af287a8b6d6": { "energy": 6021 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109838 },
+      "6238892f8e119b7b32b4767a": { "x": 9, "y": 34 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909838": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2820,
+        "invaderHarvested": 1205520
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 6014 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109839 },
+      "6238892f8e119b7b32b4767a": { "x": 8, "y": 33 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909839": {
+      "64fa93dd50522af287a8b6d6": { "energy": 6007 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109840 },
+      "6238892f8e119b7b32b4767a": {
+        "store": { "ops": 10 },
+        "powers": { "1": { "level": 4, "cooldownTime": 56909889 } },
+        "x": 9,
+        "y": 34,
+        "actionLog": { "power": { "id": 1, "x": 8, "y": 33 } }
+      },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909840": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2790,
+        "invaderHarvested": 1205550
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 6000 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109841 },
+      "6238892f8e119b7b32b4767a": {
+        "x": 8,
+        "y": 33,
+        "actionLog": { "power": null }
+      },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909841": {
+      "55c34a6b5be41a0a6e80c2cf": { "energy": 3000 },
+      "64fa93dd50522af287a8b6d6": { "energy": 5994 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109842 },
+      "62373a6bfab02b03544f7fa3": {
+        "effects": {
+          "0": { "effect": 5, "power": 5, "level": 5, "endTime": 56910841 }
+        }
+      },
+      "6238892f8e119b7b32b4767a": {
+        "store": { "ops": 0 },
+        "powers": { "5": { "level": 5, "cooldownTime": 56909891 } },
+        "x": 7,
+        "y": 32,
+        "actionLog": { "power": { "id": 5, "x": 5, "y": 34 } }
+      },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909842": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2970,
+        "invaderHarvested": 1205580
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5988 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109843 },
+      "6238892f8e119b7b32b4767a": {
+        "x": 8,
+        "y": 33,
+        "actionLog": { "power": null }
+      },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909843": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5982 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109844 },
+      "6238892f8e119b7b32b4767a": { "x": 9, "y": 34 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909844": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2940,
+        "invaderHarvested": 1205610
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5976 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109845 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909845": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5970 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109846 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909846": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2910,
+        "invaderHarvested": 1205640
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5964 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109847 },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": null },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909847": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5958 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109848 },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": 0 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909848": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2880,
+        "invaderHarvested": 1205670
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5952 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109849 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909849": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5946 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109850 },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": null },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909850": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2850,
+        "invaderHarvested": 1205700
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5940 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109851 },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": 0 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909851": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5934 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109852 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909852": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2820,
+        "invaderHarvested": 1205730
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5928 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109853 },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": null },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909853": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5922 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109854 },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": 0 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909854": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2790,
+        "invaderHarvested": 1205760
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5916 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109855 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909855": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5910 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109856 },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": null },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909856": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 3000,
+        "invaderHarvested": 1205790
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5904 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109857 },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": 0 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909857": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5898 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109858 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909858": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2970,
+        "invaderHarvested": 1205820
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5892 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109859 },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": null },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909859": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5886 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109860 },
+      "6237076bb911f5e908f0df4c": {
+        "store": { "energy": 1 },
+        "spawning": {
+          "name": "rlE12S4_9859",
+          "needTime": 15,
+          "spawnTime": 56909874
+        }
+      },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 1 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 53 } },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": 0 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909860": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2940,
+        "invaderHarvested": 1205850
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5880 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109861 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 2 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 2 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 54 } },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      },
+      "64fadf211e1a6b1e8cf7c9bb": {
+        "_id": "64fadf211e1a6b1e8cf7c9bb",
+        "name": "rlE12S4_9859",
+        "x": 11,
+        "y": 34,
+        "body": [
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 }
+        ],
+        "store": { "energy": 0 },
+        "storeCapacity": 200,
+        "type": "creep",
+        "room": "E12S4",
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 500,
+        "hitsMax": 500,
+        "spawning": true,
+        "fatigue": 0,
+        "notifyWhenAttacked": true,
+        "actionLog": {
+          "attacked": null,
+          "healed": null,
+          "attack": null,
+          "rangedAttack": null,
+          "rangedMassAttack": null,
+          "rangedHeal": null,
+          "harvest": null,
+          "heal": null,
+          "repair": null,
+          "build": null,
+          "say": null,
+          "upgradeController": null,
+          "reserveController": null
+        },
+        "_fatigue": -2
+      }
+    },
+    "56909861": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5874 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109862 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 3 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 3 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 55 } },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": null },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909862": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2910,
+        "invaderHarvested": 1205880
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5868 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109863 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 4 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 4 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 36 } },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": 0 },
+      "626bc60c17de8c5c9d51e93e": {
+        "actionLog": { "healed": { "x": 12, "y": 34 } },
+        "ageTime": 56911281
+      },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909863": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5862 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109864 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 5 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 5 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 17 } },
+      "626bc60c17de8c5c9d51e93e": { "ageTime": 56911316 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909864": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2880,
+        "invaderHarvested": 1205910
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5856 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109865 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 6 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 6 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 18 } },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": null },
+      "626bc60c17de8c5c9d51e93e": { "actionLog": { "healed": null } },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909865": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5850 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109866 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 7 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 7 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 19 } },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": 0 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909866": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2850,
+        "invaderHarvested": 1205940
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5844 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109867 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 8 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 8 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 20 } },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909867": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5838 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109868 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 9 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 9 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 1 } },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": null },
+      "626bc60c17de8c5c9d51e93e": {
+        "actionLog": { "healed": { "x": 12, "y": 34 } },
+        "ageTime": 56911351
+      },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909868": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2820,
+        "invaderHarvested": 1205970
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5832 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109869 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 10 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 10 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 2 } },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": 0 },
+      "626bc60c17de8c5c9d51e93e": { "actionLog": { "healed": null } },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909869": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5826 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109870 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 11 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 11 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 3 } },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909870": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2790,
+        "invaderHarvested": 1206000
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5820 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109871 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 12 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 12 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 4 } },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": null },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909871": {
+      "55c34a6b5be41a0a6e80c2cf": { "energy": 3000 },
+      "64fa93dd50522af287a8b6d6": { "energy": 5814 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109872 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 13 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 13 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 5 } },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": 0 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909872": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2970,
+        "invaderHarvested": 1206030
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5808 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109873 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 14 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 14 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 6 } },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909873": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5802 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109874 },
+      "6237076bb911f5e908f0df4c": {
+        "store": { "energy": 15 },
+        "spawning": null
+      },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 15 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 7 } },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": null },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      },
+      "64fadf211e1a6b1e8cf7c9bb": {
+        "y": 33,
+        "spawning": false,
+        "ageTime": 56911373
+      }
+    },
+    "56909874": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2940,
+        "invaderHarvested": 1206060
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5796 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109875 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 16 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 16 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 8 } },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": 0 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      },
+      "64fadf211e1a6b1e8cf7c9bb": { "x": 12, "_oldFatigue": 0 }
+    },
+    "56909875": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5790 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109876 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 17 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 17 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 9 } },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      },
+      "64fadf211e1a6b1e8cf7c9bb": { "x": 13, "y": 34 }
+    },
+    "56909876": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2910,
+        "invaderHarvested": 1206090
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5784 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109877 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 18 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 18 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 10 } },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": null },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      },
+      "64fadf211e1a6b1e8cf7c9bb": { "y": 35 }
+    },
+    "56909877": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5778 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109878 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 19 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 19 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 11 } },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": 0 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      },
+      "64fadf211e1a6b1e8cf7c9bb": { "x": 12, "y": 36 }
+    },
+    "56909878": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2880,
+        "invaderHarvested": 1206120
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5772 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109879 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 20 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 20 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 12 } },
+      "64fac227ece3cb42b19c99d8": null,
+      "64fac4231e69521ff77950c6": {
+        "x": 13,
+        "y": 39,
+        "fatigue": 6,
+        "_fatigue": 6,
+        "_oldFatigue": 0
+      },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      },
+      "64fada351a1c52b51726ae1d": {
+        "x": 14,
+        "y": 38,
+        "fatigue": 6,
+        "_fatigue": 6,
+        "_oldFatigue": 0
+      },
+      "64fadf211e1a6b1e8cf7c9bb": { "x": 13, "y": 37 }
+    },
+    "56909879": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5766 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109880 },
+      "623701b1b6200be7b82e3557": { "store": { "energy": 584 } },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 21 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 21 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 13 } },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": null },
+      "64fac4231e69521ff77950c6": {
+        "fatigue": 4,
+        "_oldFatigue": null,
+        "_fatigue": 4
+      },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      },
+      "64fada351a1c52b51726ae1d": {
+        "fatigue": 4,
+        "_oldFatigue": null,
+        "_fatigue": 4
+      },
+      "64fadf211e1a6b1e8cf7c9bb": {
+        "store": { "energy": 200 },
+        "_oldFatigue": null
+      },
+      "64fadf7e9da6ad016a3fdec4": {
+        "_id": "64fadf7e9da6ad016a3fdec4",
+        "type": "tombstone",
+        "room": "E12S4",
+        "x": 13,
+        "y": 39,
+        "user": "54c0000233bcf50a41045d05",
+        "deathTime": 56909878,
+        "decayTime": 56909903,
+        "creepId": "64fac227ece3cb42b19c99d8",
+        "creepName": "rlE12S4_8383",
+        "creepTicksToLive": 19,
+        "creepBody": ["carry", "carry", "carry", "carry", "move"],
+        "creepSaying": null,
+        "store": { "energy": 200 }
+      }
+    },
+    "56909880": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2850,
+        "invaderHarvested": 1206150
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5760 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109881 },
+      "6236ff8c3d1d8b0cb24b948c": {
+        "store": { "energy": 584 },
+        "cooldown": 1,
+        "actionLog": { "transferEnergy": { "x": 13, "y": 38 } }
+      },
+      "623701b1b6200be7b82e3557": { "store": { "energy": 793 } },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 22 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 22 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 14 } },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": 0 },
+      "626bc60c17de8c5c9d51e93e": { "store": { "energy": 777 } },
+      "64fac4231e69521ff77950c6": { "fatigue": 2, "_fatigue": 2 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      },
+      "64fada351a1c52b51726ae1d": { "fatigue": 2, "_fatigue": 2 }
+    },
+    "56909881": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5754 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109882 },
+      "6236ff8c3d1d8b0cb24b948c": {
+        "cooldown": 0,
+        "actionLog": { "transferEnergy": null },
+        "_actionLog": { "transferEnergy": { "x": 13, "y": 38 } }
+      },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 23 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 23 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 15 } },
+      "64fac4231e69521ff77950c6": { "fatigue": 0, "_fatigue": 0 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      },
+      "64fada351a1c52b51726ae1d": { "fatigue": 0, "_fatigue": 0 }
+    },
+    "56909882": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2820,
+        "invaderHarvested": 1206180
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5748 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109883 },
+      "6236ff8c3d1d8b0cb24b948c": { "_actionLog": { "transferEnergy": null } },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 24 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 24 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 16 } },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": null },
+      "64fac4231e69521ff77950c6": { "_fatigue": -2 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      },
+      "64fada351a1c52b51726ae1d": { "_fatigue": -2 }
+    },
+    "56909883": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5742 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109884 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 25 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 25 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 17 } },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": 0 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909884": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2790,
+        "invaderHarvested": 1206210
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5736 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109885 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 26 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 26 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 18 } },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909885": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5730 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109886 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 27 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 27 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 19 } },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": null },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909886": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 3000,
+        "invaderHarvested": 1206240
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5724 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109887 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 28 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 28 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 20 } },
+      "6238892f8e119b7b32b4767a": { "_oldFatigue": 0 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909887": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5718 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109888 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 9 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 29 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 21 } },
+      "626bc60c17de8c5c9d51e93e": {
+        "actionLog": { "healed": { "x": 11, "y": 34 } },
+        "ageTime": 56911386
+      },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909888": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2970,
+        "invaderHarvested": 1206270
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5712 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109889 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 10 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 30 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 22 } },
+      "6238892f8e119b7b32b4767a": { "x": 8, "y": 33 },
+      "626bc60c17de8c5c9d51e93e": { "actionLog": { "healed": null } },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909889": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5706 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109890 },
+      "6237001ce23f0a3d9a51cd57": { "store": { "energy": 200 } },
+      "6237001ce23f0a76be51cd58": { "store": { "energy": 200 } },
+      "6237012e2791a435658021e9": { "store": { "energy": 200 } },
+      "62370342eb443a4d3bd79651": { "store": { "energy": 198 } },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 300 } },
+      "6238892f8e119b7b32b4767a": {
+        "store": { "ops": 6 },
+        "powers": { "1": { "level": 4, "cooldownTime": 56909939 } },
+        "x": 9,
+        "y": 34,
+        "actionLog": { "power": { "id": 1, "x": 8, "y": 33 } }
+      },
+      "626bc60c17de8c5c9d51e93e": { "store": { "energy": 487 } },
+      "64fac4231e69521ff77950c6": { "store": { "energy": 0 } },
+      "64fac7bbfd730750930b15c2": { "store": { "energy": 0 } },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      },
+      "64fada351a1c52b51726ae1d": { "store": { "energy": 0 } },
+      "64fadf211e1a6b1e8cf7c9bb": { "store": { "energy": 2 } }
+    },
+    "56909890": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2940,
+        "invaderHarvested": 1206300
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5700 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109891 },
+      "623701b1b6200be7b82e3557": { "store": { "energy": 595 } },
+      "6238892f8e119b7b32b4767a": {
+        "x": 8,
+        "y": 33,
+        "actionLog": { "power": null }
+      },
+      "64fac4231e69521ff77950c6": { "store": { "energy": 200 } },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      },
+      "64fadf211e1a6b1e8cf7c9bb": { "store": { "energy": 200 } },
+      "64fadf7e9da6ad016a3fdec4": { "store": { "energy": 0 } }
+    },
+    "56909891": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5694 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109892 },
+      "6236ff8c3d1d8b0cb24b948c": {
+        "store": { "energy": 595 },
+        "cooldown": 1,
+        "actionLog": { "transferEnergy": { "x": 13, "y": 38 } }
+      },
+      "623701b1b6200be7b82e3557": { "store": { "energy": 393 } },
+      "6238892f8e119b7b32b4767a": { "x": 9, "y": 32 },
+      "626bc60c17de8c5c9d51e93e": { "store": { "energy": 271 } },
+      "64fac7bbfd730750930b15c2": { "store": { "energy": 200 } },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      },
+      "64fada351a1c52b51726ae1d": { "store": { "energy": 200 } }
+    },
+    "56909892": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2910,
+        "invaderHarvested": 1206330
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5688 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109893 },
+      "6236ff8c3d1d8b0cb24b948c": {
+        "store": { "energy": 800 },
+        "cooldown": 0,
+        "actionLog": { "transferEnergy": null },
+        "_actionLog": { "transferEnergy": { "x": 13, "y": 38 } }
+      },
+      "6237001ce23f0a3d9a51cd57": { "store": { "energy": 0 } },
+      "6237001ce23f0a76be51cd58": { "store": { "energy": 0 } },
+      "6237012e2791a435658021e9": { "store": { "energy": 0 } },
+      "62370342eb443a4d3bd79651": { "store": { "energy": 0 } },
+      "6237076bb911f5e908f0df4c": {
+        "store": { "energy": 1 },
+        "spawning": {
+          "name": "hE11S4_0434_9892",
+          "needTime": 51,
+          "spawnTime": 56909943
+        }
+      },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 1 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 1 } },
+      "6238892f8e119b7b32b4767a": { "x": 10 },
+      "626bc60c17de8c5c9d51e93e": { "store": { "energy": 66 } },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909893": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5682 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109894 },
+      "6236ff8c3d1d8b0cb24b948c": {
+        "store": { "energy": 393 },
+        "cooldown": 1,
+        "actionLog": { "transferEnergy": { "x": 13, "y": 38 } },
+        "_actionLog": { "transferEnergy": null }
+      },
+      "623701b1b6200be7b82e3557": { "store": { "energy": 787 } },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 2 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 2 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 2 } },
+      "6238892f8e119b7b32b4767a": { "x": 11 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      },
+      "64fadfc157cdb2b351f23002": {
+        "_id": "64fadfc157cdb2b351f23002",
+        "name": "hE11S4_0434_9892",
+        "x": 11,
+        "y": 34,
+        "body": [
+          { "type": "move", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "work", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "carry", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "move", "hits": 100 },
+          { "type": "move", "hits": 100 }
+        ],
+        "store": { "energy": 0 },
+        "storeCapacity": 250,
+        "type": "creep",
+        "room": "E12S4",
+        "user": "54c0000233bcf50a41045d05",
+        "hits": 1700,
+        "hitsMax": 1700,
+        "spawning": true,
+        "fatigue": 0,
+        "notifyWhenAttacked": true,
+        "actionLog": {
+          "attacked": null,
+          "healed": null,
+          "attack": null,
+          "rangedAttack": null,
+          "rangedMassAttack": null,
+          "rangedHeal": null,
+          "harvest": null,
+          "heal": null,
+          "repair": null,
+          "build": null,
+          "say": null,
+          "upgradeController": null,
+          "reserveController": null
+        },
+        "_fatigue": -12
+      }
+    },
+    "56909894": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2880,
+        "invaderHarvested": 1206360
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5676 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109895 },
+      "6236fec564144f67dfe91aac": {
+        "store": { "energy": 393 },
+        "cooldown": 20,
+        "actionLog": { "transferEnergy": { "x": 11, "y": 36 } }
+      },
+      "6236ff8c3d1d8b0cb24b948c": {
+        "store": { "energy": 394 },
+        "cooldown": 0,
+        "actionLog": { "transferEnergy": null },
+        "_actionLog": { "transferEnergy": { "x": 13, "y": 38 } }
+      },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 3 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 3 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 3 } },
+      "6238892f8e119b7b32b4767a": { "x": 12, "y": 31 },
+      "626bc60c17de8c5c9d51e93e": { "store": { "energy": 459 } },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      }
+    },
+    "56909895": {
+      "64fa93dd50522af287a8b6d6": { "energy": 5670 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109896 },
+      "6236f81560ae50ee4c2ceade": {
+        "store": { "energy": 394 },
+        "cooldown": 11,
+        "actionLog": { "transferEnergy": { "x": 11, "y": 36 } }
+      },
+      "6236fec564144f67dfe91aac": {
+        "store": { "energy": 800 },
+        "cooldown": 19,
+        "actionLog": { "transferEnergy": null },
+        "_actionLog": { "transferEnergy": { "x": 11, "y": 36 } }
+      },
+      "6236ff8c3d1d8b0cb24b948c": {
+        "store": { "energy": 787 },
+        "_actionLog": { "transferEnergy": null }
+      },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 4 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 4 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 4 } },
+      "6238892f8e119b7b32b4767a": { "x": 13, "y": 30 },
+      "64fac54f785f7848f537bbc3": { "store": { "energy": 975 } },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909896": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2850,
+        "invaderHarvested": 1206390
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5664 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109897 },
+      "6236f81560ae50ee4c2ceade": {
+        "store": { "energy": 694 },
+        "cooldown": 10,
+        "actionLog": { "transferEnergy": null },
+        "_actionLog": { "transferEnergy": { "x": 11, "y": 36 } }
+      },
+      "6236fec564144f67dfe91aac": {
+        "cooldown": 18,
+        "_actionLog": { "transferEnergy": null }
+      },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 5 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 5 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 5 } },
+      "6238892f8e119b7b32b4767a": { "x": 14, "y": 29 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      },
+      "64fad7cf1d122810135914d8": { "store": { "energy": 0 } }
+    },
+    "56909897": {
+      "55c34a6b5be41a0a6e80c2d0": {
+        "energy": 2970,
+        "invaderHarvested": 997590
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5388 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109898 },
+      "6236f81560ae50ee4c2ceade": {
+        "cooldown": 9,
+        "_actionLog": { "transferEnergy": null }
+      },
+      "6236fec564144f67dfe91aac": { "cooldown": 17 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 6 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 6 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 6 } },
+      "6238892f8e119b7b32b4767a": { "x": 15 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      },
+      "64fad7cf1d122810135914d8": {
+        "store": { "energy": 300 },
+        "actionLog": { "harvest": { "x": 25, "y": 31 } }
+      }
+    },
+    "56909898": {
+      "55c34a6b5be41a0a6e80c2cf": {
+        "energy": 2820,
+        "invaderHarvested": 1206420
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5382 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109899 },
+      "6236f81560ae50ee4c2ceade": { "store": { "energy": 800 }, "cooldown": 8 },
+      "6236fec564144f67dfe91aac": { "cooldown": 16 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 7 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 7 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 7 } },
+      "6238892f8e119b7b32b4767a": { "x": 16 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 282 },
+        "actionLog": { "harvest": { "x": 9, "y": 15 } }
+      },
+      "64fad7cf1d122810135914d8": {
+        "store": { "energy": 194 },
+        "actionLog": { "harvest": null }
+      }
+    },
+    "56909899": {
+      "55c34a6b5be41a0a6e80c2d0": {
+        "energy": 2940,
+        "invaderHarvested": 997620
+      },
+      "64fa93dd50522af287a8b6d6": { "energy": 5300 },
+      "55c34a6b5be41a0a6e80c2ce": { "downgradeTime": 57109900 },
+      "6236f81560ae50ee4c2ceade": { "cooldown": 7 },
+      "6236fec564144f67dfe91aac": { "cooldown": 15 },
+      "6237076bb911f5e908f0df4c": { "store": { "energy": 8 } },
+      "623707a66f43a49c4ff157d7": { "store": { "energy": 8 } },
+      "623708b36aa9202c1f58a748": { "store": { "energy": 8 } },
+      "6238892f8e119b7b32b4767a": { "x": 17 },
+      "64fad76a319d1b0bd8d09929": {
+        "store": { "energy": 267 },
+        "actionLog": { "harvest": null }
+      },
+      "64fad7cf1d122810135914d8": {
+        "store": { "energy": 300 },
+        "actionLog": { "harvest": { "x": 25, "y": 31 } }
+      }
+    }
+  }
+}
