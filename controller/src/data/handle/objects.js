@@ -298,7 +298,7 @@ export default function handleObjects(username, objects, extras = {}) {
   if (terminals && terminals.length > 0) {
     const terminal = terminals[0];
     const websocket = io('ws://127.0.0.1:5001', { cookie: false });
-    websocket.emit('terminal', JSON.stringify({ terminalStore: terminal.store, currentTick, username, shard: extras.shard,room: terminal.room }))
+    websocket.emit('terminal', JSON.stringify({ terminalStore: terminal.store, tick: currentTick, username, shard: extras.shard, room: terminal.room }))
   }
   // #endregion
 

@@ -47,8 +47,7 @@ export default class DataRequestBroker {
   }
 
   getDataRequest() {
-    return this.dataRequests[0]
-    // return this.dataRequests.shift();
+    return this.dataRequests.shift();
   }
 
   getDataRequests(type) {

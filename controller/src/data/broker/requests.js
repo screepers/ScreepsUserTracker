@@ -100,6 +100,10 @@ export default class DataRequestsBroker {
 
   getRequestsToSend(count) {
     const requestsToSend = [];
+
+    // make the lowest number tick first
+    this.requests.sort((a, b) => a.tick - b.tick);
+
     for (let i = 0; i < count; i += 1) {
       const request = this.requests.shift();
       if (!request) break;
