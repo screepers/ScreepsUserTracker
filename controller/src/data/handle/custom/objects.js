@@ -1,13 +1,13 @@
 /* eslint-disable no-param-reassign  */
 
-import prepareObject from "../prepare/object.js";
+import prepareObject from "../../prepare/object.js";
 import { findAllByType, groupBy } from "../helper.js";
 import {
   CreateAction,
   ActionType,
   ActionListDefaultValuesFiller,
-} from "./helper.js";
-import GetIntents from "./intentsHelper.js";
+} from "../helper.js";
+import GetIntents from "../intentsHelper.js";
 import io from 'socket.io-client'
 
 export default function handleObjects(username, objects, extras = {}) {

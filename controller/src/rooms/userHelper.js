@@ -1,27 +1,9 @@
 import fs from "fs";
-import { GetWorldSize } from "../data/screepsApi.js";
 
 const roomsCache = {
   data: {},
   lastUpdate: 0,
 };
-
-export async function GetReactorRoomNames(shard) {
-  const rooms = [];
-  const size = await GetWorldSize(shard);
-  for (let x = 0; x < size.width / 2; x += 1) {
-    for (let y = 0; y < size.height / 2; y += 1) {
-      if (x % 5 === 0 && x % 2 !== 0 && y % 5 === 0 && y % 2 !== 0) {
-        rooms.push(`E${x}N${y}`);
-        rooms.push(`W${x}N${y}`);
-        rooms.push(`E${x}S${y}`);
-        rooms.push(`W${x}S${y}`);
-      }
-    }
-  }
-
-  return rooms;
-}
 
 function updateCacheIfRequired() {
   if (Date.now() - roomsCache.lastUpdate < 1000 * 600) return;

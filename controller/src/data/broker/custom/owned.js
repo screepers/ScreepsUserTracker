@@ -1,36 +1,21 @@
 import BaseDataBroker from "../base.js";
+import ReservedDataBroker from "./reserved.js";
 import {
   GetUsernames,
   GetUserData,
   GetRoomTotal,
 } from "../../../rooms/userHelper.js";
-import handleObjects from "../../handle/custom/reservedRoom.js";
 import {
-  getStats,
   handleCombinedRoomStats,
-  FindNewDefaultActions,
 } from "../../handle/helper.js";
+import ProcessDataBroker from "../processData.js";
 
-export default class ReservedDataBroker extends BaseDataBroker {
-  static Type = "reserved";
+export default class OwnedDataBroker extends BaseDataBroker {
+  static Type = "owned";
+  static Stats = {};
 
   static AddRoomData(username, shard, roomName, data) {
     super.AddRoomData(username, shard, roomName, data);
-  }
-
-  static async UploadStatus(ipStatus) {
-    const start = Date.now();
-
-    await super.Upload(
-      {
-        status: { [this.Type]: ipStatus },
-      },
-      undefined,
-      {
-        start,
-        type: `${this.Type}Status`,
-      }
-    );
   }
 
   static async UploadUsers(usernames) {
@@ -71,7 +56,7 @@ export default class ReservedDataBroker extends BaseDataBroker {
         this.Type
       );
       stats[username] = { stats: userStats };
-
+      
       const shards = Object.keys(this._users[username]);
       shards.forEach((shard) => {
         const rooms = this._users[username][shard];
@@ -91,20 +76,7 @@ export default class ReservedDataBroker extends BaseDataBroker {
     );
   }
 
-  static getRoomsToCheckByUsername(username, types, userData) {
-    if (!types[this.Type]) types[this.Type] = {};
-    const shardRooms = types[this.Type];
-
-    Object.entries(userData.shards).forEach(([shard, data]) => {
-      if (!shardRooms[shard]) {
-        shardRooms[shard] = [];
-      }
-      shardRooms[shard].push(...data.reserved);
-      this.AddRooms(username, shard, data.reserved);
-    });
-  }
-
-  static getRoomsToCheck(roomsPerCycle, types) {
+  static getRoomsToCheck(roomsPerCycle, types, addReservedRooms) {
     const usernames = GetUsernames();
     let userCount = 0;
     let roomCount = 0;
@@ -112,11 +84,23 @@ export default class ReservedDataBroker extends BaseDataBroker {
     usernames.forEach((username) => {
       const userData = GetUserData(username);
 
-      userData.total = GetRoomTotal(userData.shards, this.Type);
+      userData.total = !addReservedRooms ? GetRoomTotal(userData.shards, this.Type) : GetRoomTotal(userData.shards, "total");
       if (userData.total + roomCount <= roomsPerCycle) {
         userCount += 1;
         roomCount += userData.total;
-        ReservedDataBroker.getRoomsToCheckByUsername(username, types, userData);
+
+        if (!types[this.Type]) types[this.Type] = {};
+        const shardRooms = types[this.Type];
+
+        Object.entries(userData.shards).forEach(([shard, data]) => {
+          if (!shardRooms[shard]) {
+            shardRooms[shard] = [];
+          }
+          shardRooms[shard].push(...data.owned);
+          this.AddRooms(username, shard, data.owned);
+        });
+
+        if (addReservedRooms) ReservedDataBroker.getRoomsToCheckByUsername(username, types, userData);
       }
     });
 

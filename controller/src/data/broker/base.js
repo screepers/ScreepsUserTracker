@@ -92,9 +92,6 @@ export default class BaseDataBroker {
         case "reserved":
           username = GetUsername(dataRequest.room, dataRequest.shard);
           break;
-        case "reactor":
-          username = "reactor";
-          break;
         default:
           break;
       }
