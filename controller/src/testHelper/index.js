@@ -1,5 +1,4 @@
 import fs from "fs";
-console.log(fs.readdirSync("./"))
 import ProcessDataBroker from "../data/broker/processData.js";
 
 const roomData = {}
@@ -14,7 +13,7 @@ roomData.dataRequest = {
 }
 
 let currentCallTimes = 0
-const callTimes = 60 * 20;
+const callTimes = 10 * 60 * 50;
 
 const start = Date.now()
 console.profile();

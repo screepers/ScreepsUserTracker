@@ -59,9 +59,9 @@ export default class ProcessDataBroker {
         const username = GetUsername(dataRequest.room, dataRequest.shard)
         for (let t = 0; t < tickKeys.length; t++) {
             const tick = tickKeys[t];
-            if (ticks[t]) {
+            if (ticks[tick]) {
                 actionsArray = actionsArray.concat(
-                    handleObjects(username, ticks[t], {
+                    handleObjects(username, ticks[tick], {
                         previousObjects: ticks[tickKeys[t - 1]],
                         originalObjects,
                         ticks,
