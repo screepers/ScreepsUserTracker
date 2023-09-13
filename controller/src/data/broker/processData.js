@@ -1,7 +1,7 @@
 import handleOwnedObjects from "../handle/custom/objects.js";
-import handleReservedObjects from "../../handle/custom/reservedRoom.js";
+import handleReservedObjects from "../handle/custom/reservedRoom.js";
 
-import { GetUsername } from "../../../rooms/userHelper.js";
+import { GetUsername } from "../../rooms/userHelper.js";
 import {
     getStats,
     FindNewDefaultActions,
@@ -17,12 +17,12 @@ export default class ProcessDataBroker {
         if (!this.tickRates[dataRequest.shard]) {
             this.tickRates[dataRequest.shard] = dataRequest.tick;
 
-            tickRates[dataRequest.shard] = this.lastTickTimestamp[
+            this.tickRates[dataRequest.shard] = this.lastTickTimestamp[
                 dataRequest.shard
             ]
                 ? Math.round(
                     (dataResult.timestamp -
-                        this._lastTickTimestamp[dataRequest.shard]) /
+                        this.lastTickTimestamp[dataRequest.shard]) /
                     100
                 )
                 : undefined;
@@ -56,31 +56,28 @@ export default class ProcessDataBroker {
                 break;
         }
 
-        if (!timestamp) {
-            timestamp = dataResult.timestamp;
-        }
-
-        tickKeys.forEach((tick, index) => {
-            if (ticks[tick]) {
+        const username = GetUsername(dataRequest.room, dataRequest.shard)
+        for (let t = 0; t < tickKeys.length; t++) {
+            const tick = tickKeys[t];
+            if (ticks[t]) {
                 actionsArray = actionsArray.concat(
-                    handleObjects(username, ticks[tick], {
-                        previousObjects: ticks[tickKeys[index - 1]],
+                    handleObjects(username, ticks[t], {
+                        previousObjects: ticks[tickKeys[t - 1]],
                         originalObjects,
                         ticks,
                         tick,
                         type: dataRequest.type,
-                        isFirstTick: index === 0,
+                        isFirstTick: t === 0,
                         shard: dataRequest.shard,
                     })
                 );
             }
-        });
+        };
 
         if (process.env.CHECK_FOR_NEW_ACTIONS === "TRUE") FindNewDefaultActions(actionsArray, dataRequest.type);
         if (process.env.TESTING === "TRUE") return;
 
         const stats = getStats(actionsArray);
-        const username = GetUsername(dataRequest.room, dataRequest.shard)
         switch (dataRequest.type) {
             case "owned":
                 OwnedDataBroker.AddRoomData(username, dataRequest.shard, dataRequest.room, { stats, tick: dataRequest.tick, timestamp: dataResult.timestamp });

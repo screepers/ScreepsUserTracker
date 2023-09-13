@@ -1,23 +1,29 @@
 import fs from "fs";
-import ProcessDataBroker from "../data/broker/processData";
+console.log(fs.readdirSync("./"))
+import ProcessDataBroker from "../data/broker/processData.js";
 
-const roomsData = []
-const files = fs.readdirSync('./src/testHelper/files')
-files.forEach(file => {
-    const dataResult = JSON.parse(fs.readFileSync(`./src/testHelper/files/${file}`, 'utf8'))
-    const dataRequest = {
-        shard: "shard1",
-        room: "room1",
-        type: "owned",
-        tick: 100,
-    }
-    roomsData.push({ dataResult, dataRequest })
-})
+const roomData = {}
 
+const fileName = "1"
+roomData.dataResult = JSON.parse(fs.readFileSync(`./src/testHelper/files/${fileName}.json`, 'utf8'))
+roomData.dataRequest = {
+    shard: "shard1",
+    room: "room1",
+    type: "owned",
+    tick: 100,
+}
+
+let currentCallTimes = 0
+const callTimes = 60 * 20;
 
 const start = Date.now()
-roomsData.forEach(roomData => {
+console.profile();
+while (callTimes > currentCallTimes) {
     ProcessDataBroker.single(roomData)
-})
-const end = Date.now()
-console.log(`Time per request: ${Math.round((end - start) / roomsData.length)}ms`)
+    currentCallTimes += 1;
+}
+console.profileEnd();
+const timeTaken = Date.now() - start
+
+console.log(`Time needed per 1 minute of requests: ${Math.round((timeTaken) / 1000)}s\r\nTime needed per 1 request: ${Math.round((timeTaken) / callTimes)}ms`)
+process.exit(0)

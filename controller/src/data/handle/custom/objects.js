@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign  */
 
 import prepareObject from "../../prepare/object.js";
-import { findAllByType, groupBy } from "../helper.js";
+import { findAllByType, groupBy } from "../../helper.js";
 import {
   CreateAction,
   ActionType,
