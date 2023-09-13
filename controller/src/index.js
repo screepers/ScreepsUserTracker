@@ -9,6 +9,7 @@ import ReactorDataBroker from "./data/broker/custom/reactor.js";
 import ReservedDataBroker from "./data/broker/custom/reserved.js";
 import DataRequestsBroker from "./data/broker/requests.js";
 import { ownedLogger as logger } from "./logger.js";
+import websocketConnection from './websocket/connect.js';
 
 const { CronJob } = Cron;
 const DEBUG = process.env.DEBUG === "TRUE";
@@ -269,7 +270,7 @@ const requestRoomUpdaterJob = new CronJob(
   "Europe/Amsterdam"
 );
 
-app.listen(port, async () => {
+const httpServer = app.listen(port, async () => {
   ips = getIps();
   for (let i = 0; i < ips.length; i += 1) {
     const ip = ips[i];
@@ -284,15 +285,23 @@ app.listen(port, async () => {
   isOnlineMode = 1;
 
   logger.info("Starting initial room update!");
-  // await requestRoomUpdater();
+  await requestRoomUpdater();
   logger.info("Finished initial room update!");
+
+  if (process.env.TESTING === 'TRUE') {
+    console.log("Testing mode!")
+    return;
+  }
   isOnlineMode = 2;
 
-  logger.info("Starting initial data get!");
-  await dataGetter();
-  logger.info("Finished initial data get!");
+  // logger.info("Starting initial data get!");
+  // await dataGetter();
+  // logger.info("Finished initial data get!");
 
 
   requestRoomUpdaterJob.start();
-  dataGetterJob.start();
+  // dataGetterJob.start();
 });
+
+if (process.env.TESTING !== 'TRUE') websocketConnection(httpServer)
+

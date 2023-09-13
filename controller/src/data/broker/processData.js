@@ -31,7 +31,7 @@ export default class ProcessDataBroker {
         }
     }
 
-    static single(type, roomData) {
+    static single(roomData) {
         const { dataResult, dataRequest } = roomData;
 
         this.setTickRate(dataRequest, dataResult);
@@ -45,7 +45,7 @@ export default class ProcessDataBroker {
         )[0];
 
         let handleObjects = null;
-        switch (type) {
+        switch (dataRequest.type) {
             case "owned":
                 handleObjects = handleOwnedObjects;
                 break;
@@ -68,7 +68,7 @@ export default class ProcessDataBroker {
                         originalObjects,
                         ticks,
                         tick,
-                        type,
+                        type: dataRequest.type,
                         isFirstTick: index === 0,
                         shard: dataRequest.shard,
                     })
@@ -76,11 +76,11 @@ export default class ProcessDataBroker {
             }
         });
 
-        if (process.env.CHECK_FOR_NEW_ACTIONS === "TRUE") FindNewDefaultActions(actionsArray, type);
+        if (process.env.CHECK_FOR_NEW_ACTIONS === "TRUE") FindNewDefaultActions(actionsArray, dataRequest.type);
 
         const stats = getStats(actionsArray);
         const username = GetUsername(dataRequest.room, dataRequest.shard)
-        switch (type) {
+        switch (dataRequest.type) {
             case "owned":
                 OwnedDataBroker.AddRoomData(username, dataRequest.shard, dataRequest.room, { stats, tick: dataRequest.tick, timestamp: dataResult.timestamp });
                 break;

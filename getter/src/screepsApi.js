@@ -29,14 +29,6 @@ function averageResult(proxySettings, timeTaken) {
 }
 //#endregion
 
-let lastProxyIndex = 0;
-function getProxy() {
-  if (lastProxyIndex === proxies.length) lastProxyIndex = 0;
-  const proxy = proxies[lastProxyIndex];
-  lastProxyIndex += 1;
-  return proxy;
-}
-
 let path;
 switch (settings.serverType) {
   case "seasonal":
@@ -55,14 +47,13 @@ async function getHistory(proxy, room, tick, shard) {
   }
 
   const start = Date.now();
-  // const proxySettings = getProxy();
   const proxySettings = proxy;
 
-  const timeout = new Promise((resolve, reject) => {
-    setTimeout(resolve, 5000,);
+  const timeout = new Promise((resolve) => {
+    setTimeout(resolve, 5000, { status: "Timeout" });
   });
 
-  const getHistory = new Promise(async (resolve, reject) => {
+  const getHistory = new Promise(async (resolve) => {
     const agent = new HttpsProxyAgent(`http://${proxySettings.username}:${proxySettings.password}@${proxySettings.proxy_address}:${proxySettings.port}`);
     // console.log(`Using proxy ${proxySettings.proxy_address}:${proxySettings.port}`)
     try {
@@ -73,9 +64,11 @@ async function getHistory(proxy, room, tick, shard) {
       const end = Date.now();
       // console.log(`History for ${room} at tick ${tick} fetched in ${end - start}ms`)
       averageResult(proxySettings, end - start);
-      resolve({ history: response.data });
+      resolve({ status: "Success", result: response.data });
     } catch (error) {
-      resolve();
+      if (error.message && error.message.includes("404 Not Found"))
+        resolve({ status: "Not found", result: null });
+      resolve({ status: "Error" });
     }
   });
 
@@ -95,8 +88,8 @@ if (process.env.PRIVATE_SERVER_USERNAME) await historyApi.auth(process.env.PRIVA
 export async function GetRoomHistory(proxy, shard, room, tick) {
   try {
     const historyResponse = await getHistory(proxy, room, tick, shard);
-    if (!historyResponse) return { status: "Error" };
-    const history = historyResponse.history;
+    if (historyResponse.status !== "Success") return historyResponse;
+    const history = historyResponse.result;
 
     if (tick === 0) {
       history.ticks["0"] = history.ticks["1"];
@@ -105,8 +98,6 @@ export async function GetRoomHistory(proxy, shard, room, tick) {
 
     return { status: "Success", result: history };
   } catch (error) {
-    if (error.message && error.message.includes("404 Not Found"))
-      return { status: "Not found", result: null };
     return { status: "Error" };
   }
 }

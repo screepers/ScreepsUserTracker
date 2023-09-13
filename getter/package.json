@@ -17,6 +17,7 @@
     "https-proxy-agent": "^7.0.2",
     "public-ip": "^6.0.1",
     "screeps-api": "^1.16.0",
+    "socket.io-client": "^2.3.0",
     "winston": "^3.8.2",
     "winston-daily-rotate-file": "^4.7.1"
   },

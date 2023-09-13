@@ -9,6 +9,7 @@ import {
 } from "../helper.js";
 import GetIntents from "../intentsHelper.js";
 import io from 'socket.io-client'
+const websocket = io(`ws://${process.env.TERMINAL_IP}`, { cookie: false });
 
 export default function handleObjects(username, objects, extras = {}) {
   const originalObjects = extras.originalObjects || {};
@@ -297,7 +298,6 @@ export default function handleObjects(username, objects, extras = {}) {
   const terminals = structuresByType.terminal
   if (terminals && terminals.length > 0) {
     const terminal = terminals[0];
-    const websocket = io('ws://127.0.0.1:5001', { cookie: false });
     websocket.emit('terminal', JSON.stringify({ terminalStore: terminal.store, tick: currentTick, username, shard: extras.shard, room: terminal.room }))
   }
   // #endregion

@@ -1,6 +1,9 @@
 import { GetRoomHistory } from "./screepsApi.js";
 import { dataRequestBroker as logger } from "./logger.js";
 import axios from "axios";
+import io from 'socket.io-client'
+const controllerIp = process.env.CONTROLLER_IP;
+const websocket = io(`ws://${controllerIp}`, { cookie: false });
 
 let proxies = [];
 async function getProxies() {
@@ -42,66 +45,45 @@ export default class DataRequestBroker {
       });
   }
 
-  addDataRequests(dataRequests) {
-    this.dataRequests = dataRequests.concat(this.dataRequests);
+  async getDataRequest() {
+    const timeout = new Promise((resolve) => {
+      setTimeout(resolve, 5000, null);
+    });
+    const getRequest = new Promise((resolve) => {
+      websocket.emit('request');
+      websocket.on('request', (data) => {
+        const dataRequest = JSON.parse(data);
+        resolve(dataRequest);
+      })
+    });
+
+    const request = await Promise.race([timeout, getRequest])
+    return request;
   }
 
-  getDataRequest() {
-    return this.dataRequests.shift();
-  }
-
-  getDataRequests(type) {
-    if (!type) return [...this.dataRequests];
-    return [...this.dataRequests.filter((dr) => dr.type === type)];
-  }
-
-  addDataResult(dataResult, dataRequest, force = false) {
-    if (force) {
-      this.dataResults.push({
-        dataResult,
-        dataRequest,
-        id: (resultId += 1),
-      });
-      return;
+  sendDataResult(dataResult, dataRequest, force = false) {
+    let data = {
+      dataResult,
+      dataRequest,
+    }
+    if (!force) {
+      const firstTickObjects = Object.values(dataResult.ticks).filter(
+        (tl) => tl !== null
+      )[0];
+      if (
+        !firstTickObjects ||
+        !Object.values(firstTickObjects).find((obj) => obj.type === "controller")
+      )
+        return;
     }
 
-    const firstTickObjects = Object.values(dataResult.ticks).filter(
-      (tl) => tl !== null
-    )[0];
-    if (
-      !firstTickObjects ||
-      !Object.values(firstTickObjects).find((obj) => obj.type === "controller")
-    )
-      return;
-
-    this.dataResults.push({ dataResult, dataRequest, id: (resultId += 1) });
+    websocket.emit('data', JSON.stringify(data));
   }
 
-  resetDataResults(newData) {
-    this.dataResults = [];
-    // this.dataResults = newData;
-  }
-
-  getDataResultsToSend() {
-    const toSend = this.dataResults.slice(0, 500);
-    const dataResults = JSON.parse(JSON.stringify(toSend));
-    this.resetDataResults(this.dataResults.slice(500));
-
-    return dataResults;
-  }
-
-  getTotalDataResults() {
-    return this.dataResults.length;
-  }
-
-  getTotalDataRequests() {
-    return this.dataRequests.length;
-  }
-
-  async executeSingle(proxy) {
-    const dataRequest = this.getDataRequest();
+  async executeSingle(proxy, forceDataRequest = null) {
+    const dataRequest = forceDataRequest || await this.getDataRequest();
     if (!dataRequest) {
-      await wait(100);
+      await wait(10 * 1000);
       return this.executeSingle(proxy);
     }
 
@@ -115,7 +97,7 @@ export default class DataRequestBroker {
     else logger.debug(`Failed to get data for ${shard}/${room}/${tick}`);
 
     if (dataResult.status === "Success")
-      this.addDataResult(
+      this.sendDataResult(
         dataResult.result,
         dataRequest,
         dataRequest.type !== "owned"
@@ -125,9 +107,9 @@ export default class DataRequestBroker {
         ? (dataRequest.retries += 1)
         : 1;
 
-      if (dataRequest.retries < 3) this.addDataRequests([dataRequest]);
+      if (dataRequest.retries < 3) return this.executeSingle(proxy, dataRequest);
       else if (dataResult.status === "Not found")
-        this.addDataResult(dataResult.result, dataRequest, true);
+        this.sendDataResult(dataResult.result, dataRequest, true);
       else
         logger.debug(
           `Failed to get data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick} after 3 retries`

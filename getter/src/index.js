@@ -14,6 +14,7 @@ let lastDataSend = Date.now();
 const { CronJob } = Cron;
 
 const controllerIp = process.env.CONTROLLER_IP || "http://localhost:5000";
+process.env.CONTROLLER_IP = controllerIp;
 const port = 4000;
 let ip;
 
@@ -42,46 +43,46 @@ app.post("/ping", (req, res) => {
   return res.send("pong");
 });
 
-app.post("/requests", (req, res) => {
-  const start = Date.now();
-  try {
-    dataRequestBroker.addDataRequests(req.body);
+// app.post("/requests", (req, res) => {
+//   const start = Date.now();
+//   try {
+//     dataRequestBroker.addDataRequests(req.body);
 
-    logger.info(
-      `Request:post took ${((Date.now() - start) / 1000).toFixed(2)}s`
-    );
-    return res.json("Success");
-  } catch (e) {
-    logger.error(
-      `${req.ip}: Failed to save requests with ${e.message} and stack of ${e.stack}`
-    );
-    return res.status(500).json("Failed to save requests");
-  }
-});
-app.get("/data", (req, res) => {
-  const start = Date.now();
-  try {
-    logger.info(`${req.ip}: Received data request`);
+//     logger.info(
+//       `Request:post took ${((Date.now() - start) / 1000).toFixed(2)}s`
+//     );
+//     return res.json("Success");
+//   } catch (e) {
+//     logger.error(
+//       `${req.ip}: Failed to save requests with ${e.message} and stack of ${e.stack}`
+//     );
+//     return res.status(500).json("Failed to save requests");
+//   }
+// });
+// app.get("/data", (req, res) => {
+//   const start = Date.now();
+//   try {
+//     logger.info(`${req.ip}: Received data request`);
 
-    const results = dataRequestBroker.getDataResultsToSend();
-    const requestsCount = dataRequestBroker.getTotalDataRequests();
+//     const results = dataRequestBroker.getDataResultsToSend();
+//     const requestsCount = dataRequestBroker.getTotalDataRequests();
 
-    if (results.length > 0) {
-      lastDataSend = Date.now();
-    }
+//     if (results.length > 0) {
+//       lastDataSend = Date.now();
+//     }
 
-    logger.info(`Data:get took ${((Date.now() - start) / 1000).toFixed(2)}s`);
-    return res.json({
-      results,
-      requestsCount,
-    });
-  } catch (e) {
-    logger.error(
-      `${req.ip}: Failed to get data with ${e.message} and stack of ${e.stack}`
-    );
-    return res.status(500).json("Failed to get data");
-  }
-});
+//     logger.info(`Data:get took ${((Date.now() - start) / 1000).toFixed(2)}s`);
+//     return res.json({
+//       results,
+//       requestsCount,
+//     });
+//   } catch (e) {
+//     logger.error(
+//       `${req.ip}: Failed to get data with ${e.message} and stack of ${e.stack}`
+//     );
+//     return res.status(500).json("Failed to get data");
+//   }
+// });
 
 async function connectToController() {
   try {
@@ -98,20 +99,20 @@ async function connectToController() {
   }
 }
 
-const job = new CronJob(
-  !settings.debug ? "0 * * * *" : "* * * * *",
-  () => {
-    const requestCount = dataRequestBroker.getTotalDataRequests();
-    const resultCount = dataRequestBroker.getTotalDataResults();
-    backlogLogger.info(
-      `Request count: ${requestCount}, Result count: ${resultCount}`
-    );
-  },
-  null,
-  false,
-  "Europe/Amsterdam"
-);
-job.start();
+// const job = new CronJob(
+//   !settings.debug ? "0 * * * *" : "* * * * *",
+//   () => {
+//     const requestCount = dataRequestBroker.getTotalDataRequests();
+//     const resultCount = dataRequestBroker.getTotalDataResults();
+//     backlogLogger.info(
+//       `Request count: ${requestCount}, Result count: ${resultCount}`
+//     );
+//   },
+//   null,
+//   false,
+//   "Europe/Amsterdam"
+// );
+// job.start();
 
 app.listen(port, async () => {
   if (!process.env.GETTER_IP) {

@@ -70,6 +70,7 @@ export default class DataRequestsBroker {
 
     const noDuplicatedRequests = [];
     const noDuplicatedRequestsAggregator = {};
+    this.requests.sort((a, b) => a.tick - b.tick);
     this.requests.forEach((r) => {
       if (!noDuplicatedRequestsAggregator[r.type])
         noDuplicatedRequestsAggregator[r.type] = {};
@@ -101,9 +102,6 @@ export default class DataRequestsBroker {
   getRequestsToSend(count) {
     const requestsToSend = [];
 
-    // make the lowest number tick first
-    this.requests.sort((a, b) => a.tick - b.tick);
-
     for (let i = 0; i < count; i += 1) {
       const request = this.requests.shift();
       if (!request) break;
@@ -111,6 +109,10 @@ export default class DataRequestsBroker {
     }
 
     return requestsToSend;
+  }
+
+  getFirstRequest() {
+    return this.requests.shift()
   }
 
   async getCurrentTick(type, shard) {
