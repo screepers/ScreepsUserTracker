@@ -55,14 +55,12 @@ async function getHistory(proxy, room, tick, shard) {
 
   const getHistory = new Promise(async (resolve) => {
     const agent = new HttpsProxyAgent(`http://${proxySettings.username}:${proxySettings.password}@${proxySettings.proxy_address}:${proxySettings.port}`);
-    // console.log(`Using proxy ${proxySettings.proxy_address}:${proxySettings.port}`)
     try {
       const response = await axios.get(`${baseHistoryPath}room-history/${shard}/${room}/${tick}.json`, {
         httpsAgent: agent,
       })
 
       const end = Date.now();
-      // console.log(`History for ${room} at tick ${tick} fetched in ${end - start}ms`)
       averageResult(proxySettings, end - start);
       resolve({ status: "Success", result: response.data });
     } catch (error) {
@@ -74,7 +72,6 @@ async function getHistory(proxy, room, tick, shard) {
 
   const result = await Promise.race([timeout, getHistory])
   return result;
-  // Both resolve, but promise2 is faster
 }
 
 const historyApi = new ScreepsAPI({

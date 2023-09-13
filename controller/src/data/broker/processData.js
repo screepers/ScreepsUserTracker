@@ -77,6 +77,7 @@ export default class ProcessDataBroker {
         });
 
         if (process.env.CHECK_FOR_NEW_ACTIONS === "TRUE") FindNewDefaultActions(actionsArray, dataRequest.type);
+        if (process.env.TESTING === "TRUE") return;
 
         const stats = getStats(actionsArray);
         const username = GetUsername(dataRequest.room, dataRequest.shard)
