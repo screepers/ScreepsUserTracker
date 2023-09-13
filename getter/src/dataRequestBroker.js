@@ -1,14 +1,15 @@
+import "dotenv/config";
 import { GetRoomHistory } from "./screepsApi.js";
 import { dataRequestBroker as logger } from "./logger.js";
 import axios from "axios";
 import io from 'socket.io-client'
 const controllerIp = process.env.CONTROLLER_IP;
-const websocket = io(`ws://${controllerIp}`, { cookie: false });
+const websocket = io(`ws://${controllerIp.replace('http://', '').replace('https://', '')}`, { cookie: false });
 
 let proxies = [];
 async function getProxies() {
   try {
-    const proxiesResponse = await axios.get('https://proxy.webshare.io/api/v2/proxy/list/?mode=direct&page=1&page_size=100', {
+    const proxiesResponse = await axios.get(`https://proxy.webshare.io/api/v2/proxy/list/?mode=direct&page=1&page_size=${process.env.WEBSHARE_PROXYAMOUNT}`, {
       headers: {
         Authorization: `Token ${process.env.WEBSHARE_TOKEN}`
       }
@@ -20,11 +21,9 @@ async function getProxies() {
     return proxies;
   } catch (error) {
     console.log(`Failed to load proxies: ${error.message}`)
-    return;
+    return [];
   }
 }
-
-let resultId = 0;
 
 function wait(ms) {
   // eslint-disable-next-line no-promise-executor-return
@@ -39,6 +38,9 @@ export default class DataRequestBroker {
   constructor() {
     getProxies()
       .then((proxies) => {
+        if (proxies.length === 0) {
+          this.executeSingle(null);
+        }
         proxies.forEach((proxy) => {
           this.executeSingle(proxy);
         })

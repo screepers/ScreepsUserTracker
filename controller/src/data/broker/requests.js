@@ -17,17 +17,17 @@ function wait(ms) {
 }
 
 export default class DataRequestsBroker {
-  requests;
+  static requests;
 
-  roomsBeingChecked;
+  static roomsBeingChecked;
 
-  lastTickTimes = {};
+  static lastTickTimes = {};
 
-  knownTickTimes = {};
+  static knownTickTimes = {};
 
-  async constructorAsync() {
-    this.requests = DataRequestsBroker.getRequests();
-    this.roomsBeingChecked = DataRequestsBroker.getRoomsBeingChecked();
+  static async constructorAsync() {
+    this.requests = this.getRequests();
+    this.roomsBeingChecked = this.getRoomsBeingChecked();
     for (let dt = 0; dt < dataTypes.length; dt += 1) {
       const dataType = dataTypes[dt];
       this.lastTickTimes[dataType] = {};
@@ -49,7 +49,7 @@ export default class DataRequestsBroker {
     return {};
   }
 
-  saveRoomsBeingChecked(rooms) {
+  static saveRoomsBeingChecked(rooms) {
     fs.mkdirSync(roomsCheckedFolderPath, { recursive: true });
     fs.writeFileSync(roomsCheckedPath, JSON.stringify(rooms));
 
@@ -65,7 +65,7 @@ export default class DataRequestsBroker {
     return [];
   }
 
-  saveRequests() {
+  static saveRequests() {
     fs.mkdirSync(requestsFolderPath, { recursive: true });
 
     const noDuplicatedRequests = [];
@@ -99,7 +99,7 @@ export default class DataRequestsBroker {
     this.requests = noDuplicatedRequests;
   }
 
-  getRequestsToSend(count) {
+  static getRequestsToSend(count) {
     const requestsToSend = [];
 
     for (let i = 0; i < count; i += 1) {
@@ -111,11 +111,11 @@ export default class DataRequestsBroker {
     return requestsToSend;
   }
 
-  getFirstRequest() {
+  static getFirstRequest() {
     return this.requests.shift()
   }
 
-  async getCurrentTick(type, shard) {
+  static async getCurrentTick(type, shard) {
     const time = Date.now();
     if (this.knownTickTimes[shard]) {
       const knownTick = this.knownTickTimes[shard];
@@ -132,7 +132,7 @@ export default class DataRequestsBroker {
     return this.lastTickTimes[type][shard] || 0;
   }
 
-  async syncRequests() {
+  static async syncRequests() {
     let addedRequests = false;
     for (let i = 0; i < shards.length; i += 1) {
       const shard = shards[i];

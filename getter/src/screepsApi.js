@@ -1,33 +1,9 @@
 import "dotenv/config";
 import { ScreepsAPI } from "screeps-api";
 import settings from "./settings.js";
-import fs from "fs";
 import axios from "axios";
 import { HttpsProxyAgent } from "https-proxy-agent";
 
-
-// #region temp
-
-let averagedOverCountry = {};
-let averagedOverCountryAndIp = {};
-let total = 0;
-let lastTotal = 0;
-
-function averageResult(proxySettings, timeTaken) {
-  if (!averagedOverCountry[proxySettings.country_code]) averagedOverCountry[proxySettings.country_code] = { total: 0, count: 0, perResult: 0 };
-  averagedOverCountry[proxySettings.country_code].total += timeTaken;
-  averagedOverCountry[proxySettings.country_code].count += 1;
-  averagedOverCountry[proxySettings.country_code].perResult = averagedOverCountry[proxySettings.country_code].total / averagedOverCountry[proxySettings.country_code].count;
-
-  if (!averagedOverCountryAndIp[proxySettings.country_code]) averagedOverCountryAndIp[proxySettings.country_code] = {};
-  if (!averagedOverCountryAndIp[proxySettings.country_code][proxySettings.proxy_address]) averagedOverCountryAndIp[proxySettings.country_code][proxySettings.proxy_address] = { total: 0, count: 0, perResult: 0 };
-  averagedOverCountryAndIp[proxySettings.country_code][proxySettings.proxy_address].total += timeTaken;
-  averagedOverCountryAndIp[proxySettings.country_code][proxySettings.proxy_address].count += 1;
-  averagedOverCountryAndIp[proxySettings.country_code][proxySettings.proxy_address].perResult = averagedOverCountryAndIp[proxySettings.country_code][proxySettings.proxy_address].total / averagedOverCountryAndIp[proxySettings.country_code][proxySettings.proxy_address].count;
-
-  total += 1;
-}
-//#endregion
 
 let path;
 switch (settings.serverType) {
@@ -43,10 +19,10 @@ const baseHistoryPath = `${process.env.PRIVATE_SERVER_PROTOCOL || "https"}://${p
 
 async function getHistory(proxy, room, tick, shard) {
   if (!proxy) {
-    return await historyApi.raw.history(room, tick, shard);
+    const response = await historyApi.raw.history(room, tick, shard);
+    return { status: "Success", result: response };
   }
 
-  const start = Date.now();
   const proxySettings = proxy;
 
   const timeout = new Promise((resolve) => {
@@ -60,8 +36,6 @@ async function getHistory(proxy, room, tick, shard) {
         httpsAgent: agent,
       })
 
-      const end = Date.now();
-      averageResult(proxySettings, end - start);
       resolve({ status: "Success", result: response.data });
     } catch (error) {
       if (error.message && error.message.includes("404 Not Found"))
@@ -98,14 +72,3 @@ export async function GetRoomHistory(proxy, shard, room, tick) {
     return { status: "Error" };
   }
 }
-
-setInterval(() => {
-  console.log(`${(total - lastTotal) / 10} requests per second`)
-  lastTotal = total;
-
-  // averaged by country, give array of countries with average time, sorted by average time
-  const averagedOverCountryArray = Object.keys(averagedOverCountry).map((key) => {
-    return { country: key, ...averagedOverCountry[key] };
-  }).sort((a, b) => a.perResult - b.perResult);
-  let a = 1
-}, 1000 * 10);

@@ -72,47 +72,14 @@ export default class BaseDataBroker {
     });
   }
 
-  static async AddRoomsData(dataList) {
-    if (dataList.length === 0) return;
-
-    dataList.sort((a, b) => a.dataRequest.tick - b.dataRequest.tick);
-
-    let lastTick = dataList[0].dataRequest.tick;
-    for (let i = 0; i < dataList.length; i += 1) {
-      const { dataRequest } = dataList[i];
-
-      if (lastTick !== dataRequest.tick) {
-        lastTick = dataRequest.tick;
-        await this.CheckUsers();
-      }
-
-      let username;
-      switch (dataRequest.type) {
-        case "owned":
-        case "reserved":
-          username = GetUsername(dataRequest.room, dataRequest.shard);
-          break;
-        default:
-          break;
-      }
-
-      this.AddRoomData(
-        username,
-        dataRequest.shard,
-        dataRequest.room,
-        dataList[i]
-      );
-    }
-
-    await this.CheckUsers();
-  }
-
   static AddRoomData(username, shard, roomName, data) {
     if (!this._users[username]) return;
     if (!this._users[username][shard]) return;
     if (this._users[username][shard][roomName] === undefined) return;
 
     this._users[username][shard][roomName] = data;
+
+    this.CheckUsers();
   }
 
   static async CheckUsers() {

@@ -40,9 +40,18 @@ export default class ProcessDataBroker {
         const { ticks } = dataResult;
         const tickKeys = Object.keys(ticks);
 
-        const originalObjects = Object.values(ticks).filter(
-            (tl) => tl !== null
-        )[0];
+        const originalObjects = {}
+        for (const tick in ticks) {
+            if (Object.hasOwnProperty.call(ticks, tick)) {
+                const tickList = ticks[tick];
+                for (const objectId in tickList) {
+                    if (Object.hasOwnProperty.call(tickList, objectId)) {
+                        const object = tickList[objectId];
+                        if (!originalObjects[objectId]) originalObjects[objectId] = object;
+                    }
+                }
+            }
+        }
 
         let handleObjects = null;
         switch (dataRequest.type) {

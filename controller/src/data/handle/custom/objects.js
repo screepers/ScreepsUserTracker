@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign  */
 
 import prepareObject from "../../prepare/object.js";
-import { findAllByType, groupBy } from "../../helper.js";
+import { summarizeObjects } from "../../helper.js";
 import {
   CreateAction,
   ActionType,
@@ -17,11 +17,13 @@ export default function handleObjects(username, objects, extras = {}) {
 
   const objectKeys = Object.keys(objects);
   for (let o = objectKeys.length - 1; o >= 0; o -= 1) {
-    const object = objects[objectKeys[o]];
-    if (object) {
-      prepareObject(object);
+    const id = objectKeys[o];
+    const object = objects[id];
+    const originalObject = originalObjects[id];
+    if (object && originalObject) {
+      prepareObject(object, originalObject);
       if (object.username && object.username !== username)
-        delete objects[objectKeys[o]];
+        delete objects[id];
     }
   }
   const actions = [];
@@ -30,12 +32,13 @@ export default function handleObjects(username, objects, extras = {}) {
   const { isFirstTick } = extras;
   const intents = GetIntents(objects, originalObjects);
 
-  const structures = findAllByType(objects, "structure");
-  const structuresByType = groupBy(structures, "type");
+  const summarize = summarizeObjects(objects)
+  const structures = summarize.structures;
+  const structuresByType = summarize.structuresByType
   if (isFirstTick) {
-    const creeps = findAllByType(objects, "creep");
-    const constructionSites = findAllByType(objects, "constructionSite");
-    const minerals = findAllByType(objects, "mineral");
+    const creeps = summarize.creeps;
+    const constructionSites = summarize.constructionSites;
+    const minerals = summarize.minerals;
 
     // #region Totals
     actions.push(
@@ -307,7 +310,7 @@ export default function handleObjects(username, objects, extras = {}) {
   // #region Divide100
 
   // #region Controller
-  const originalControllers = findAllByType(originalObjects, "controller");
+  const originalControllers = summarize.controllers;
   let rclPerTick = 0;
   if (originalControllers && originalControllers.length > 0) {
     const originalController = originalControllers[0];
@@ -385,7 +388,7 @@ export default function handleObjects(username, objects, extras = {}) {
   // #endregion
 
   // #region Spawn
-  const originalSpawns = findAllByType(originalObjects, "spawn");
+  const originalSpawns = summarize.spawns;
   const spawnCount = originalSpawns.length;
   let spawnDuration = 0;
   originalSpawns.forEach((originalSpawn) => {

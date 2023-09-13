@@ -1,4 +1,4 @@
-import "dotenv/config";
+const controllerIp = process.env.CONTROLLER_IP;
 
 import express from "express";
 import bodyParser from "body-parser";
@@ -6,15 +6,12 @@ import axios from "axios";
 import Cron from "cron";
 import { publicIpv4 } from "public-ip";
 import DataRequestBroker from "./dataRequestBroker.js";
-import { ownedLogger as logger, backlogLogger } from "./logger.js";
-import settings, { writeSettings } from "./settings.js";
+import { ownedLogger as logger } from "./logger.js";
+import { writeSettings } from "./settings.js";
 
 let lastDataSend = Date.now();
 
 const { CronJob } = Cron;
-
-const controllerIp = process.env.CONTROLLER_IP || "http://localhost:5000";
-process.env.CONTROLLER_IP = controllerIp;
 const port = 4000;
 let ip;
 
@@ -42,47 +39,6 @@ app.post("/ping", (req, res) => {
   logger.info(`${req.ip}: Received ping`);
   return res.send("pong");
 });
-
-// app.post("/requests", (req, res) => {
-//   const start = Date.now();
-//   try {
-//     dataRequestBroker.addDataRequests(req.body);
-
-//     logger.info(
-//       `Request:post took ${((Date.now() - start) / 1000).toFixed(2)}s`
-//     );
-//     return res.json("Success");
-//   } catch (e) {
-//     logger.error(
-//       `${req.ip}: Failed to save requests with ${e.message} and stack of ${e.stack}`
-//     );
-//     return res.status(500).json("Failed to save requests");
-//   }
-// });
-// app.get("/data", (req, res) => {
-//   const start = Date.now();
-//   try {
-//     logger.info(`${req.ip}: Received data request`);
-
-//     const results = dataRequestBroker.getDataResultsToSend();
-//     const requestsCount = dataRequestBroker.getTotalDataRequests();
-
-//     if (results.length > 0) {
-//       lastDataSend = Date.now();
-//     }
-
-//     logger.info(`Data:get took ${((Date.now() - start) / 1000).toFixed(2)}s`);
-//     return res.json({
-//       results,
-//       requestsCount,
-//     });
-//   } catch (e) {
-//     logger.error(
-//       `${req.ip}: Failed to get data with ${e.message} and stack of ${e.stack}`
-//     );
-//     return res.status(500).json("Failed to get data");
-//   }
-// });
 
 async function connectToController() {
   try {
@@ -116,7 +72,7 @@ async function connectToController() {
 
 app.listen(port, async () => {
   if (!process.env.GETTER_IP) {
-    ip = process.env.CONTROLLER_IP
+    ip = !process.env.CONTROLLER_IP.includes("localhost")
       ? `http://${await publicIpv4()}:${port}`
       : `http://localhost:${port}`;
   }

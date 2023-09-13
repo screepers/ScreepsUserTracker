@@ -4,22 +4,6 @@ export function GetShards() {
   return process.env.SHARDS.split(" ");
 }
 
-export const STRUCTURE_TYPES = [
-  "road",
-  "wall",
-  "spawn",
-  "extension",
-  "link",
-  "storage",
-  "tower",
-  "observer",
-  "powerSpawn",
-  "extractor",
-  "lab",
-  "terminal",
-  "container",
-  "nuker",
-];
 export function findOriginalObject(id, ticks) {
   const tickKeys = Object.keys(ticks);
   for (let t = 0; t < tickKeys.length; t += 1) {
@@ -32,25 +16,60 @@ export function findOriginalObject(id, ticks) {
   return null;
 }
 
-export function findAllByType(objects, type) {
-  let possibleTypes = [type];
-  if (type === "structure") {
-    possibleTypes = STRUCTURE_TYPES;
-    possibleTypes.push("controller");
+export function summarizeObjects(objects) {
+  const summarize = {
+    structures: [],
+    structuresByType: {},
+    creeps: [],
+    constructionSites: [],
+    minerals: [],
+    controllers: [],
+    spawns: [],
   }
-  const list = Object.values(objects).filter(
-    (o) => o && o.type && possibleTypes.includes(o.type)
-  );
-  return list;
-}
 
-export function groupBy(obj, key) {
-  const result = {};
-  obj.forEach((o) => {
-    if (!result[o[key]]) result[o[key]] = [];
-    result[o[key]].push(o);
-  });
-  return result;
+  for (const object of Object.values(objects)) {
+    if (!object) continue;
+
+    if (object['type']) {
+      if (!summarize.structuresByType[object['type']]) summarize.structuresByType[object['type']] = [];
+      summarize.structuresByType[object['type']].push(object);
+    }
+
+    switch (object['type']) {
+      case "road":
+      case "wall":
+      case "spawn":
+      case "extension":
+      case "link":
+      case "storage":
+      case "tower":
+      case "observer":
+      case "powerSpawn":
+      case "extractor":
+      case "lab":
+      case "terminal":
+      case "container":
+      case "nuker":
+        summarize.structures.push(object);
+
+        if (object['type'] === "spawn") summarize.spawns.push(object);
+        break;
+      case "creep":
+        summarize.creeps.push(object);
+        break;
+      case "constructionSite":
+        summarize.constructionSites.push(object);
+        break;
+      case "mineral":
+        summarize.minerals.push(object);
+        break;
+      case "controller":
+        summarize.controllers.push(object);
+        break;
+    }
+  }
+
+  return summarize;
 }
 
 export function getIntentEffect(action, originalObject) {

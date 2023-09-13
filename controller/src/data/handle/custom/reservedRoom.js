@@ -1,4 +1,4 @@
-import { findAllByType, groupBy } from "../../helper.js";
+import { summarizeObjects } from "../../helper.js";
 import prepareObject from "../../prepare/object.js";
 import {
     CreateAction,
@@ -9,15 +9,16 @@ import GetIntents from "../intentsHelper.js";
 
 export default function handleObjects(username, objects, extras = {}) {
     const originalObjects = extras.originalObjects || {};
-    const currentTick = parseInt(extras.tick, 10);
 
     const objectKeys = Object.keys(objects);
     for (let o = objectKeys.length - 1; o >= 0; o -= 1) {
-        const object = objects[objectKeys[o]];
-        if (object) {
-            prepareObject(object);
+        const id = objectKeys[o];
+        const object = objects[id];
+        const originalObject = originalObjects[id];
+        if (object && originalObject) {
+            prepareObject(object, originalObject);
             if (object.username && object.username !== username)
-                delete objects[objectKeys[o]];
+                delete objects[id];
         }
     }
 
@@ -26,9 +27,10 @@ export default function handleObjects(username, objects, extras = {}) {
     const intents = GetIntents(objects, originalObjects);
 
     if (isFirstTick) {
-        const creeps = findAllByType(objects, "creep");
-        const structures = findAllByType(objects, "structure");
-        const constructionSites = findAllByType(objects, "constructionSite");
+        const summarize = summarizeObjects(objects)
+        const creeps = summarize.creeps;
+        const structures = summarize.structures;
+        const constructionSites = summarize.constructionSites;
 
         // #region Totals
         actions.push(
@@ -83,7 +85,7 @@ export default function handleObjects(username, objects, extras = {}) {
             );
         });
 
-        const structuresByType = groupBy(structures, "type");
+        const structuresByType = summarize.structuresByType;
         const structuresByTypeKeys = Object.keys(structuresByType);
         structuresByTypeKeys.forEach((type) => {
             actions.push(
