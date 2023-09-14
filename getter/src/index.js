@@ -3,7 +3,6 @@ const controllerIp = process.env.CONTROLLER_IP;
 import express from "express";
 import bodyParser from "body-parser";
 import axios from "axios";
-import Cron from "cron";
 import { publicIpv4 } from "public-ip";
 import DataRequestBroker from "./dataRequestBroker.js";
 import { ownedLogger as logger } from "./logger.js";
@@ -11,7 +10,6 @@ import { writeSettings } from "./settings.js";
 
 let lastDataSend = Date.now();
 
-const { CronJob } = Cron;
 const port = 4000;
 let ip;
 
@@ -20,7 +18,6 @@ process.once("SIGINT", async () => {
   process.exit(0);
 });
 
-const dataRequestBroker = new DataRequestBroker();
 const app = express();
 
 app.use(bodyParser.json({ limit: "100mb" }));
@@ -54,21 +51,6 @@ async function connectToController() {
     connectToController();
   }
 }
-
-// const job = new CronJob(
-//   !settings.debug ? "0 * * * *" : "* * * * *",
-//   () => {
-//     const requestCount = dataRequestBroker.getTotalDataRequests();
-//     const resultCount = dataRequestBroker.getTotalDataResults();
-//     backlogLogger.info(
-//       `Request count: ${requestCount}, Result count: ${resultCount}`
-//     );
-//   },
-//   null,
-//   false,
-//   "Europe/Amsterdam"
-// );
-// job.start();
 
 app.listen(port, async () => {
   if (!process.env.GETTER_IP) {

@@ -18,7 +18,7 @@ export default class OwnedDataBroker extends BaseDataBroker {
     super.AddRoomData(username, shard, roomName, data);
   }
 
-  static async UploadUsers(usernames) {
+  static async UploadUsers(username) {
     const start = Date.now();
     let timestamp;
     const historyTicks = {};
@@ -34,37 +34,27 @@ export default class OwnedDataBroker extends BaseDataBroker {
     }
 
     const tickRates = ProcessDataBroker.tickRates;
-    for (let u = 0; u < usernames.length; u++) {
-      const userStats = getStatsObject();
-      const username = usernames[u];
-      for (const shardName in this._users[username]) {
-        if (Object.hasOwnProperty.call(this._users[username], shardName)) {
-          const shards = this._users[username][shardName];
-          for (const roomName in shards) {
-            if (Object.hasOwnProperty.call(shards, roomName)) {
-              const roomData = shards[roomName];
-              userStats.shards[roomName] = roomData.stats;
+    const userStats = getStatsObject();
+    for (const shardName in this._users[username]) {
+      if (Object.hasOwnProperty.call(this._users[username], shardName)) {
+        const shards = this._users[username][shardName];
+        for (const roomName in shards) {
+          if (Object.hasOwnProperty.call(shards, roomName)) {
+            const roomData = shards[roomName].shift();
+            userStats.shards[roomName] = roomData.stats;
 
-              if (!historyTicks[shardName]) historyTicks[shardName] = roomData.tick;
-            }
+            if (!historyTicks[shardName]) historyTicks[shardName] = roomData.tick;
           }
         }
       }
-
-      userStats.combined.shards = handleCombinedRoomStats(
-        userStats.shards,
-        this.Type
-      );
-      stats[username] = { stats: userStats };
-      
-      const shards = Object.keys(this._users[username]);
-      shards.forEach((shard) => {
-        const rooms = this._users[username][shard];
-
-        const roomNames = Object.keys(rooms);
-        this.AddRooms(username, shard, roomNames, true);
-      });
     }
+
+    userStats.combined.shards = handleCombinedRoomStats(
+      userStats.shards,
+      this.Type
+    );
+    if (process.env.ONLY_COMBINED_DATA_UPLOAD === "true") delete userStats.shards;
+    stats[username] = { stats: userStats };
 
     await super.Upload(
       { users: stats, ticks: { history: historyTicks, tickRates } },
@@ -107,3 +97,13 @@ export default class OwnedDataBroker extends BaseDataBroker {
     return { userCount, roomCount };
   }
 }
+
+const DEBUG = process.env.DEBUG === "TRUE";
+const checkUsersJob = new CronJob(
+  DEBUG ? "* * * * *" : "*/10 * * * *",
+  OwnedDataBroker.CheckUsers,
+  null,
+  false,
+  "Europe/Amsterdam"
+);
+checkUsersJob.start();

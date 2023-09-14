@@ -3,7 +3,7 @@ import * as dotenv from "dotenv";
 import graphite from "graphite";
 import { graphiteLogger as logger } from "../../logger.js";
 import { GetShards } from "../helper.js";
-import { GetUsername, GetUsernames } from "../../rooms/userHelper.js";
+import { GetUsernames } from "../../rooms/userHelper.js";
 import handleUsers from "../handle/users.js";
 import { GetGameTime } from "../screepsApi.js";
 
@@ -16,9 +16,9 @@ const client = graphite.createClient(
 export default class BaseDataBroker {
   static _users = {};
 
-  static _lastTickTimestamp = {};
-
   static _shards = GetShards();
+
+  static _lastTickTimestamp = {};
 
   static async UploadStatus(ipStatus) {
     const start = Date.now();
@@ -52,7 +52,7 @@ export default class BaseDataBroker {
     );
   }
 
-  static AddRooms(username, shard, rooms, force = false) {
+  static AddRooms(username, shard, rooms) {
     if (!this._users[username]) {
       this._users[username] = {};
     }
@@ -67,8 +67,8 @@ export default class BaseDataBroker {
     });
 
     rooms.forEach((roomName) => {
-      if (!this._users[username][shard][roomName] || force)
-        this._users[username][shard][roomName] = null;
+      if (!this._users[username][shard][roomName])
+        this._users[username][shard][roomName] = [];
     });
   }
 
@@ -77,29 +77,32 @@ export default class BaseDataBroker {
     if (!this._users[username][shard]) return;
     if (this._users[username][shard][roomName] === undefined) return;
 
-    this._users[username][shard][roomName] = data;
-
-    this.CheckUsers();
+    this._users[username][shard][roomName].push(data);
   }
 
   static async CheckUsers() {
-    const usernamesToUpload = [];
+    for (const username in this._users) {
+      let lowestRoomDataCount = 0;
+      if (Object.hasOwnProperty.call(this._users, username)) {
+        const shards = this._users[username];
+        for (const shardName in shards) {
+          if (Object.hasOwnProperty.call(shards, shardName)) {
+            const rooms = shards[shardName];
+            for (const roomName in rooms) {
+              if (Object.hasOwnProperty.call(rooms, roomName)) {
+                const roomData = rooms[roomName];
+                if (roomData.length < lowestRoomDataCount)
+                  lowestRoomDataCount = roomData.length;
+              }
+            }
+          }
+        }
 
-    Object.entries(this._users).forEach(([username, shards]) => {
-      let hasUndefinedData = false;
-
-      Object.values(shards).forEach((rooms) => {
-        Object.values(rooms).forEach((roomData) => {
-          if (!roomData) hasUndefinedData = true;
-        });
-      });
-
-      if (!hasUndefinedData) {
-        usernamesToUpload.push(username);
+        for (let i = 0; i < lowestRoomDataCount; i++) {
+          await this.UploadUsers(username)
+        }
       }
-    });
-
-    if (usernamesToUpload.length) await this.UploadUsers(usernamesToUpload);
+    }
   }
 
   static async Upload(data, timestamp, logInfo) {
