@@ -1,6 +1,6 @@
 import fs from "fs";
-import { ownedLogger as logger } from "../logger.js";
 import AdvancedScreepsApi from "screeps-advanced-api";
+import { ownedLogger as logger } from "../logger.js";
 
 const advancedScreepsApi = new AdvancedScreepsApi(process.env.SCREEPS_TOKEN);
 
@@ -11,17 +11,17 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function roomCount(shards) {
+  let count = 0;
+  Object.values(shards).forEach(({ owned }) => {
+    count += owned.length;
+  });
+  return count;
+}
+
 async function UpdateRooms() {
   try {
-    let users = await advancedScreepsApi.getAllUsers();
-
-    function roomCount(shards) {
-      let count = 0;
-      Object.values(shards).forEach(({ owned }) => {
-        count += owned.length;
-      });
-      return count;
-    }
+    const users = await advancedScreepsApi.getAllUsers();
     users.sort((a, b) => roomCount(b.shards) - roomCount(a.shards));
 
     fs.writeFileSync("./files/users.json", JSON.stringify(users));

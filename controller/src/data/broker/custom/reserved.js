@@ -4,9 +4,7 @@ import {
   GetUserData,
   GetRoomTotal,
 } from "../../../rooms/userHelper.js";
-import {
-  handleCombinedRoomStats,
-} from "../../handle/helper.js";
+import { handleCombinedRoomStats } from "../../handle/helper.js";
 
 export default class ReservedDataBroker extends BaseDataBroker {
   static Type = "reserved";
@@ -45,19 +43,18 @@ export default class ReservedDataBroker extends BaseDataBroker {
       };
     }
 
-    const tickRates = ProcessDataBroker.tickRates;
     const userStats = getStatsObject();
-    for (const shardName in this._users[username]) {
-      if (Object.hasOwnProperty.call(this._users[username], shardName)) {
-        const shards = this._users[username][shardName];
-        for (const roomName in shards) {
-          if (Object.hasOwnProperty.call(shards, roomName)) {
-            const roomData = shards[roomName].shift();
-            userStats.shards[roomName] = roomData.stats;
+    const shardNames = Object.keys(this.users[username]);
+    for (let i = 0; i < shardNames.length; i += 1) {
+      const shardName = shardNames[i];
+      const shardData = this.users[username][shardName];
+      const roomNames = Object.keys(shardData);
+      for (let j = 0; j < roomNames.length; j += 1) {
+        const roomName = roomNames[j];
+        const roomData = shardData[roomName].shift();
+        userStats.shards[roomName] = roomData.stats;
 
-            if (!historyTicks[shardName]) historyTicks[shardName] = roomData.tick;
-          }
-        }
+        if (!historyTicks[shardName]) historyTicks[shardName] = roomData.tick;
       }
     }
 
@@ -68,7 +65,13 @@ export default class ReservedDataBroker extends BaseDataBroker {
     stats[username] = { stats: userStats };
 
     await super.Upload(
-      { users: stats, ticks: { history: historyTicks, tickRates } },
+      {
+        users: stats,
+        ticks: {
+          history: historyTicks,
+          tickRates: BaseDataBroker.tickRates,
+        },
+      },
       timestamp,
       {
         start,
@@ -109,13 +112,3 @@ export default class ReservedDataBroker extends BaseDataBroker {
     return { userCount, roomCount };
   }
 }
-
-const DEBUG = process.env.DEBUG === "TRUE";
-const checkUsersJob = new CronJob(
-  DEBUG ? "* * * * *" : "*/10 * * * *",
-  ReservedDataBroker.CheckUsers,
-  null,
-  false,
-  "Europe/Amsterdam"
-);
-checkUsersJob.start();

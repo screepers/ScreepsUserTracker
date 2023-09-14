@@ -37,9 +37,15 @@ export function GetRoomTotal(shards, type) {
 export function GetUserData(username) {
   updateCacheIfRequired();
 
-  const user = roomsCache.data.find((user) => user.username === username);
+  const user = roomsCache.data.find((u) => u.username === username);
   if (!user) return { shards: [] };
-  return user
+  return user;
+}
+
+export function GetUsernames() {
+  updateCacheIfRequired();
+
+  return roomsCache.data.map((user) => user.username);
 }
 
 export function GetUsername(room, shard) {
@@ -63,7 +69,7 @@ export function GetUsername(room, shard) {
 export function GetUsernameById(id) {
   updateCacheIfRequired();
 
-  const usernames = GetUsernames()
+  const usernames = GetUsernames();
   for (let u = 0; u < usernames.length; u += 1) {
     const username = usernames[u];
     const user = GetUserData(username);
@@ -71,10 +77,4 @@ export function GetUsernameById(id) {
       return username;
     }
   }
-}
-
-export function GetUsernames() {
-  updateCacheIfRequired();
-
-  return roomsCache.data.map((user) => user.username);
 }

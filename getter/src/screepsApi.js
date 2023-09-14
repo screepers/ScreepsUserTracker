@@ -1,9 +1,8 @@
 import "dotenv/config";
 import { ScreepsAPI } from "screeps-api";
-import settings from "./settings.js";
 import axios from "axios";
 import { HttpsProxyAgent } from "https-proxy-agent";
-
+import settings from "./settings.js";
 
 let path;
 switch (settings.serverType) {
@@ -15,7 +14,21 @@ switch (settings.serverType) {
     path = "/";
     break;
 }
-const baseHistoryPath = `${process.env.PRIVATE_SERVER_PROTOCOL || "https"}://${process.env.PRIVATE_SERVER_HOST || "screeps.com"}:${process.env.PRIVATE_SERVER_PORT || 443}${path}`
+const baseHistoryPath = `${process.env.PRIVATE_SERVER_PROTOCOL || "https"}://${
+  process.env.PRIVATE_SERVER_HOST || "screeps.com"
+}:${process.env.PRIVATE_SERVER_PORT || 443}${path}`;
+
+const historyApi = new ScreepsAPI({
+  protocol: process.env.PRIVATE_SERVER_PROTOCOL || "https",
+  hostname: process.env.PRIVATE_SERVER_HOST || "screeps.com",
+  port: process.env.PRIVATE_SERVER_PORT || 443,
+  path: "/",
+});
+if (process.env.PRIVATE_SERVER_USERNAME)
+  await historyApi.auth(
+    process.env.PRIVATE_SERVER_USERNAME,
+    process.env.PRIVATE_SERVER_PASSWORD
+  );
 
 async function getHistory(proxy, room, tick, shard) {
   if (!proxy) {
@@ -25,18 +38,27 @@ async function getHistory(proxy, room, tick, shard) {
 
   const proxySettings = proxy;
 
-  const timeout = new Promise((resolve) => {
+  const timeoutPromise = new Promise((resolve) => {
     setTimeout(resolve, 5000, { status: "Timeout" });
   });
 
-  const getHistory = new Promise(async (resolve) => {
-    const agent = new HttpsProxyAgent(`http://${proxySettings.username}:${proxySettings.password}@${proxySettings.proxy_address}:${proxySettings.port}`);
+  const getHistoryPromise = new Promise((resolve) => {
+    const agent = new HttpsProxyAgent(
+      `http://${proxySettings.username}:${proxySettings.password}@${proxySettings.proxy_address}:${proxySettings.port}`
+    );
     try {
-      const response = await axios.get(`${baseHistoryPath}room-history/${shard}/${room}/${tick}.json`, {
-        httpsAgent: agent,
-      })
-
-      resolve({ status: "Success", result: response.data });
+      axios
+        .get(`${baseHistoryPath}room-history/${shard}/${room}/${tick}.json`, {
+          httpsAgent: agent,
+        })
+        .then((response) => {
+          resolve({ status: "Success", result: response.data });
+        })
+        .catch((error) => {
+          if (error.response && error.response.status === 404)
+            resolve({ status: "Not found", result: null });
+          resolve({ status: "Error" });
+        });
     } catch (error) {
       if (error.message && error.message.includes("404 Not Found"))
         resolve({ status: "Not found", result: null });
@@ -44,19 +66,11 @@ async function getHistory(proxy, room, tick, shard) {
     }
   });
 
-  const result = await Promise.race([timeout, getHistory])
+  const result = await Promise.race([timeoutPromise, getHistoryPromise]);
   return result;
 }
 
-const historyApi = new ScreepsAPI({
-  protocol: process.env.PRIVATE_SERVER_PROTOCOL || "https",
-  hostname: process.env.PRIVATE_SERVER_HOST || "screeps.com",
-  port: process.env.PRIVATE_SERVER_PORT || 443,
-  path: "/",
-});
-if (process.env.PRIVATE_SERVER_USERNAME) await historyApi.auth(process.env.PRIVATE_SERVER_USERNAME, process.env.PRIVATE_SERVER_PASSWORD);
-
-export async function GetRoomHistory(proxy, shard, room, tick) {
+export default async function GetRoomHistory(proxy, shard, room, tick) {
   try {
     const historyResponse = await getHistory(proxy, room, tick, shard);
     if (historyResponse.status !== "Success") return historyResponse;

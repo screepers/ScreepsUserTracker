@@ -20,7 +20,11 @@ const api = new ScreepsAPI({
   port: process.env.PRIVATE_SERVER_PORT || 443,
   path,
 });
-if (process.env.PRIVATE_SERVER_USERNAME) await api.auth(process.env.PRIVATE_SERVER_USERNAME, process.env.PRIVATE_SERVER_PASSWORD);
+if (process.env.PRIVATE_SERVER_USERNAME)
+  await api.auth(
+    process.env.PRIVATE_SERVER_USERNAME,
+    process.env.PRIVATE_SERVER_PASSWORD
+  );
 
 function sleep(ms) {
   // eslint-disable-next-line no-promise-executor-return

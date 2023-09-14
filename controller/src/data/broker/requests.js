@@ -70,7 +70,14 @@ export default class DataRequestsBroker {
 
     const noDuplicatedRequests = [];
     const noDuplicatedRequestsAggregator = {};
-    this.requests.sort((a, b) => a.tick - b.tick);
+
+    this.requests.sort((a, b) => {
+      if (a.tick !== b.tick) return a.tick - b.tick;
+      if (a.shard !== b.shard) return a.shard - b.shard;
+      if (a.room !== b.room) return a.room.localeCompare(b.room);
+      return a.type.localeCompare(b.type);
+    });
+
     this.requests.forEach((r) => {
       if (!noDuplicatedRequestsAggregator[r.type])
         noDuplicatedRequestsAggregator[r.type] = {};
@@ -88,7 +95,12 @@ export default class DataRequestsBroker {
             Object.keys(
               noDuplicatedRequestsAggregator[type][tick][shard]
             ).forEach((room) => {
-              noDuplicatedRequests.push({ type, tick, shard, room });
+              noDuplicatedRequests.push({
+                type,
+                tick,
+                shard,
+                room,
+              });
             });
           }
         );
@@ -99,20 +111,8 @@ export default class DataRequestsBroker {
     this.requests = noDuplicatedRequests;
   }
 
-  static getRequestsToSend(count) {
-    const requestsToSend = [];
-
-    for (let i = 0; i < count; i += 1) {
-      const request = this.requests.shift();
-      if (!request) break;
-      requestsToSend.push(request);
-    }
-
-    return requestsToSend;
-  }
-
   static getFirstRequest() {
-    return this.requests.shift()
+    return this.requests.shift();
   }
 
   static async getCurrentTick(type, shard) {

@@ -5,13 +5,11 @@ import {
   GetUserData,
   GetRoomTotal,
 } from "../../../rooms/userHelper.js";
-import {
-  handleCombinedRoomStats,
-} from "../../handle/helper.js";
-import ProcessDataBroker from "../processData.js";
+import { handleCombinedRoomStats } from "../../handle/helper.js";
 
 export default class OwnedDataBroker extends BaseDataBroker {
   static Type = "owned";
+
   static Stats = {};
 
   static AddRoomData(username, shard, roomName, data) {
@@ -33,19 +31,18 @@ export default class OwnedDataBroker extends BaseDataBroker {
       };
     }
 
-    const tickRates = ProcessDataBroker.tickRates;
     const userStats = getStatsObject();
-    for (const shardName in this._users[username]) {
-      if (Object.hasOwnProperty.call(this._users[username], shardName)) {
-        const shards = this._users[username][shardName];
-        for (const roomName in shards) {
-          if (Object.hasOwnProperty.call(shards, roomName)) {
-            const roomData = shards[roomName].shift();
-            userStats.shards[roomName] = roomData.stats;
+    const shardNames = Object.keys(this.users[username]);
+    for (let i = 0; i < shardNames.length; i += 1) {
+      const shardName = shardNames[i];
+      const shardData = this.users[username][shardName];
+      const roomNames = Object.keys(shardData);
+      for (let j = 0; j < roomNames.length; j += 1) {
+        const roomName = roomNames[j];
+        const roomData = shardData[roomName];
+        userStats.shards[roomName] = roomData.stats;
 
-            if (!historyTicks[shardName]) historyTicks[shardName] = roomData.tick;
-          }
-        }
+        if (!historyTicks[shardName]) historyTicks[shardName] = roomData.tick;
       }
     }
 
@@ -53,11 +50,18 @@ export default class OwnedDataBroker extends BaseDataBroker {
       userStats.shards,
       this.Type
     );
-    if (process.env.ONLY_COMBINED_DATA_UPLOAD === "true") delete userStats.shards;
+    if (process.env.ONLY_COMBINED_DATA_UPLOAD === "true")
+      delete userStats.shards;
     stats[username] = { stats: userStats };
 
     await super.Upload(
-      { users: stats, ticks: { history: historyTicks, tickRates } },
+      {
+        users: stats,
+        ticks: {
+          history: historyTicks,
+          tickRates: BaseDataBroker.tickRates,
+        },
+      },
       timestamp,
       {
         start,
@@ -74,7 +78,9 @@ export default class OwnedDataBroker extends BaseDataBroker {
     usernames.forEach((username) => {
       const userData = GetUserData(username);
 
-      userData.total = !addReservedRooms ? GetRoomTotal(userData.shards, this.Type) : GetRoomTotal(userData.shards, "total");
+      userData.total = !addReservedRooms
+        ? GetRoomTotal(userData.shards, this.Type)
+        : GetRoomTotal(userData.shards, "total");
       if (userData.total + roomCount <= roomsPerCycle) {
         userCount += 1;
         roomCount += userData.total;
@@ -90,20 +96,15 @@ export default class OwnedDataBroker extends BaseDataBroker {
           this.AddRooms(username, shard, data.owned);
         });
 
-        if (addReservedRooms) ReservedDataBroker.getRoomsToCheckByUsername(username, types, userData);
+        if (addReservedRooms)
+          ReservedDataBroker.getRoomsToCheckByUsername(
+            username,
+            types,
+            userData
+          );
       }
     });
 
     return { userCount, roomCount };
   }
 }
-
-const DEBUG = process.env.DEBUG === "TRUE";
-const checkUsersJob = new CronJob(
-  DEBUG ? "* * * * *" : "*/10 * * * *",
-  OwnedDataBroker.CheckUsers,
-  null,
-  false,
-  "Europe/Amsterdam"
-);
-checkUsersJob.start();

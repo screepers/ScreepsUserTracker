@@ -25,47 +25,52 @@ export function summarizeObjects(objects) {
     minerals: [],
     controllers: [],
     spawns: [],
-  }
+  };
 
-  for (const object of Object.values(objects)) {
-    if (!object) continue;
+  const objectKeys = Object.keys(objects);
+  for (let o = 0; o < objectKeys.length; o += 1) {
+    const object = objectKeys[o];
+    if (object) {
+      if (object.type) {
+        if (!summarize.structuresByType[object.type])
+          summarize.structuresByType[object.type] = [];
+        summarize.structuresByType[object.type].push(object);
+      }
 
-    if (object['type']) {
-      if (!summarize.structuresByType[object['type']]) summarize.structuresByType[object['type']] = [];
-      summarize.structuresByType[object['type']].push(object);
-    }
+      switch (object.type) {
+        case "road":
+        case "wall":
+        case "spawn":
+        case "extension":
+        case "link":
+        case "storage":
+        case "tower":
+        case "observer":
+        case "powerSpawn":
+        case "extractor":
+        case "lab":
+        case "terminal":
+        case "container":
+        case "nuker":
+          summarize.structures.push(object);
 
-    switch (object['type']) {
-      case "road":
-      case "wall":
-      case "spawn":
-      case "extension":
-      case "link":
-      case "storage":
-      case "tower":
-      case "observer":
-      case "powerSpawn":
-      case "extractor":
-      case "lab":
-      case "terminal":
-      case "container":
-      case "nuker":
-        summarize.structures.push(object);
-
-        if (object['type'] === "spawn") summarize.spawns.push(object);
-        break;
-      case "creep":
-        summarize.creeps.push(object);
-        break;
-      case "constructionSite":
-        summarize.constructionSites.push(object);
-        break;
-      case "mineral":
-        summarize.minerals.push(object);
-        break;
-      case "controller":
-        summarize.controllers.push(object);
-        break;
+          if (object.type === "spawn") summarize.spawns.push(object);
+          break;
+        case "creep":
+          summarize.creeps.push(object);
+          break;
+        case "constructionSite":
+          summarize.constructionSites.push(object);
+          break;
+        case "mineral":
+          summarize.minerals.push(object);
+          break;
+        case "controller":
+          summarize.controllers.push(object);
+          break;
+        default:
+          break;
+      }
     }
   }
 
@@ -87,10 +92,14 @@ export function getIntentEffect(action, originalObject) {
       case "dismantle":
         return { action, energy: originalObject.body.work * 0.25 };
       case "attack":
-        if (originalObject.type === "tower") return { action, energy: 10, damage: 300 };
+        if (originalObject.type === "tower")
+          return { action, energy: 10, damage: 300 };
         return { action, damage: originalObject.body.attack * 30 };
       case "rangedAttack":
-        return { action, damage: originalObject.body.rangedAttack * 10 };
+        return {
+          action,
+          damage: originalObject.body.rangedAttack * 10,
+        };
       case "rangedMassAttack":
         return { action, damage: originalObject.body.rangedAttack * 4 };
       case "heal":

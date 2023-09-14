@@ -126,8 +126,9 @@ export function ActionListDefaultValuesFiller(actions, type, isFirstTick) {
 }
 
 function groupBy(original, value, obj) {
-  // eslint-disable-next-line no-param-reassign
-  if (original === undefined || original === null) original = JSON.parse(JSON.stringify(value));
+  if (original === undefined || original === null)
+    // eslint-disable-next-line no-param-reassign
+    original = JSON.parse(JSON.stringify(value));
   const typeofValue = typeof value;
 
   if (original !== null && value !== null) {
@@ -150,7 +151,7 @@ function groupBy(original, value, obj) {
 export function handleCombinedRoomStats(shards, type) {
   const defaultStats = getStats(getDefaultActions(type));
   const stats = {};
-  
+
   Object.entries(shards).forEach(([shard, rooms]) => {
     if (!stats[shard]) stats[shard] = JSON.parse(JSON.stringify(defaultStats));
 

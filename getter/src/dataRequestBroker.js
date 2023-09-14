@@ -1,26 +1,36 @@
 import "dotenv/config";
-import { GetRoomHistory } from "./screepsApi.js";
-import { dataRequestBroker as logger } from "./logger.js";
 import axios from "axios";
-import io from 'socket.io-client'
+import io from "socket.io-client";
+import GetRoomHistory from "./screepsApi.js";
+import { dataRequestBroker as logger } from "./logger.js";
+
 const controllerIp = process.env.CONTROLLER_IP;
-const websocket = io(`ws://${controllerIp.replace('http://', '').replace('https://', '')}`, { cookie: false });
+const websocket = io(
+  `ws://${controllerIp.replace("http://", "").replace("https://", "")}`,
+  { cookie: false }
+);
+
+let count = 0;
+let lastCount = 0;
 
 let proxies = [];
 async function getProxies() {
   try {
-    const proxiesResponse = await axios.get(`https://proxy.webshare.io/api/v2/proxy/list/?mode=direct&page=1&page_size=${process.env.WEBSHARE_PROXYAMOUNT}`, {
-      headers: {
-        Authorization: `Token ${process.env.WEBSHARE_TOKEN}`
+    const proxiesResponse = await axios.get(
+      `https://proxy.webshare.io/api/v2/proxy/list/?mode=direct&page=1&page_size=${process.env.WEBSHARE_PROXYAMOUNT}`,
+      {
+        headers: {
+          Authorization: `Token ${process.env.WEBSHARE_TOKEN}`,
+        },
       }
-    });
+    );
 
     // proxies = proxiesResponse.data.results.filter(p => p.country_code === "DE");
     proxies = proxiesResponse.data.results;
-    console.log(`Loaded ${proxies.length} proxies`)
+    console.log(`Loaded ${proxies.length} proxies`);
     return proxies;
   } catch (error) {
-    console.log(`Failed to load proxies: ${error.message}`)
+    console.log(`Failed to load proxies: ${error.message}`);
     return [];
   }
 }
@@ -36,54 +46,57 @@ export default class DataRequestBroker {
   dataResults = [];
 
   constructor() {
-    getProxies()
-      .then((proxies) => {
-        if (proxies.length === 0) {
-          this.executeSingle(null);
-        }
-        proxies.forEach((proxy) => {
-          this.executeSingle(proxy);
-        })
+    getProxies().then(() => {
+      if (proxies.length === 0) {
+        this.executeSingle(null);
+      }
+      proxies.forEach((proxy) => {
+        this.executeSingle(proxy);
       });
+    });
   }
 
-  async getDataRequest() {
+  static async getDataRequest() {
     const timeout = new Promise((resolve) => {
-      setTimeout(resolve, 5000, null);
+      setTimeout(resolve, 60*1000, null);
     });
     const getRequest = new Promise((resolve) => {
-      websocket.emit('request');
-      websocket.on('request', (data) => {
+      websocket.emit("request");
+      websocket.on("request", (data) => {
         const dataRequest = JSON.parse(data);
         resolve(dataRequest);
-      })
+      });
     });
 
-    const request = await Promise.race([timeout, getRequest])
+    const request = await Promise.race([timeout, getRequest]);
     return request;
   }
 
-  sendDataResult(dataResult, dataRequest, force = false) {
-    let data = {
+  static async sendDataResult(dataResult, dataRequest, force = false) {
+    const data = {
       dataResult,
       dataRequest,
-    }
+    };
     if (!force) {
       const firstTickObjects = Object.values(dataResult.ticks).filter(
         (tl) => tl !== null
       )[0];
       if (
         !firstTickObjects ||
-        !Object.values(firstTickObjects).find((obj) => obj.type === "controller")
+        !Object.values(firstTickObjects).find(
+          (obj) => obj.type === "controller"
+        )
       )
         return;
     }
 
-    websocket.emit('data', JSON.stringify(data));
+    count += 1;
+    websocket.emit("data", JSON.stringify(data));
   }
 
   async executeSingle(proxy, forceDataRequest = null) {
-    const dataRequest = forceDataRequest || await this.getDataRequest();
+    const dataRequest =
+      forceDataRequest !== null ? forceDataRequest : (await DataRequestBroker.getDataRequest());
     if (!dataRequest) {
       await wait(10 * 1000);
       return this.executeSingle(proxy);
@@ -99,7 +112,7 @@ export default class DataRequestBroker {
     else logger.debug(`Failed to get data for ${shard}/${room}/${tick}`);
 
     if (dataResult.status === "Success")
-      this.sendDataResult(
+      DataRequestBroker.sendDataResult(
         dataResult.result,
         dataRequest,
         dataRequest.type !== "owned"
@@ -109,9 +122,10 @@ export default class DataRequestBroker {
         ? (dataRequest.retries += 1)
         : 1;
 
-      if (dataRequest.retries < 3) return this.executeSingle(proxy, dataRequest);
-      else if (dataResult.status === "Not found")
-        this.sendDataResult(dataResult.result, dataRequest, true);
+      if (dataRequest.retries < 3)
+        return this.executeSingle(proxy, dataRequest);
+      if (dataResult.status === "Not found")
+        DataRequestBroker.sendDataResult(dataResult.result, dataRequest, true);
       else
         logger.debug(
           `Failed to get data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick} after 3 retries`
@@ -120,3 +134,9 @@ export default class DataRequestBroker {
     return this.executeSingle(proxy);
   }
 }
+
+
+setInterval(() => {
+    console.log(`Requests per second: ${Math.round((count-lastCount)/10)}`)
+    lastCount = count;
+}, 10*1000)

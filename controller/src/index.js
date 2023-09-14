@@ -1,32 +1,32 @@
 import express from "express";
 import bodyParser from "body-parser";
-import Cron from "cron";
+import { CronJob } from "cron";
 import UpdateRooms from "./rooms/updateRooms.js";
 import OwnedDataBroker from "./data/broker/custom/owned.js";
 import ReservedDataBroker from "./data/broker/custom/reserved.js";
 import DataRequestsBroker from "./data/broker/requests.js";
 import { ownedLogger as logger } from "./logger.js";
-import websocketConnection from './websocket/connect.js';
-import { removeAllOfflineIps, getRoomsPerCycle, IpRouter } from './ips.js';
-
-const { CronJob } = Cron;
+import websocketConnection from "./websocket/connect.js";
+import { removeAllOfflineIps, getRoomsPerCycle, IpRouter } from "./ips.js";
 
 const app = express();
 const port = 5000;
 let isOnlineMode = 0;
 
-let healthCheck = {
+const healthCheck = {
   lastDataReceived: Date.now(),
   lastRequestSent: Date.now(),
-}
+};
 
 app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
 
-app.use("/", IpRouter)
+app.use("/", IpRouter);
 app.get("/healthCheck", (req, res) => {
   logger.info(`${req.ip}: Received health check`);
-  const success = Date.now() - healthCheck.lastDataReceived < 600 * 1000 && Date.now() - healthCheck.lastRequestSent < 600 * 1000;
+  const success =
+    Date.now() - healthCheck.lastDataReceived < 600 * 1000 &&
+    Date.now() - healthCheck.lastRequestSent < 600 * 1000;
   const lastDataReceivedMinutesAgo = Math.floor(
     (Date.now() - healthCheck.lastDataReceived) / 60000
   );
@@ -39,7 +39,7 @@ app.get("/healthCheck", (req, res) => {
     lastDataReceived: healthCheck.lastDataReceived,
     lastRequestSent: healthCheck.lastRequestSent,
     lastDataReceivedMinutesAgo,
-    lastRequestSentMinutesAgo
+    lastRequestSentMinutesAgo,
   });
 });
 
@@ -67,8 +67,7 @@ async function requestRoomUpdater() {
     );
     userCount += roomsToCheck.userCount;
     roomCount += roomsToCheck.roomCount;
-  }
-  else if (dataTypes.includes("reserved")) {
+  } else if (dataTypes.includes("reserved")) {
     const roomsToCheck = ReservedDataBroker.getRoomsToCheck(
       roomsPerCycle,
       types
@@ -106,11 +105,6 @@ const httpServer = app.listen(port, async () => {
   await requestRoomUpdater();
   logger.info("Finished initial room update!");
 
-  if (process.env.TESTING === 'TRUE') {
-    console.log("Testing mode!")
-    return;
-  }
-
   requestRoomUpdaterJob.start();
-  if (process.env.TESTING !== 'TRUE') websocketConnection(httpServer)
+  websocketConnection(httpServer);
 });

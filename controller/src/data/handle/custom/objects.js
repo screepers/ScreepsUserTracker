@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign  */
 
+import io from "socket.io-client";
 import prepareObject from "../../prepare/object.js";
 import { summarizeObjects } from "../../helper.js";
 import {
@@ -8,7 +9,7 @@ import {
   ActionListDefaultValuesFiller,
 } from "../helper.js";
 import GetIntents from "../intentsHelper.js";
-import io from 'socket.io-client'
+
 const websocket = io(`ws://${process.env.TERMINAL_IP}`, { cookie: false });
 
 export default function handleObjects(username, objects, extras = {}) {
@@ -22,8 +23,7 @@ export default function handleObjects(username, objects, extras = {}) {
     const originalObject = originalObjects[id];
     if (object && originalObject) {
       prepareObject(object, originalObject);
-      if (object.username && object.username !== username)
-        delete objects[id];
+      if (object.username && object.username !== username) delete objects[id];
     }
   }
   const actions = [];
@@ -32,13 +32,13 @@ export default function handleObjects(username, objects, extras = {}) {
   const { isFirstTick } = extras;
   const intents = GetIntents(objects, originalObjects);
 
-  const summarize = summarizeObjects(objects)
-  const structures = summarize.structures;
-  const structuresByType = summarize.structuresByType
+  const summarize = summarizeObjects(objects);
+  const { structures } = summarize;
+  const { structuresByType } = summarize;
   if (isFirstTick) {
-    const creeps = summarize.creeps;
-    const constructionSites = summarize.constructionSites;
-    const minerals = summarize.minerals;
+    const { creeps } = summarize;
+    const { constructionSites } = summarize;
+    const { minerals } = summarize;
 
     // #region Totals
     actions.push(
@@ -137,9 +137,9 @@ export default function handleObjects(username, objects, extras = {}) {
         `constructionSites.progressPercentage`,
         constructionSites.length > 0
           ? constructionSites.reduce((acc, site) => {
-            acc += site.progress / site.progressTotal;
-            return acc;
-          }, 0) / constructionSites.length
+              acc += site.progress / site.progressTotal;
+              return acc;
+            }, 0) / constructionSites.length
           : 0,
         ActionType.FirstTickOnly
       )
@@ -272,9 +272,7 @@ export default function handleObjects(username, objects, extras = {}) {
     const structureHitsByType = {};
     structuresByTypeKeys.forEach((structureKey) => {
       if (structureKey !== "controller") {
-        const strs = structuresByType[
-          structureKey
-        ];
+        const strs = structuresByType[structureKey];
         const hitsTotal = strs.reduce((acc, structure) => {
           acc += structure.hits || 0;
           return acc;
@@ -298,10 +296,19 @@ export default function handleObjects(username, objects, extras = {}) {
   // #endregion
 
   // #region Terminal storage changes
-  const terminals = structuresByType.terminal
+  const terminals = structuresByType.terminal;
   if (terminals && terminals.length > 0) {
     const terminal = terminals[0];
-    websocket.emit('terminal', JSON.stringify({ terminalStore: terminal.store, tick: currentTick, username, shard: extras.shard, room: terminal.room }))
+    websocket.emit(
+      "terminal",
+      JSON.stringify({
+        terminalStore: terminal.store,
+        tick: currentTick,
+        username,
+        shard: extras.shard,
+        room: terminal.room,
+      })
+    );
   }
   // #endregion
 
@@ -395,8 +402,9 @@ export default function handleObjects(username, objects, extras = {}) {
     const maxSpawnTime = Math.floor(currentTick / 100) * 100 + 100;
 
     const spawn = objects[originalSpawn._id] || {};
-    if (spawn.spawning) spawnDuration +=
-      Math.min(spawn.spawning.spawnTime, maxSpawnTime) - currentTick;
+    if (spawn.spawning)
+      spawnDuration +=
+        Math.min(spawn.spawning.spawnTime, maxSpawnTime) - currentTick;
   });
   actions.push(
     CreateAction(

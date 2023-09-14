@@ -16,17 +16,18 @@ module.exports = {
     },
     "rules": {
         "linebreak-style": ["error", (process.platform === "win32" ? "windows" : "unix")],
-        "no-console":"off",
-        "import/extensions":"off",
-        "no-underscore-dangle":"off",
+        "no-console": "off",
+        "import/extensions": "off",
+        "no-underscore-dangle": "off",
         "no-param-reassign": ["error", { "props": false }],
         'import/no-unresolved': 'off',
         "no-await-in-loop": "off",
         "prettier/prettier": [
             "error",
             {
-              "endOfLine": "auto"
+                "endOfLine": "auto"
             },
-          ],
+        ],
+        "no-param-reassign": "off",
     }
 }

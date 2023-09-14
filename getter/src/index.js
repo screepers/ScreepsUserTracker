@@ -1,14 +1,15 @@
-const controllerIp = process.env.CONTROLLER_IP;
-
+import "dotenv/config";
 import express from "express";
 import bodyParser from "body-parser";
 import axios from "axios";
 import { publicIpv4 } from "public-ip";
-import DataRequestBroker from "./dataRequestBroker.js";
 import { ownedLogger as logger } from "./logger.js";
 import { writeSettings } from "./settings.js";
+import DataRequestBroker from "./dataRequestBroker.js";
 
-let lastDataSend = Date.now();
+const controllerIp = process.env.CONTROLLER_IP;
+
+const lastDataSend = Date.now();
 
 const port = 4000;
 let ip;
@@ -37,6 +38,9 @@ app.post("/ping", (req, res) => {
   return res.send("pong");
 });
 
+// eslint-disable-next-line no-new
+new DataRequestBroker();
+
 async function connectToController() {
   try {
     const result = await axios.post(`${controllerIp}/ip`, { ip });
@@ -45,7 +49,7 @@ async function connectToController() {
     }
   } catch (e) {
     logger.error(`Failed to connect to controller, trying again in 60 seconds`);
-    logger.error(e)
+    logger.error(e);
     // eslint-disable-next-line no-promise-executor-return
     await new Promise((resolve) => setTimeout(resolve, 60 * 1000));
     connectToController();
@@ -57,10 +61,9 @@ app.listen(port, async () => {
     ip = !process.env.CONTROLLER_IP.includes("localhost")
       ? `http://${await publicIpv4()}:${port}`
       : `http://localhost:${port}`;
-  }
-  else ip = process.env.GETTER_IP
+  } else ip = process.env.GETTER_IP;
 
   connectToController();
-  console.log(`Starting API on ${ip}`)
+  console.log(`Starting API on ${ip}`);
   console.log(`API listening on port ${port}`);
 });
