@@ -49,10 +49,12 @@ export default class ReservedDataBroker extends BaseDataBroker {
       const shardName = shardNames[i];
       const shardData = this.users[username][shardName];
       const roomNames = Object.keys(shardData);
+
+      userStats.shards[shardName] = {};
       for (let j = 0; j < roomNames.length; j += 1) {
         const roomName = roomNames[j];
-        const roomData = shardData[roomName].shift();
-        userStats.shards[roomName] = roomData.stats;
+        const roomData = shardData[roomName];
+        userStats.shards[shardName][roomName] = roomData.stats;
 
         if (!historyTicks[shardName]) historyTicks[shardName] = roomData.tick;
       }

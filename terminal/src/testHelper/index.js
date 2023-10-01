@@ -1,6 +1,6 @@
+import fs from "fs";
 import TerminalStoreBroker from "../broker/terminalStore.js";
 import TransactionBroker from "../broker/transaction.js";
-import fs from "fs";
 import TickBroker from "../broker/tick.js";
 
 const baseDir = './src/testHelper/';

@@ -7,7 +7,7 @@ export default async function StartSocket() {
     await api.socket.connect();
 
     api.socket.subscribe("console", (event) => {
-        const data = event.data;
+        const {data} = event;
         if (!data || !event.data.messages || event.data.messages.log.length === 0)
             return;
 

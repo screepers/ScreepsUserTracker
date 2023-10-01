@@ -111,8 +111,8 @@ export default class DataRequestsBroker {
     this.requests = noDuplicatedRequests;
   }
 
-  static getFirstRequest() {
-    return this.requests.shift();
+  static getRequest() {
+    return this.requests.shift()
   }
 
   static async getCurrentTick(type, shard) {

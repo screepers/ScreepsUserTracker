@@ -11,7 +11,7 @@ export default function handleConnection(socket) {
   });
 
   socket.on("request", () => {
-    const request = DataRequestsBroker.getFirstRequest();
+    const request = DataRequestsBroker.getRequest();
     socket.emit("request", JSON.stringify(request));
   });
 }

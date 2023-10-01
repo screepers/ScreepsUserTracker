@@ -37,10 +37,12 @@ export default class OwnedDataBroker extends BaseDataBroker {
       const shardName = shardNames[i];
       const shardData = this.users[username][shardName];
       const roomNames = Object.keys(shardData);
+
+      userStats.shards[shardName] = {};
       for (let j = 0; j < roomNames.length; j += 1) {
         const roomName = roomNames[j];
         const roomData = shardData[roomName];
-        userStats.shards[roomName] = roomData.stats;
+        userStats.shards[shardName][roomName] = roomData.stats;
 
         if (!historyTicks[shardName]) historyTicks[shardName] = roomData.tick;
       }

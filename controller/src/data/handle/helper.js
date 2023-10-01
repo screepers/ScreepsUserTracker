@@ -125,48 +125,86 @@ export function ActionListDefaultValuesFiller(actions, type, isFirstTick) {
   return actions;
 }
 
-function groupBy(original, value, obj) {
-  if (original === undefined || original === null)
-    // eslint-disable-next-line no-param-reassign
-    original = JSON.parse(JSON.stringify(value));
-  const typeofValue = typeof value;
+function groupBy2(acc, value) {
 
-  if (original !== null && value !== null) {
-    if (Array.isArray(value)) {
-      value.forEach((index) => {
-        original[index] = groupBy(original[index], value[index], obj).original;
-      });
-    } else if (typeofValue === "object") {
-      Object.keys(value).forEach((key) => {
-        original[key] = groupBy(original[key], value[key], obj).original;
-      });
-    } else if (typeofValue === "number") {
-      // eslint-disable-next-line no-param-reassign
-      original += value;
+  if (acc === null || value === null) return;
+
+  if (Array.isArray(value)) {
+    for (let i = 0; i < value.length; i += 1) {
+      const innerValue = value[i];
+      const typeOfValue = typeof innerValue;
+      if (acc[i] === undefined) acc[i] = innerValue;
+
+      if (typeOfValue === "number") {
+        acc[i] += innerValue;
+      }
+      else groupBy2(acc[i], innerValue, acc, value);
+    }
+  } else if (typeof value === "object") {
+    const valueKeys = Object.keys(value);
+    for (let i = 0; i < valueKeys.length; i += 1) {
+      const key = valueKeys[i];
+      const innerValue = value[key];
+      if (acc[key] === undefined) acc[key] = innerValue;
+
+      const typeOfValue = typeof innerValue;
+      if (typeOfValue === "number") {
+        acc[key] += innerValue;
+      }
+      else groupBy2(acc[key], innerValue, acc, value);
     }
   }
-  return { original, value };
 }
+
+// function groupBy(original, value, obj) {
+//   if (original === undefined || original === null)
+//     // eslint-disable-next-line no-param-reassign
+//     original = JSON.parse(JSON.stringify(value));
+//   const typeofValue = typeof value;
+
+//   if (original !== null && value !== null) {
+//     if (Array.isArray(value)) {
+//       for (let i = 0; i < value.length; i += 1) {
+//         original[i] = groupBy(original[i], value[i], obj).original;
+//       }
+//     } else if (typeofValue === "object") {
+//       const valueKeys = Object.keys(value);
+//       for (let i = 0; i < valueKeys.length; i += 1) {
+//         const key = valueKeys[i];
+//         original[key] = groupBy(original[key], value[key], obj).original;
+//       }
+//     } else if (typeofValue === "number") {
+//       // eslint-disable-next-line no-param-reassign
+//       original += value;
+//     }
+//   }
+//   return { original, value };
+// }
 
 export function handleCombinedRoomStats(shards, type) {
   const defaultStats = getStats(getDefaultActions(type));
   const stats = {};
 
-  Object.entries(shards).forEach(([shard, rooms]) => {
-    if (!stats[shard]) stats[shard] = JSON.parse(JSON.stringify(defaultStats));
+  const shardKeys = Object.keys(shards);
+  for (let i = 0; i < shardKeys.length; i += 1) {
+    const shardName = shardKeys[i];
+    const rooms = shards[shardName];
+    if (!stats[shardName]) stats[shardName] = JSON.parse(JSON.stringify(defaultStats));
 
-    // eslint-disable-next-line no-unused-vars
-    Object.entries(rooms).forEach(([_, roomStats]) => {
-      stats[shard] = groupBy(
-        stats[shard],
+    const roomKeys = Object.keys(rooms);
+    for (let j = 0; j < roomKeys.length; j += 1) {
+      const roomName = roomKeys[j];
+      const roomStats = rooms[roomName];
+      groupBy2(
+        stats[shardName],
         JSON.parse(JSON.stringify(roomStats)),
         {
-          base: stats[shard],
+          base: stats[shardName],
           roomStats,
         }
-      ).original;
-    });
-  });
+      );
+    }
+  }
 
   return stats;
 }

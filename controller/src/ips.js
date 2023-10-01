@@ -3,8 +3,6 @@ import axios from "axios";
 import express from "express";
 import { ownedLogger as logger } from "./logger.js";
 
-let ips = [];
-
 const DEBUG = process.env.DEBUG === "TRUE";
 const settings = {
   serverType: process.env.SERVER_TYPE,
@@ -12,14 +10,14 @@ const settings = {
 };
 
 function getIps() {
-  ips = fs.existsSync("./files/ips.json")
+  return fs.existsSync("./files/ips.json")
     ? JSON.parse(fs.readFileSync("./files/ips.json"))
     : [];
 }
 
 async function ipIsOnline(ip) {
   try {
-    await axios.post(`${ip}/ping`, settings);
+    await axios.post(`${ip}/api/ping`, settings);
   } catch (error) {
     return false;
   }
@@ -27,13 +25,12 @@ async function ipIsOnline(ip) {
   return true;
 }
 function removeIp(ip) {
-  ips = getIps().filter((i) => i !== ip);
+  const ips = getIps().filter((i) => i !== ip);
   fs.writeFileSync("./files/ips.json", JSON.stringify(ips));
-  return ips;
 }
 
 export async function removeAllOfflineIps() {
-  getIps();
+  const ips = getIps();
   for (let i = 0; i < ips.length; i += 1) {
     const ip = ips[i];
     if (!(await ipIsOnline(ip))) {
@@ -44,6 +41,7 @@ export async function removeAllOfflineIps() {
 }
 
 export function getRoomsPerCycle() {
+  const ips = getIps();
   // tickSpeed * ticksPerCall * callsPerSecond
   const roomsPerIp = 4 * 100 * 2;
   const roomsPerCycle = roomsPerIp * ips.length;
@@ -53,8 +51,9 @@ export function getRoomsPerCycle() {
 export function IpRouter() {
   const router = new express.Router();
 
-  router.post("ip", async (req, res) => {
+  router.post("/ip", async (req, res) => {
     try {
+      const ips = getIps();
       const { ip } = req.body;
       const ipOnline = await ipIsOnline(ip);
       if (!ipOnline) {
@@ -79,7 +78,7 @@ export function IpRouter() {
     }
   });
 
-  router.delete("ip", async (req, res) => {
+  router.delete("/ip", async (req, res) => {
     try {
       const { ip } = req.body;
       removeIp(ip);

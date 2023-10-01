@@ -15,9 +15,9 @@ export default class ProcessDataBroker {
       dataRequest.shard
     ]
       ? Math.round(
-          (dataResult.timestamp - this.lastTickTimestamp[dataRequest.shard]) /
-            100
-        )
+        (dataResult.timestamp - this.lastTickTimestamp[dataRequest.shard]) /
+        100
+      )
       : undefined;
 
     this.lastTickTimestamp[dataRequest.shard] = dataResult.timestamp;

@@ -10,7 +10,7 @@ import websocketConnection from "./websocket/connect.js";
 import { removeAllOfflineIps, getRoomsPerCycle, IpRouter } from "./ips.js";
 
 const app = express();
-const port = 5000;
+const port = 5001;
 let isOnlineMode = 0;
 
 const healthCheck = {
@@ -21,8 +21,8 @@ const healthCheck = {
 app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
 
-app.use("/", IpRouter);
-app.get("/healthCheck", (req, res) => {
+app.use("/api", IpRouter());
+app.get("/api/healthCheck", (req, res) => {
   logger.info(`${req.ip}: Received health check`);
   const success =
     Date.now() - healthCheck.lastDataReceived < 600 * 1000 &&
