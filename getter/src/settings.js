@@ -6,12 +6,12 @@ const filePath = `${folderPath}/settings.json`;
 const settings = {};
 export default settings;
 
-export function writeSettings(recievedSettings) {
+export function writeSettings(receivedSettings) {
   fs.mkdirSync(folderPath, { recursive: true });
-  fs.writeFileSync(filePath, JSON.stringify(recievedSettings));
+  fs.writeFileSync(filePath, JSON.stringify(receivedSettings));
 
-  const keys = Object.keys(recievedSettings);
+  const keys = Object.keys(receivedSettings);
   keys.forEach((key) => {
-    settings[key] = recievedSettings[key];
+    settings[key] = receivedSettings[key];
   });
 }

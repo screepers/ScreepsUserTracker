@@ -1,27 +1,9 @@
-import * as dotenv from "dotenv";
-
-dotenv.config();
+import "dotenv/config";
 
 export function GetShards() {
   return process.env.SHARDS.split(" ");
 }
 
-export const STRUCTURE_TYPES = [
-  "road",
-  "wall",
-  "spawn",
-  "extension",
-  "link",
-  "storage",
-  "tower",
-  "observer",
-  "powerSpawn",
-  "extractor",
-  "lab",
-  "terminal",
-  "container",
-  "nuker",
-];
 export function findOriginalObject(id, ticks) {
   const tickKeys = Object.keys(ticks);
   for (let t = 0; t < tickKeys.length; t += 1) {
@@ -34,25 +16,65 @@ export function findOriginalObject(id, ticks) {
   return null;
 }
 
-export function findAllByType(objects, type) {
-  let possibleTypes = [type];
-  if (type === "structure") {
-    possibleTypes = STRUCTURE_TYPES;
-    possibleTypes.push("controller");
-  }
-  const list = Object.values(objects).filter(
-    (o) => o && o.type && possibleTypes.includes(o.type)
-  );
-  return list;
-}
+export function summarizeObjects(objects) {
+  const summarize = {
+    structures: [],
+    structuresByType: {},
+    creeps: [],
+    constructionSites: [],
+    minerals: [],
+    controllers: [],
+    spawns: [],
+  };
 
-export function groupBy(obj, key) {
-  const result = {};
-  obj.forEach((o) => {
-    if (!result[o[key]]) result[o[key]] = [];
-    result[o[key]].push(o);
-  });
-  return result;
+  const objectKeys = Object.keys(objects);
+  for (let o = 0; o < objectKeys.length; o += 1) {
+    const object = objectKeys[o];
+    if (object) {
+      if (object.type) {
+        if (!summarize.structuresByType[object.type])
+          summarize.structuresByType[object.type] = [];
+        summarize.structuresByType[object.type].push(object);
+      }
+
+      switch (object.type) {
+        case "road":
+        case "wall":
+        case "spawn":
+        case "extension":
+        case "link":
+        case "storage":
+        case "tower":
+        case "observer":
+        case "powerSpawn":
+        case "extractor":
+        case "lab":
+        case "terminal":
+        case "container":
+        case "nuker":
+          summarize.structures.push(object);
+
+          if (object.type === "spawn") summarize.spawns.push(object);
+          break;
+        case "creep":
+          summarize.creeps.push(object);
+          break;
+        case "constructionSite":
+          summarize.constructionSites.push(object);
+          break;
+        case "mineral":
+          summarize.minerals.push(object);
+          break;
+        case "controller":
+          summarize.controllers.push(object);
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  return summarize;
 }
 
 export function getIntentEffect(action, originalObject) {
@@ -63,21 +85,21 @@ export function getIntentEffect(action, originalObject) {
       case "build":
         return { action, energy: originalObject.body.work * 5 };
       case "repair":
-        if (originalObject.type === "tower") {
-          return { action, energy: 10 };
-        }
+        if (originalObject.type === "tower") return { action, energy: 10 };
         return { action, energy: originalObject.body.work * 1 };
       case "upgradeController":
         return { action, energy: originalObject.body.work * 1 };
       case "dismantle":
         return { action, energy: originalObject.body.work * 0.25 };
       case "attack":
-        if (originalObject.type === "tower") {
+        if (originalObject.type === "tower")
           return { action, energy: 10, damage: 300 };
-        }
         return { action, damage: originalObject.body.attack * 30 };
       case "rangedAttack":
-        return { action, damage: originalObject.body.rangedAttack * 10 };
+        return {
+          action,
+          damage: originalObject.body.rangedAttack * 10,
+        };
       case "rangedMassAttack":
         return { action, damage: originalObject.body.rangedAttack * 4 };
       case "heal":

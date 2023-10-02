@@ -3,7 +3,7 @@ import * as dotenv from "dotenv";
 import graphite from "graphite";
 import { graphiteLogger as logger } from "../../logger.js";
 import { GetShards } from "../helper.js";
-import { GetUsername, GetUsernames } from "../../rooms/userHelper.js";
+import { GetUsernames } from "../../rooms/userHelper.js";
 import handleUsers from "../handle/users.js";
 import { GetGameTime } from "../screepsApi.js";
 
@@ -14,13 +14,13 @@ const client = graphite.createClient(
 );
 
 export default class BaseDataBroker {
-  _users = {};
+  static users = {};
 
-  _lastTickTimestamp = {};
+  static shards = GetShards();
 
-  _shards = GetShards();
+  static tickRates = {};
 
-  async UploadStatus(ipStatus) {
+  static async UploadStatus(ipStatus) {
     const start = Date.now();
     const usernames = GetUsernames();
 
@@ -31,12 +31,12 @@ export default class BaseDataBroker {
     });
 
     const liveTicks = {};
-    for (let t = 0; t < this._shards.length; t += 1) {
-      const shardName = this._shards[t];
+    for (let t = 0; t < this.shards.length; t += 1) {
+      const shardName = this.shards[t];
       liveTicks[shardName] = await GetGameTime(shardName);
     }
 
-    await BaseDataBroker.Upload(
+    await this.Upload(
       {
         status: ipStatus,
         ticks: {
@@ -52,98 +52,62 @@ export default class BaseDataBroker {
     );
   }
 
-  AddRooms(username, shard, rooms, force = false) {
-    if (!this._users[username]) {
-      this._users[username] = {};
+  static AddRooms(username, shard, rooms) {
+    if (!this.users[username]) {
+      this.users[username] = {};
     }
-    if (!this._users[username][shard]) {
-      this._users[username][shard] = {};
+    if (!this.users[username][shard]) {
+      this.users[username][shard] = {};
     }
 
-    const knownRoomNames = Object.keys(this._users[username][shard]);
+    const knownRoomNames = Object.keys(this.users[username][shard]);
     knownRoomNames.forEach((roomName) => {
-      if (!this._users[username][shard][roomName])
-        delete this._users[username][shard][roomName];
+      if (!this.users[username][shard][roomName])
+        delete this.users[username][shard][roomName];
     });
 
     rooms.forEach((roomName) => {
-      if (!this._users[username][shard][roomName] || force)
-        this._users[username][shard][roomName] = null;
+      if (!this.users[username][shard][roomName])
+        this.users[username][shard][roomName] = null;
     });
   }
 
-  async AddRoomsData(dataList) {
-    if (dataList.length === 0) return;
+  static AddRoomData(username, shard, roomName, data) {
+    if (!this.users[username]) return;
+    if (!this.users[username][shard]) return;
+    if (this.users[username][shard][roomName] === undefined) return;
 
-    dataList.sort((a, b) => a.dataRequest.tick - b.dataRequest.tick);
+    this.users[username][shard][roomName] = data;
+    this.CheckUsers(username);
+  }
 
-    let lastTick = dataList[0].dataRequest.tick;
-    for (let i = 0; i < dataList.length; i += 1) {
-      const { dataRequest } = dataList[i];
-
-      if (lastTick !== dataRequest.tick) {
-        lastTick = dataRequest.tick;
-        await this.CheckUsers();
+  static async CheckUsers(username) {
+    let hasNullData = false;
+    const shardsKeys = Object.keys(this.users[username]);
+    for (let s = 0; s < shardsKeys.length; s += 1) {
+      const shardName = shardsKeys[s];
+      const roomsKeys = Object.keys(this.users[username][shardName]);
+      for (let r = 0; r < roomsKeys.length; r += 1) {
+        const roomName = roomsKeys[r];
+        const roomData = this.users[username][shardName][roomName];
+        if (roomData === null) hasNullData = true;
       }
-
-      let username;
-      switch (dataRequest.type) {
-        case "main":
-          username = GetUsername(dataRequest.room, dataRequest.shard);
-          break;
-        case "reactor":
-          username = "reactor";
-          break;
-        default:
-          break;
-      }
-
-      this.AddRoomData(
-        username,
-        dataRequest.shard,
-        dataRequest.room,
-        dataList[i]
-      );
     }
 
-    await this.CheckUsers();
-  }
-
-  AddRoomData(username, shard, roomName, data) {
-    if (!this._users[username]) return;
-    if (!this._users[username][shard]) return;
-    if (this._users[username][shard][roomName] === undefined) return;
-
-    this._users[username][shard][roomName] = data;
-  }
-
-  async CheckUsers() {
-    const usernamesToUpload = [];
-
-    Object.entries(this._users).forEach(([username, shards]) => {
-      let hasUndefinedData = false;
-
-      Object.values(shards).forEach((rooms) => {
-        Object.values(rooms).forEach((roomData) => {
-          if (!roomData) hasUndefinedData = true;
-        });
-      });
-
-      if (!hasUndefinedData) {
-        usernamesToUpload.push(username);
-      }
-    });
-
-    if (usernamesToUpload.length) await this.UploadUsers(usernamesToUpload);
+    if (!hasNullData) await this.UploadUsers(username);
   }
 
   static async Upload(data, timestamp, logInfo) {
+    if (process.env.GRAPHITE_ONLINE !== "TRUE") return undefined;
     return new Promise((resolve) => {
       const _timestamp = timestamp || Date.now();
 
-      if (process.env.GRAPHITE_ONLINE !== "TRUE") return;
       client.write(
-        { screeps: { userTracker: { [process.env.SERVER_TYPE]: data } } },
+        {
+          screeps: {
+            userTracker: { [process.env.SERVER_TYPE]: data },
+          },
+        },
         _timestamp,
         (err) => {
           if (err) {

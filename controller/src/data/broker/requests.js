@@ -17,17 +17,17 @@ function wait(ms) {
 }
 
 export default class DataRequestsBroker {
-  requests;
+  static requests;
 
-  roomsBeingChecked;
+  static roomsBeingChecked;
 
-  lastTickTimes = {};
+  static lastTickTimes = {};
 
-  knownTickTimes = {};
+  static knownTickTimes = {};
 
-  async constructorAsync() {
-    this.requests = DataRequestsBroker.getRequests();
-    this.roomsBeingChecked = DataRequestsBroker.getRoomsBeingChecked();
+  static async constructorAsync() {
+    this.requests = this.getRequests();
+    this.roomsBeingChecked = this.getRoomsBeingChecked();
     for (let dt = 0; dt < dataTypes.length; dt += 1) {
       const dataType = dataTypes[dt];
       this.lastTickTimes[dataType] = {};
@@ -49,7 +49,7 @@ export default class DataRequestsBroker {
     return {};
   }
 
-  saveRoomsBeingChecked(rooms) {
+  static saveRoomsBeingChecked(rooms) {
     fs.mkdirSync(roomsCheckedFolderPath, { recursive: true });
     fs.writeFileSync(roomsCheckedPath, JSON.stringify(rooms));
 
@@ -65,11 +65,19 @@ export default class DataRequestsBroker {
     return [];
   }
 
-  saveRequests() {
+  static saveRequests() {
     fs.mkdirSync(requestsFolderPath, { recursive: true });
 
     const noDuplicatedRequests = [];
     const noDuplicatedRequestsAggregator = {};
+
+    this.requests.sort((a, b) => {
+      if (a.tick !== b.tick) return a.tick - b.tick;
+      if (a.shard !== b.shard) return a.shard - b.shard;
+      if (a.room !== b.room) return a.room.localeCompare(b.room);
+      return a.type.localeCompare(b.type);
+    });
+
     this.requests.forEach((r) => {
       if (!noDuplicatedRequestsAggregator[r.type])
         noDuplicatedRequestsAggregator[r.type] = {};
@@ -87,7 +95,12 @@ export default class DataRequestsBroker {
             Object.keys(
               noDuplicatedRequestsAggregator[type][tick][shard]
             ).forEach((room) => {
-              noDuplicatedRequests.push({ type, tick, shard, room });
+              noDuplicatedRequests.push({
+                type,
+                tick,
+                shard,
+                room,
+              });
             });
           }
         );
@@ -98,18 +111,11 @@ export default class DataRequestsBroker {
     this.requests = noDuplicatedRequests;
   }
 
-  getRequestsToSend(count) {
-    const requestsToSend = [];
-    for (let i = 0; i < count; i += 1) {
-      const request = this.requests.shift();
-      if (!request) break;
-      requestsToSend.push(request);
-    }
-
-    return requestsToSend;
+  static getRequest() {
+    return this.requests.shift()
   }
 
-  async getCurrentTick(type, shard) {
+  static async getCurrentTick(type, shard) {
     const time = Date.now();
     if (this.knownTickTimes[shard]) {
       const knownTick = this.knownTickTimes[shard];
@@ -126,7 +132,7 @@ export default class DataRequestsBroker {
     return this.lastTickTimes[type][shard] || 0;
   }
 
-  async syncRequests() {
+  static async syncRequests() {
     let addedRequests = false;
     for (let i = 0; i < shards.length; i += 1) {
       const shard = shards[i];

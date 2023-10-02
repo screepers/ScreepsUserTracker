@@ -1,6 +1,6 @@
 import { GetUsernameById } from "../../rooms/userHelper.js";
 
-export default function prepareObject(object) {
+export default function prepareObject(object, originalObject) {
   if (object.user) {
     object.username = GetUsernameById(object.user);
     delete object.user;
@@ -14,4 +14,6 @@ export default function prepareObject(object) {
         return acc;
       }, {});
   }
+
+  object.type = originalObject.type;
 }

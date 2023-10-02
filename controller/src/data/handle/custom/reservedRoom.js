@@ -1,38 +1,35 @@
-/* eslint-disable no-param-reassign  */
-
-import prepareObject from "../prepare/object.js";
-import { findAllByType, groupBy } from "../helper.js";
+import { summarizeObjects } from "../../helper.js";
+import prepareObject from "../../prepare/object.js";
 import {
   CreateAction,
   ActionType,
   ActionListDefaultValuesFiller,
-} from "./helper.js";
-import GetIntents from "./intentsHelper.js";
+} from "../helper.js";
+import GetIntents from "../intentsHelper.js";
 
 export default function handleObjects(username, objects, extras = {}) {
   const originalObjects = extras.originalObjects || {};
-  const currentTick = parseInt(extras.tick, 10);
 
   const objectKeys = Object.keys(objects);
   for (let o = objectKeys.length - 1; o >= 0; o -= 1) {
-    const object = objects[objectKeys[o]];
-    if (object) {
-      prepareObject(object);
-      if (object.username && object.username !== username)
-        delete objects[objectKeys[o]];
+    const id = objectKeys[o];
+    const object = objects[id];
+    const originalObject = originalObjects[id];
+    if (object && originalObject) {
+      prepareObject(object, originalObject);
+      if (object.username && object.username !== username) delete objects[id];
     }
   }
-  const actions = [];
 
-  // #region FirstTick
+  let actions = [];
   const { isFirstTick } = extras;
   const intents = GetIntents(objects, originalObjects);
 
   if (isFirstTick) {
-    const creeps = findAllByType(objects, "creep");
-    const structures = findAllByType(objects, "structure");
-    const constructionSites = findAllByType(objects, "constructionSite");
-    const minerals = findAllByType(objects, "mineral");
+    const summarize = summarizeObjects(objects);
+    const { creeps } = summarize;
+    const { structures } = summarize;
+    const { constructionSites } = summarize;
 
     // #region Totals
     actions.push(
@@ -66,16 +63,6 @@ export default function handleObjects(username, objects, extras = {}) {
         ActionType.FirstTickOnly
       )
     );
-    actions.push(
-      CreateAction(
-        "totals.minerals",
-        minerals.reduce((acc, mineral) => {
-          acc += mineral.amount || 0;
-          return acc;
-        }, 0),
-        ActionType.FirstTickOnly
-      )
-    );
     // #endregion
 
     // #region CountByType
@@ -97,7 +84,7 @@ export default function handleObjects(username, objects, extras = {}) {
       );
     });
 
-    const structuresByType = groupBy(structures, "type");
+    const { structuresByType } = summarize;
     const structuresByTypeKeys = Object.keys(structuresByType);
     structuresByTypeKeys.forEach((type) => {
       actions.push(
@@ -171,108 +158,19 @@ export default function handleObjects(username, objects, extras = {}) {
         )
       );
     });
-    minerals.forEach((mineral) => {
-      actions.push(
-        CreateAction(
-          `minerals.${mineral.mineralType}`,
-          mineral.mineralAmount,
-          ActionType.FirstTickOnly
-        )
-      );
-    });
-    // #endregion
-
-    // #region Controller
-    const controllers = structuresByType.controller;
-    if (controllers && controllers.length > 0) {
-      const controller = controllers[0];
-      actions.push(
-        CreateAction(
-          `controller.level`,
-          controller.level,
-          ActionType.FirstTickOnly
-        )
-      );
-
-      if (controller.level < 8) {
-        actions.push(
-          CreateAction(
-            `controller.progress`,
-            controller.progress,
-            ActionType.FirstTickOnly
-          )
-        );
-        actions.push(
-          CreateAction(
-            `controller.progressTotal`,
-            controller.progressTotal,
-            ActionType.FirstTickOnly
-          )
-        );
-      }
-
-      actions.push(
-        CreateAction(
-          `controller.ticksToDowngrade`,
-          controller.ticksToDowngrade || -1,
-          ActionType.FirstTickOnly
-        )
-      );
-      actions.push(
-        CreateAction(
-          `controller.safeModeAvailable`,
-          controller.safeModeAvailable,
-          ActionType.FirstTickOnly
-        )
-      );
-    }
-
-    // #region Spawning
-    let storedSpawningEnergy = 0;
-    let capacitySpawningEnergy = 0;
-
-    if (structuresByType.spawn) {
-      structuresByType.spawn.forEach((spawn) => {
-        if (spawn.store) storedSpawningEnergy += spawn.store.energy || 0;
-        if (spawn.storeCapacityResource)
-          capacitySpawningEnergy += spawn.storeCapacityResource.energy || 0;
-      });
-    }
-
-    if (structuresByType.extension) {
-      structuresByType.extension.forEach((extension) => {
-        if (extension.store)
-          storedSpawningEnergy += extension.store.energy || 0;
-        if (extension.storeCapacityResource)
-          capacitySpawningEnergy += extension.storeCapacityResource.energy || 0;
-      });
-    }
-    actions.push(
-      CreateAction(
-        `spawning.storedSpawningEnergy`,
-        storedSpawningEnergy,
-        ActionType.FirstTickOnly
-      )
-    );
-    actions.push(
-      CreateAction(
-        `spawning.capacitySpawningEnergy`,
-        capacitySpawningEnergy,
-        ActionType.FirstTickOnly
-      )
-    );
     // #endregion
 
     // #region StructureHits
     const structureHitsByType = {};
     structuresByTypeKeys.forEach((structureKey) => {
       if (structureKey !== "controller") {
-        structureHitsByType[structureKey] = structuresByType[
-          structureKey
-        ].reduce((acc, structure) => {
+        const strs = structuresByType[structureKey];
+        const hitsTotal = strs.reduce((acc, structure) => {
           acc += structure.hits || 0;
           return acc;
         }, 0);
+
+        structureHitsByType[structureKey] = hitsTotal / strs.length;
       }
     });
 
@@ -292,21 +190,6 @@ export default function handleObjects(username, objects, extras = {}) {
   // #endregion
 
   // #region Divide100
-
-  // #region Controller
-  const originalControllers = findAllByType(originalObjects, "controller");
-  let rclPerTick = 0;
-  if (originalControllers && originalControllers.length > 0) {
-    const originalController = originalControllers[0];
-    const controller = objects[originalController._id] || {};
-    if (controller._upgraded) {
-      rclPerTick = controller._upgraded;
-    }
-  }
-  actions.push(
-    CreateAction(`controller.rclPerTick`, rclPerTick, ActionType.Divide100)
-  );
-  // #endregion
 
   // #region IntentsCategories
   const intentsCategories = {
@@ -370,31 +253,12 @@ export default function handleObjects(username, objects, extras = {}) {
     );
   });
   // #endregion
-
-  // #region Spawn
-  const originalSpawns = findAllByType(originalObjects, "spawn");
-  const spawnCount = originalSpawns.length;
-  let spawnDuration = 0;
-  originalSpawns.forEach((originalSpawn) => {
-    const maxSpawnTime = Math.floor(currentTick / 100) * 100 + 100;
-
-    const spawn = objects[originalSpawn._id] || {};
-    if (spawn.spawning) spawnDuration +=
-        Math.min(spawn.spawning.spawnTime, maxSpawnTime) - currentTick;
-  });
-  actions.push(
-    CreateAction(
-      `spawning.spawnUptimePercentage`,
-      spawnDuration > 0 ? Math.round(spawnDuration / spawnCount) : 0,
-      ActionType.Divide100
-    )
-  );
-  // #endregion
   // #endregion
 
   actions.push(
     CreateAction("totals.intents", intents.length, ActionType.Divide100)
   );
 
-  return ActionListDefaultValuesFiller(actions, extras.type, isFirstTick);
+  actions = ActionListDefaultValuesFiller(actions, extras.type, isFirstTick);
+  return actions;
 }

@@ -1,0 +1,38 @@
+[
+  {
+    "terminalStore": {
+      "energy": 100
+    },
+    "tick": 1,
+    "username": "Panda1",
+    "shard": "shard1",
+    "room": "room1"
+  },
+  {
+    "terminalStore": {
+      "energy": 200
+    },
+    "tick": 1,
+    "username": "Panda1",
+    "shard": "shard1",
+    "room": "room2"
+  },
+  {
+    "terminalStore": {
+      "energy": 200
+    },
+    "tick": 2,
+    "username": "Panda1",
+    "shard": "shard1",
+    "room": "room1"
+  },
+  {
+    "terminalStore": {
+      "energy": 100
+    },
+    "tick": 2,
+    "username": "Panda1",
+    "shard": "shard1",
+    "room": "room2"
+  }
+]

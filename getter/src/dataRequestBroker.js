@@ -1,81 +1,85 @@
-import { GetRoomHistory } from "./screepsApi.js";
+import io from "socket.io-client";
 import { dataRequestBroker as logger } from "./logger.js";
+import GetRoomHistory from "./screepsApi.js";
 
-let resultId = 0;
+const controllerIp = process.env.CONTROLLER_IP;
+const websocket = io(
+  `ws://${controllerIp.replace("http://", "").replace("https://", "")}`,
+  { cookie: false }
+);
+
+let count = 0;
+let lastCount = 0;
 
 function wait(ms) {
   // eslint-disable-next-line no-promise-executor-return
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+const speed = {};
+
 export default class DataRequestBroker {
   dataRequests = [];
 
   dataResults = [];
 
-  constructor() {
-    this.executeSingle();
+  proxy;
+
+  constructor(proxy = null) {
+    this.proxy = proxy;
   }
 
-  addDataRequests(dataRequests) {
-    this.dataRequests = dataRequests.concat(this.dataRequests);
-  }
+  static async getDataRequest() {
+    // if (this.dataRequests.length > 0) return this.dataRequests.shift();
 
-  getDataRequest() {
-    return this.dataRequests.shift();
-  }
-
-  getDataRequests(type) {
-    if (!type) return [...this.dataRequests];
-    return [...this.dataRequests.filter((dr) => dr.type === type)];
-  }
-
-  addDataResult(dataResult, dataRequest, force = false) {
-    if (force) {
-      this.dataResults.push({
-        dataResult,
-        dataRequest,
-        id: (resultId += 1),
+    const timeout = new Promise((resolve) => {
+      setTimeout(resolve, 60 * 1000, null);
+    });
+    const getRequest = new Promise((resolve) => {
+      websocket.emit("request");
+      websocket.on("request", (data) => {
+        resolve(JSON.parse(data));
       });
-      return;
+    });
+
+    // const dataRequests = await Promise.race([timeout, getRequest]);
+    // this.dataRequests = dataRequests;
+    // if (dataRequests.length === 0) return undefined;
+    // return dataRequests.shift();
+
+    const dataRequest = await Promise.race([timeout, getRequest]);
+    return dataRequest;
+  }
+
+  static async emitData(data) {
+    websocket.emit("data", JSON.stringify(data));
+  }
+
+  static sendDataResult(dataResult, dataRequest, force = false) {
+    const data = {
+      dataResult,
+      dataRequest,
+    };
+    if (!force) {
+      const firstTickObjects = Object.values(dataResult.ticks).filter(
+        (tl) => tl !== null
+      )[0];
+      if (
+        !firstTickObjects ||
+        !Object.values(firstTickObjects).find(
+          (obj) => obj.type === "controller"
+        )
+      )
+        return;
     }
 
-    const firstTickObjects = Object.values(dataResult.ticks).filter(
-      (tl) => tl !== null
-    )[0];
-    if (
-      !firstTickObjects ||
-      !Object.values(firstTickObjects).find((obj) => obj.type === "controller")
-    )
-      return;
-
-    this.dataResults.push({ dataResult, dataRequest, id: (resultId += 1) });
+    DataRequestBroker.emitData(data)
   }
 
-  resetDataResults(newData) {
-    this.dataResults = newData;
-  }
-
-  getDataResultsToSend() {
-    const toSend = this.dataResults.slice(0, 500);
-    const dataResults = JSON.parse(JSON.stringify(toSend));
-    this.resetDataResults(this.dataResults.slice(500));
-
-    return dataResults;
-  }
-
-  getTotalDataResults() {
-    return this.dataResults.length;
-  }
-
-  getTotalDataRequests() {
-    return this.dataRequests.length;
-  }
-
-  async executeSingle() {
-    const dataRequest = this.getDataRequest();
+  async executeSingle(forceDataRequest = undefined) {
+    const dataRequest = forceDataRequest || (await DataRequestBroker.getDataRequest());
     if (!dataRequest) {
-      await wait(100);
+      await wait(10 * 1000);
       return this.executeSingle();
     }
 
@@ -83,25 +87,36 @@ export default class DataRequestBroker {
     const { room } = dataRequest;
     const { tick } = dataRequest;
 
-    const dataResult = await GetRoomHistory(shard, room, tick);
+    const start = Date.now();
+    const dataResult = await GetRoomHistory(this.proxy, shard, room, tick);
+    const end = Date.now() - start;
+    if (!speed[this.proxy.proxy_address])
+      speed[this.proxy.proxy_address] = {
+        count: 0,
+        total: 0,
+      };
+    speed[this.proxy.proxy_address].count += 1;
+    speed[this.proxy.proxy_address].total += end;
+    count += 1;
+
     if (dataResult.status === "Success")
       logger.debug(`Got data for ${shard}/${room}/${tick}`);
     else logger.debug(`Failed to get data for ${shard}/${room}/${tick}`);
 
     if (dataResult.status === "Success")
-      this.addDataResult(
+      DataRequestBroker.sendDataResult(
         dataResult.result,
         dataRequest,
-        dataRequest.type !== "main"
+        dataRequest.type !== "owned"
       );
     else {
       dataRequest.retries = dataRequest.retries
         ? (dataRequest.retries += 1)
         : 1;
 
-      if (dataRequest.retries < 3) this.addDataRequests([dataRequest]);
-      else if (dataResult.status === "Not found")
-        this.addDataResult(dataResult.result, dataRequest, true);
+      if (dataRequest.retries < 3) return this.executeSingle(dataRequest);
+      if (dataResult.status === "Not found")
+        DataRequestBroker.sendDataResult(dataResult.result, dataRequest, true);
       else
         logger.debug(
           `Failed to get data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick} after 3 retries`
@@ -110,3 +125,24 @@ export default class DataRequestBroker {
     return this.executeSingle();
   }
 }
+
+setInterval(() => {
+  console.log(new Date().getMinutes())
+  console.log(`Requests per second: ${Math.round((count - lastCount) / 60)}`);
+  lastCount = count;
+
+  const proxiesKeys = Object.keys(speed);
+  proxiesKeys.forEach((proxy) => {
+    // console.log(
+    //   `Speed for ${proxy}: ${Math.round(
+    //     speed[proxy].total / speed[proxy].count
+    //   )}ms`
+    // );
+    // console.log(
+    //   `Total requests per second for ${proxy}: ${Math.round(speed[proxy].total / speed[proxy].count
+    //   )}`
+    // );
+    speed[proxy].avg = Math.round(speed[proxy].total / speed[proxy].count);
+  });
+  console.log("End of minute")
+}, 60 * 1000);
