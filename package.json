@@ -1,23 +1,20 @@
 {
-	"name": "screeps-user-tracker",
-	"version": "1.0.0",
-	"description": "",
-	"main": "index.js",
-	"scripts": {
-		"lint": "eslint controller/**/*.js && eslint getter/**/*.js && eslint terminal/**/*.js",
-		"lint:fix": "eslint controller/**/*.js --fix && eslint getter/**/*.js --fix && eslint terminal/**/*.js --fix"
-	},
-	"author": "",
-	"license": "ISC",
-	"devDependencies": {
-		"eslint": "^8.23.1",
-		"eslint-config-airbnb-base": "^15.0.0",
-		"eslint-config-prettier": "^8.8.0",
-		"eslint-plugin-import": "^2.26.0",
-		"eslint-plugin-prettier": "^4.2.1"
-	},
-	"dependencies": {
-		"postgres": "^3.3.5",
-		"screeps-advanced-api": "^1.0.0"
-	}
+  "name": "screeps-user-tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint controller/**/*.js && eslint getter/**/*.js && eslint terminal/**/*.js",
+    "lint:fix": "eslint controller/**/*.js --fix && eslint getter/**/*.js --fix && eslint terminal/**/*.js --fix"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.23.1",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^4.2.1"
+  },
+  "dependencies": {}
 }

@@ -9,6 +9,17 @@ import { GetGameTime } from "../screepsApi.js";
 
 dotenv.config();
 
+import postgres from 'postgres'
+
+let sql = null;
+if (process.env.POSTGRES_ENABLED === 'TRUE') sql = postgres({
+  host: process.env.POSTGRES_HOST,
+  port: process.env.POSTGRES_PORT,
+  database: 'postgres',
+  username: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+})
+
 const client = graphite.createClient(
   `plaintext://${process.env.GRAPHITE_HOST}/`
 );
@@ -126,6 +137,7 @@ export default class BaseDataBroker {
     });
 
     const postgres = new Promise(async (resolve) => {
+      if (process.env.POSTGRES_ENABLED !== 'TRUE') resolve();
       const shards = Object.keys(data.ticks.historyTicks);
       if (shards.length !== 1) resolve();
       const tick = Number(data.ticks.historyTicks[shards[0]]);
