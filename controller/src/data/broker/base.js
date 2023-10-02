@@ -99,7 +99,7 @@ export default class BaseDataBroker {
 
   static async Upload(data, timestamp, logInfo) {
     if (process.env.GRAPHITE_ONLINE !== "TRUE") return undefined;
-    return new Promise((resolve) => {
+    const graphite = new Promise((resolve) => {
       const _timestamp = timestamp || Date.now();
 
       client.write(
@@ -124,5 +124,16 @@ export default class BaseDataBroker {
         }
       );
     });
+
+    const postgres = new Promise(async (resolve) => {
+      const shards = Object.keys(data.ticks.historyTicks);
+      if (shards.length !== 1) resolve();
+      const tick = Number(data.ticks.historyTicks[shards[0]]);
+      await sql`
+      INSERT INTO public.tickData ${sql({ data, tick }, 'data', 'tick')}`
+      resolve();
+    })
+
+    return Promise.all([graphite, postgres]);
   }
 }

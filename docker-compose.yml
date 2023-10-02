@@ -6,6 +6,9 @@ x-logging: &default-logging
     max-size: "20m"
     max-file: "5"
 
+volumes:
+  postgres_data:
+
 services:
   controller:
     build: controller
@@ -26,4 +29,20 @@ services:
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    logging: *default-logging
+  postgres:
+    image: postgres:14
+    restart: unless-stopped
+    ports:
+      - 5434:5432
+    volumes:
+      - ./controller/files/scripts/sql:/docker-entrypoint-initdb.d:ro
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-U", "${POSTGRES_USER}"]
+    user: postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     logging: *default-logging
