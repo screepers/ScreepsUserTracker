@@ -8,3 +8,4 @@ users.json
 requests.json
 roomsBeingChecked.json
 getter/files/settings.json
+docker-compose.override.yml
