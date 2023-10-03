@@ -33,7 +33,7 @@ function roomCount(shards) {
 
 async function UpdateRooms() {
   try {
-    const forcedUsers = process.env.USERNAMES.split(",");
+    const forcedUsers = process.env.USERNAMES.length > 0 ? process.env.USERNAMES.split(",") : [];
     let users = (await advancedScreepsApi.getAllUsers())
     users = users.filter(forcedUsers.length > 0 ? (user) => forcedUsers.includes(user.username) : () => true);
     users.sort((a, b) => roomCount(b.shards) - roomCount(a.shards));
