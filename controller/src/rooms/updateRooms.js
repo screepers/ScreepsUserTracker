@@ -21,7 +21,9 @@ function roomCount(shards) {
 
 async function UpdateRooms() {
   try {
-    const users = await advancedScreepsApi.getAllUsers();
+    const forcedUsers = process.env.USERNAMES.split(",");
+    let users = (await advancedScreepsApi.getAllUsers())
+    users = users.filter(forcedUsers.length > 0 ? (user) => forcedUsers.includes(user.username) : () => true);
     users.sort((a, b) => roomCount(b.shards) - roomCount(a.shards));
 
     fs.writeFileSync("./files/users.json", JSON.stringify(users));

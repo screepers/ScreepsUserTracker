@@ -8,15 +8,10 @@ const websocket = io(
   { cookie: false }
 );
 
-let count = 0;
-let lastCount = 0;
-
 function wait(ms) {
   // eslint-disable-next-line no-promise-executor-return
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
-
-const speed = {};
 
 export default class DataRequestBroker {
   dataRequests = [];
@@ -87,17 +82,7 @@ export default class DataRequestBroker {
     const { room } = dataRequest;
     const { tick } = dataRequest;
 
-    const start = Date.now();
     const dataResult = await GetRoomHistory(this.proxy, shard, room, tick);
-    const end = Date.now() - start;
-    if (!speed[this.proxy.proxy_address])
-      speed[this.proxy.proxy_address] = {
-        count: 0,
-        total: 0,
-      };
-    speed[this.proxy.proxy_address].count += 1;
-    speed[this.proxy.proxy_address].total += end;
-    count += 1;
 
     if (dataResult.status === "Success")
       logger.debug(`Got data for ${shard}/${room}/${tick}`);
@@ -125,24 +110,3 @@ export default class DataRequestBroker {
     return this.executeSingle();
   }
 }
-
-setInterval(() => {
-  console.log(new Date().getMinutes())
-  console.log(`Requests per second: ${Math.round((count - lastCount) / 60)}`);
-  lastCount = count;
-
-  const proxiesKeys = Object.keys(speed);
-  proxiesKeys.forEach((proxy) => {
-    // console.log(
-    //   `Speed for ${proxy}: ${Math.round(
-    //     speed[proxy].total / speed[proxy].count
-    //   )}ms`
-    // );
-    // console.log(
-    //   `Total requests per second for ${proxy}: ${Math.round(speed[proxy].total / speed[proxy].count
-    //   )}`
-    // );
-    speed[proxy].avg = Math.round(speed[proxy].total / speed[proxy].count);
-  });
-  console.log("End of minute")
-}, 60 * 1000);

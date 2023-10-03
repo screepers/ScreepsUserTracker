@@ -1,6 +1,7 @@
 import * as dotenv from "dotenv";
 
 import graphite from "graphite";
+import postgres from 'postgres'
 import { graphiteLogger as logger } from "../../logger.js";
 import { GetShards } from "../helper.js";
 import { GetUsernames } from "../../rooms/userHelper.js";
@@ -8,8 +9,6 @@ import handleUsers from "../handle/users.js";
 import { GetGameTime } from "../screepsApi.js";
 
 dotenv.config();
-
-import postgres from 'postgres'
 
 let sql = null;
 if (process.env.POSTGRES_ENABLED === 'TRUE') sql = postgres({
@@ -89,7 +88,9 @@ export default class BaseDataBroker {
     if (this.users[username][shard][roomName] === undefined) return;
 
     this.users[username][shard][roomName] = data;
-    this.CheckUsers(username);
+    const roomsWithNoData = Object.values(this.users[username][shard]).filter((x) => !x).length
+    console.log(username, shard, roomsWithNoData)
+    if (!roomsWithNoData) this.CheckUsers(username);
   }
 
   static async CheckUsers(username) {
@@ -109,43 +110,55 @@ export default class BaseDataBroker {
   }
 
   static async Upload(data, timestamp, logInfo) {
-    if (process.env.GRAPHITE_ONLINE !== "TRUE") return undefined;
-    const graphite = new Promise((resolve) => {
-      const _timestamp = timestamp || Date.now();
+    const graphiteQuery = new Promise((resolve) => {
+      try {
+        if (process.env.GRAPHITE_ONLINE !== "TRUE") resolve();
+        else {
+          const _timestamp = timestamp || Date.now();
 
-      client.write(
-        {
-          screeps: {
-            userTracker: { [process.env.SERVER_TYPE]: data },
-          },
-        },
-        _timestamp,
-        (err) => {
-          if (err) {
-            logger.error(err);
-          } else if (logInfo)
-            logger.info(
-              `Written data for ${logInfo.type}, took ${(
-                (Date.now() - logInfo.start) /
-                1000
-              ).toFixed(2)}s`
-            );
+          client.write(
+            {
+              screeps: {
+                userTracker: { [process.env.SERVER_TYPE]: data },
+              },
+            },
+            _timestamp,
+            (err) => {
+              if (err) {
+                logger.error(err);
+              } else if (logInfo)
+                logger.info(
+                  `Written data for ${logInfo.type}, took ${(
+                    (Date.now() - logInfo.start) /
+                    1000
+                  ).toFixed(2)}s`
+                );
 
-          resolve();
+              resolve();
+            }
+          );
         }
-      );
+      } catch {
+        resolve();
+      }
     });
 
-    const postgres = new Promise(async (resolve) => {
-      if (process.env.POSTGRES_ENABLED !== 'TRUE') resolve();
-      const shards = Object.keys(data.ticks.historyTicks);
-      if (shards.length !== 1) resolve();
-      const tick = Number(data.ticks.historyTicks[shards[0]]);
-      await sql`
-      INSERT INTO public.tickData ${sql({ data, tick }, 'data', 'tick')}`
-      resolve();
+    // eslint-disable-next-line
+    const postgresQuery = new Promise(async (resolve) => {
+      try {
+        if (process.env.POSTGRES_ENABLED !== 'TRUE') resolve();
+        const shards = Object.keys(data.ticks.history);
+        if (shards.length !== 1) resolve();
+        const tick = Number(data.ticks.history[shards[0]]);
+        const username = Object.keys(data.users)[0];
+
+        await sql`
+      INSERT INTO public.tickData ${sql({ data, tick, username }, 'data', 'tick', 'username')}`
+      } catch (err) {
+        resolve();
+      }
     })
 
-    return Promise.all([graphite, postgres]);
+    return Promise.all([graphiteQuery, postgresQuery]);
   }
 }

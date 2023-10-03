@@ -41,7 +41,8 @@ app.post("/api/ping", (req, res) => {
 
 async function connectToController() {
   try {
-    const result = await axios.post(`${controllerIp}/api/ip`, { ip });
+    console.log(`Connecting to controller at ${controllerIp}`);
+    const result = await axios.post(`${controllerIp}/api/ip`, { ip: process.env.GETTER_IP || ip });
     if (result.status === 200) {
       logger.info(`Connected to controller at ${controllerIp}`);
       const proxies = await getAllProxies();
@@ -66,7 +67,7 @@ async function connectToController() {
 
 app.listen(port, async () => {
   if (!process.env.GETTER_IP) {
-    ip = !process.env.CONTROLLER_IP.includes("localhost")
+    ip = !process.env.CONTROLLER_IP_EXTERNAL === "TRUE"
       ? `http://${await publicIpv4()}:${port}`
       : `http://localhost:${port}`;
   } else ip = process.env.GETTER_IP;

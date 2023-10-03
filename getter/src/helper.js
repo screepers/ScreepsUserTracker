@@ -27,7 +27,6 @@ export async function getAllProxies() {
     console.log(`Loaded ${proxies.length} proxies`);
     return proxies;
   } catch (error) {
-    console.log(`Failed to load proxies: ${error.message}`);
     return [];
   }
 }
