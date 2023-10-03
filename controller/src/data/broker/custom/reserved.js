@@ -57,6 +57,7 @@ export default class ReservedDataBroker extends BaseDataBroker {
         userStats.shards[shardName][roomName] = roomData.stats;
 
         if (!historyTicks[shardName]) historyTicks[shardName] = roomData.tick;
+        if (!timestamp) timestamp = roomData.timestamp;
       }
     }
 

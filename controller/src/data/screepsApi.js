@@ -45,15 +45,26 @@ export async function GetWorldSize(shard) {
   }
 }
 
+let lastTickCache = {
+  tick: 0,
+  lastUpdate: 0,
+}
 export async function GetGameTime(shard) {
-  await sleep(500);
-
   try {
-    const time = await api.raw.game.time(shard);
-    if (typeof time !== "object" || !time.ok)
-      throw new Error(JSON.stringify(time));
-    logger.debug(time);
-    return time.time;
+    if (lastTickCache.lastUpdate + 10 * 1000 > Date.now()) {
+      return lastTickCache.tick;
+    }
+    await sleep(500);
+
+    const timeResult = await api.raw.game.time(shard);
+    if (typeof timeResult !== "object" || !timeResult.ok)
+      throw new Error(JSON.stringify(timeResult));
+    logger.debug(timeResult);
+    lastTickCache = {
+      tick: timeResult.time,
+      lastUpdate: Date.now(),
+    }
+    return lastTickCache.tick;
   } catch (error) {
     logger.error(error);
     return undefined;
