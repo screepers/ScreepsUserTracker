@@ -77,7 +77,8 @@ export default class OwnedDataBroker extends BaseDataBroker {
     let userCount = 0;
     let roomCount = 0;
 
-    usernames.forEach((username) => {
+    for (let u = 0; u < usernames.length; u += 1) {
+      const username = usernames[u];
       const userData = GetUserData(username);
 
       userData.total = !addReservedRooms
@@ -105,7 +106,7 @@ export default class OwnedDataBroker extends BaseDataBroker {
             userData
           );
       }
-    });
+    };
 
     return { userCount, roomCount };
   }

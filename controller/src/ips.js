@@ -44,8 +44,8 @@ export function getRoomsPerCycle() {
   const ips = getIps();
   // tickSpeed * ticksPerCall * callsPerSecond
   const roomsPerIp = 4 * 100 * 2;
-  const roomsPerCycle = roomsPerIp * ips.length;
-  return roomsPerCycle * 100;
+  const roomsPerCycle = roomsPerIp * (ips.length || 1);
+  return roomsPerCycle;
 }
 
 export function IpRouter() {

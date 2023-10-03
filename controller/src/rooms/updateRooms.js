@@ -2,7 +2,19 @@ import fs from "fs";
 import AdvancedScreepsApi from "screeps-advanced-api";
 import { ownedLogger as logger } from "../logger.js";
 
-const advancedScreepsApi = new AdvancedScreepsApi(process.env.SCREEPS_TOKEN);
+let loginInfo = process.env.SCREEPS_TOKEN;
+if (process.env.SERVER_TYPE === 'private') {
+  loginInfo = {
+    protocol: process.env.PRIVATE_SERVER_PROTOCOL,
+    hostname: process.env.PRIVATE_SERVER_HOST,
+    port: process.env.PRIVATE_SERVER_PORT,
+    path: "/",
+    username: process.env.PRIVATE_SERVER_USERNAME,
+    password: process.env.PRIVATE_SERVER_PASSWORD
+  }
+}
+
+const advancedScreepsApi = new AdvancedScreepsApi(loginInfo);
 
 fs.mkdirSync("./files", { recursive: true });
 

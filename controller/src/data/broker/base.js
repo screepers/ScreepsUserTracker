@@ -89,7 +89,6 @@ export default class BaseDataBroker {
 
     this.users[username][shard][roomName] = data;
     const roomsWithNoData = Object.values(this.users[username][shard]).filter((x) => !x).length
-    console.log(username, shard, roomsWithNoData)
     if (!roomsWithNoData) this.CheckUsers(username);
   }
 
@@ -118,7 +117,7 @@ export default class BaseDataBroker {
 
           client.write(
             {
-              screeps: {
+              [process.env.GRAPHITE_PREFIX || '']: {
                 userTracker: { [process.env.SERVER_TYPE]: data },
               },
             },

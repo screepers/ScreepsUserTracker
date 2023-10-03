@@ -8,6 +8,7 @@ import DataRequestsBroker from "./data/broker/requests.js";
 import { ownedLogger as logger } from "./logger.js";
 import websocketConnection from "./websocket/connect.js";
 import { removeAllOfflineIps, getRoomsPerCycle, IpRouter } from "./ips.js";
+import adminUtilsStart from "./adminUtilsTracker/index.js";
 
 const app = express();
 const port = 5001;
@@ -108,3 +109,5 @@ const httpServer = app.listen(port, async () => {
   requestRoomUpdaterJob.start();
   websocketConnection(httpServer);
 });
+
+if (process.env.POSTGRES_ENABLED === "TRUE" && process.env.PRIVATE_SERVER_HOST) adminUtilsStart();
