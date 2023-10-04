@@ -29,6 +29,7 @@ async function init() {
 
 async function getAdminUtilsStats() {
   try {
+    // eslint-disable-next-line max-len
     const response = await axios.get(`${process.env.PRIVATE_SERVER_PROTOCOL}://${process.env.PRIVATE_SERVER_HOST}:${process.env.PRIVATE_SERVER_PORT}/stats`);
     const { data } = response;
 

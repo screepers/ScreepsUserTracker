@@ -5,6 +5,7 @@ import {
   GetRoomTotal,
 } from "../../../rooms/userHelper.js";
 import { handleCombinedRoomStats } from "../../handle/helper.js";
+import DataRequestsBroker from "../requests.js";
 
 export default class ReservedDataBroker extends BaseDataBroker {
   static Type = "reserved";
@@ -13,12 +14,12 @@ export default class ReservedDataBroker extends BaseDataBroker {
     super.AddRoomData(username, shard, roomName, data);
   }
 
-  static async UploadStatus(ipStatus) {
+  static async UploadStatus() {
     const start = Date.now();
 
     await super.Upload(
       {
-        status: { [this.Type]: ipStatus },
+        status: { [this.Type]: DataRequestsBroker.getStatusObject(this.Type) },
       },
       undefined,
       {

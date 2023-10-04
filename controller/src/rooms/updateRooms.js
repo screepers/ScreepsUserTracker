@@ -38,7 +38,7 @@ async function UpdateRooms() {
     users = users.filter(forcedUsers.length > 0 ? (user) => forcedUsers.includes(user.username) : () => true);
     users.sort((a, b) => roomCount(b.shards) - roomCount(a.shards));
 
-    fs.writeFileSync("./files/users.json", JSON.stringify(users));
+    fs.writeFileSync("./files/users.json", JSON.stringify(users, null, 2));
     await sleep(30 * 1000);
   } catch (error) {
     if (error.message && error.message.startsWith("Rate limit exceeded"))

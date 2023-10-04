@@ -23,5 +23,6 @@ module.exports = {
     'import/no-unresolved': 'off',
     "no-await-in-loop": "off",
     "no-param-reassign": "off",
+    "max-len": ["error", { "code": 120 }],
   }
 }

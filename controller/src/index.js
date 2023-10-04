@@ -69,7 +69,7 @@ async function requestRoomUpdater() {
     );
     userCount += roomsToCheck.userCount;
     roomCount += roomsToCheck.roomCount;
-    await OwnedDataBroker.UploadStatus({ requestCount: DataRequestsBroker.getRequestsByType('owned').length, lastTickTimes: DataRequestsBroker.lastTickTimes.owned, knownTickTimes: DataRequestsBroker.knownTickTimes });
+    await OwnedDataBroker.UploadStatus();
   } else if (dataTypes.includes("reserved")) {
     const roomsToCheck = ReservedDataBroker.getRoomsToCheck(
       roomsPerCycle,
@@ -77,7 +77,7 @@ async function requestRoomUpdater() {
     );
     userCount += roomsToCheck.userCount;
     roomCount += roomsToCheck.roomCount;
-    await ReservedDataBroker.UploadStatus({ requestCount: DataRequestsBroker.getRequestsByType('reserved').length, lastTickTimes: DataRequestsBroker.lastTickTimes.reserved, knownTickTimes: DataRequestsBroker.knownTickTimes });
+    await ReservedDataBroker.UploadStatus();
   }
 
   DataRequestsBroker.saveRoomsBeingChecked(types);

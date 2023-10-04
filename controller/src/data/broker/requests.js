@@ -48,7 +48,7 @@ export default class DataRequestsBroker {
 
   static saveRoomsBeingChecked(rooms) {
     fs.mkdirSync(roomsCheckedFolderPath, { recursive: true });
-    fs.writeFileSync(roomsCheckedPath, JSON.stringify(rooms));
+    fs.writeFileSync(roomsCheckedPath, JSON.stringify(rooms, null, 2));
 
     this.roomsBeingChecked = rooms;
     this.saveRequests();
@@ -64,6 +64,15 @@ export default class DataRequestsBroker {
 
   static getRequestsByType(type) {
     return this.requests.filter((r) => r.type === type);
+  }
+
+  static getStatusObject(type) {
+    return {
+      requestCount: this.getRequestsByType(type).length,
+      lastTickTimes: this.lastTickTimes[type],
+      knownTickTimes: this.knownTickTimes,
+      roomsBeingChecked: this.roomsBeingChecked[type]
+    }
   }
 
   static saveRequests() {
@@ -108,7 +117,7 @@ export default class DataRequestsBroker {
       });
     });
 
-    fs.writeFileSync(requestsPath, JSON.stringify(this.requests));
+    fs.writeFileSync(requestsPath, JSON.stringify(this.requests, null, 2));
     this.requests = noDuplicatedRequests;
   }
 

@@ -26,7 +26,7 @@ async function ipIsOnline(ip) {
 }
 function removeIp(ip) {
   const ips = getIps().filter((i) => i !== ip);
-  fs.writeFileSync("./files/ips.json", JSON.stringify(ips));
+  fs.writeFileSync("./files/ips.json", JSON.stringify(ips, null, 2));
 }
 
 export async function removeAllOfflineIps() {
@@ -70,7 +70,7 @@ export function IpRouter() {
 
       logger.info(`${req.ip}: Added! ${ip}`);
       ips.push(ip);
-      fs.writeFileSync("./files/ips.json", JSON.stringify(ips));
+      fs.writeFileSync("./files/ips.json", JSON.stringify(ips, null, 2));
       res.json("Success");
     } catch (e) {
       logger.error(`${e.message}\nStack of ${e.stack}`);
