@@ -16,6 +16,21 @@ export default class OwnedDataBroker extends BaseDataBroker {
     super.AddRoomData(username, shard, roomName, data);
   }
 
+  static async UploadStatus(ipStatus) {
+    const start = Date.now();
+
+    await super.Upload(
+      {
+        status: { [this.Type]: ipStatus },
+      },
+      undefined,
+      {
+        start,
+        type: `${this.Type}Status`,
+      }
+    );
+  }
+
   static async UploadUsers(username) {
     const start = Date.now();
     let timestamp;

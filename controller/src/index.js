@@ -10,6 +10,7 @@ import websocketConnection from "./websocket/connect.js";
 import { removeAllOfflineIps, getRoomsPerCycle, IpRouter } from "./ips.js";
 import adminUtilsStart from "./adminUtilsTracker/index.js";
 
+const debug = process.env.DEBUG === "TRUE"
 const app = express();
 const port = 5001;
 let isOnlineMode = 0;
@@ -68,6 +69,7 @@ async function requestRoomUpdater() {
     );
     userCount += roomsToCheck.userCount;
     roomCount += roomsToCheck.roomCount;
+    await OwnedDataBroker.UploadStatus({ requestCount: DataRequestsBroker.getRequestsByType('owned').length, lastTickTimes: DataRequestsBroker.lastTickTimes.owned, knownTickTimes: DataRequestsBroker.knownTickTimes });
   } else if (dataTypes.includes("reserved")) {
     const roomsToCheck = ReservedDataBroker.getRoomsToCheck(
       roomsPerCycle,
@@ -75,6 +77,7 @@ async function requestRoomUpdater() {
     );
     userCount += roomsToCheck.userCount;
     roomCount += roomsToCheck.roomCount;
+    await ReservedDataBroker.UploadStatus({ requestCount: DataRequestsBroker.getRequestsByType('reserved').length, lastTickTimes: DataRequestsBroker.lastTickTimes.reserved, knownTickTimes: DataRequestsBroker.knownTickTimes });
   }
 
   DataRequestsBroker.saveRoomsBeingChecked(types);
@@ -88,7 +91,7 @@ async function requestRoomUpdater() {
 }
 
 const requestRoomUpdaterJob = new CronJob(
-  "0 * * * *",
+  debug ? "*/10 * * * *" : "0 * * * *",
   requestRoomUpdater,
   null,
   false,

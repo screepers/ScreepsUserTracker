@@ -1,8 +1,6 @@
-import * as dotenv from "dotenv";
+import 'dotenv/config';
 import fs from "fs";
 import { GetGameTime } from "../screepsApi.js";
-
-dotenv.config();
 
 const shards = process.env.SHARDS.split(" ");
 const dataTypes = process.env.DATA_TYPES.split(" ");
@@ -62,6 +60,10 @@ export default class DataRequestsBroker {
       return JSON.parse(fs.readFileSync(requestsPath));
     }
     return [];
+  }
+
+  static getRequestsByType(type) {
+    return this.requests.filter((r) => r.type === type);
   }
 
   static saveRequests() {
