@@ -71,15 +71,17 @@ export default class BaseDataBroker {
     }
 
     const knownRoomNames = Object.keys(this.users[username][shard]);
-    knownRoomNames.forEach((roomName) => {
+    for (let kr = 0; kr < knownRoomNames.length; kr += 1) {
+      const roomName = knownRoomNames[kr];
       if (!this.users[username][shard][roomName])
         delete this.users[username][shard][roomName];
-    });
+    }
 
-    rooms.forEach((roomName) => {
+    for (let r = 0; r < rooms.length; r += 1) {
+      const roomName = rooms[r];
       if (!this.users[username][shard][roomName])
         this.users[username][shard][roomName] = null;
-    });
+    }
   }
 
   static AddRoomData(username, shard, roomName, data) {

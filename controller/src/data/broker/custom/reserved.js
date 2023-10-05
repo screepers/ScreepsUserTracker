@@ -84,7 +84,7 @@ export default class ReservedDataBroker extends BaseDataBroker {
     );
   }
 
-  static getRoomsToCheckByUsername(username, types, userData) {
+  static getRoomsToCheckByUsername(username, types, userData, includeOwned = false) {
     if (!types[this.Type]) types[this.Type] = {};
     const shardRooms = types[this.Type];
 
@@ -93,7 +93,9 @@ export default class ReservedDataBroker extends BaseDataBroker {
         shardRooms[shard] = [];
       }
       shardRooms[shard].push(...data.reserved);
-      this.AddRooms(username, shard, data.reserved);
+      const rooms = [...data.reserved];
+      if (includeOwned) rooms.push(...data.owned);
+      this.AddRooms(username, shard, rooms);
     });
   }
 

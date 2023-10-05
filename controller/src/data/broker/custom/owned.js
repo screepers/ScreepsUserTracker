@@ -120,7 +120,8 @@ export default class OwnedDataBroker extends BaseDataBroker {
           ReservedDataBroker.getRoomsToCheckByUsername(
             username,
             types,
-            userData
+            userData,
+            true
           );
       }
     };
