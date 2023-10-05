@@ -2,11 +2,14 @@ import io from "socket.io-client";
 import { dataRequestBroker as logger } from "./logger.js";
 import GetRoomHistory from "./screepsApi.js";
 
-const controllerIp = process.env.CONTROLLER_IP;
-const websocket = io(
-  `ws://${controllerIp.replace("http://", "").replace("https://", "")}`,
-  { cookie: false }
-);
+let websocket = null;
+if (process.env.GETTER_DISABLED !== "TRUE") {
+  const controllerIp = process.env.CONTROLLER_IP;
+  websocket = io(
+    `ws://${controllerIp.replace("http://", "").replace("https://", "")}`,
+    { cookie: false }
+  );
+}
 
 function wait(ms) {
   // eslint-disable-next-line no-promise-executor-return

@@ -9,6 +9,7 @@ import { ownedLogger as logger } from "./logger.js";
 import websocketConnection from "./websocket/connect.js";
 import { removeAllOfflineIps, getRoomsPerCycle, IpRouter } from "./ips.js";
 import adminUtilsStart from "./adminUtilsTracker/index.js";
+import LocalDataRequestBroker from "./localDataRequestBroker/index.js";
 
 const debug = process.env.DEBUG === "TRUE"
 const app = express();
@@ -110,7 +111,8 @@ const httpServer = app.listen(port, async () => {
   logger.info("Finished initial room update!");
 
   requestRoomUpdaterJob.start();
-  websocketConnection(httpServer);
+  if (process.env.GETTER_DISABLED !== "TRUE") websocketConnection(httpServer);
+  else LocalDataRequestBroker.start();
 });
 
 if (process.env.POSTGRES_ENABLED === "TRUE" && process.env.PRIVATE_SERVER_HOST) adminUtilsStart();
