@@ -11,9 +11,9 @@ volumes:
 
 services:
   controller:
-    build: controller
+    build: .
     volumes:
-      - ./logs/controller:/app/logs
+      - ./logs/controller:/app/controller/logs
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -26,7 +26,6 @@ services:
       - 4000:4000
     volumes:
       - ./logs/getter:/app/logs
-    restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
     logging: *default-logging

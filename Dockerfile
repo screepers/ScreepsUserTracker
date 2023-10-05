@@ -5,6 +5,8 @@ ENV NODE_ENV=production
 
 WORKDIR "/app"
 COPY . .
-RUN npm install
 
+WORKDIR "/app/controller"
+
+RUN npm install
 CMD ["node", "src/index.js"]

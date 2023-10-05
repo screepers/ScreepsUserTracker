@@ -8,6 +8,11 @@ import { writeSettings } from "./settings.js";
 import DataRequestBroker from "./dataRequestBroker.js";
 import { getAllProxies } from "./helper.js";
 
+if (process.env.GETTER_DISABLED === "TRUE") {
+  console.log("Getter disabled, exiting");
+  process.exit(0);
+}
+
 const controllerIp = process.env.CONTROLLER_IP;
 
 const lastDataSend = Date.now();

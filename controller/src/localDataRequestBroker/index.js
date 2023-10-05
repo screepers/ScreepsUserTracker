@@ -5,7 +5,6 @@ import DataRequestsBroker from "../data/broker/requests.js";
 import DataRequestBroker from "../../../getter/src/dataRequestBroker.js";
 import { getAllProxies } from "../../../getter/src/helper.js";
 
-let lastCount = 0;
 let count = 0;
 
 export default class LocalDataRequestBroker {
@@ -57,8 +56,8 @@ export default class LocalDataRequestBroker {
 const logStatus = new CronJob(
   "* * * * *",
   () => {
-    console.log(count, count - lastCount, "per minute", Math.round((count - lastCount) / 60), "per second");
-    lastCount = count;
+    console.log(count, "per minute", Math.round(count / 60), "per second");
+    count = 0;
   },
   null,
   false,
