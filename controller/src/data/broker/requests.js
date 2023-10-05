@@ -183,7 +183,7 @@ export default class DataRequestsBroker {
       }
     }
 
-    if (addedRequests) {
+    if (addedRequests && this.requests.length < 100 * 1000) {
       this.syncRequests();
     }
   }

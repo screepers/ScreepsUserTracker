@@ -14,9 +14,9 @@ switch (settings.serverType) {
     path = "/";
     break;
 }
-const baseHistoryPath = `${process.env.PRIVATE_SERVER_PROTOCOL || "https"}://${
-  process.env.PRIVATE_SERVER_HOST || "screeps.com"
-}:${process.env.PRIVATE_SERVER_PORT || 443}${path}`;
+const baseHistoryPath = process.env.PRIVATE_SERVER_USERNAME ?
+  `${process.env.PRIVATE_SERVER_PROTOCOL}://${process.env.PRIVATE_SERVER_HOST
+  }:${process.env.PRIVATE_SERVER_PORT}${path}` : `https://screeps.com${path}`;
 
 const historyApi = new ScreepsAPI({
   protocol: process.env.PRIVATE_SERVER_PROTOCOL || "https",
@@ -39,7 +39,7 @@ async function getHistory(proxy, room, tick, shard) {
   const proxySettings = proxy;
 
   const timeoutPromise = new Promise((resolve) => {
-    setTimeout(resolve, 5000, { status: "Timeout" });
+    setTimeout(resolve, 10 * 1000, { status: "Timeout" });
   });
 
   const getHistoryPromise = new Promise((resolve) => {

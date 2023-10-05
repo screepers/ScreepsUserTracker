@@ -3,7 +3,7 @@ import AdvancedScreepsApi from "screeps-advanced-api";
 import { ownedLogger as logger } from "../logger.js";
 
 let loginInfo = process.env.SCREEPS_TOKEN;
-if (process.env.SERVER_TYPE === 'private') {
+if (process.env.PRIVATE_SERVER_USERNAME) {
   loginInfo = {
     protocol: process.env.PRIVATE_SERVER_PROTOCOL,
     hostname: process.env.PRIVATE_SERVER_HOST,

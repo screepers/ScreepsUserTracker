@@ -1,17 +1,29 @@
+/* eslint-disable import/no-relative-packages */
+import { CronJob } from "cron";
 import ProcessDataBroker from "../data/broker/processData.js";
 import DataRequestsBroker from "../data/broker/requests.js";
-// eslint-disable-next-line import/no-relative-packages
 import DataRequestBroker from "../../../getter/src/dataRequestBroker.js";
+import { getAllProxies } from "../../../getter/src/helper.js";
+
+let lastCount = 0;
+let count = 0;
 
 export default class LocalDataRequestBroker {
-  static dataRequestBroker = null;
 
-  static start() {
+  static async start() {
     DataRequestBroker.getDataRequest = this.getDataRequest;
     DataRequestBroker.sendDataResult = this.sendDataResult;
-    this.dataRequestBroker = new DataRequestBroker();
 
-    this.dataRequestBroker.executeSingle();
+    const proxies = await getAllProxies();
+    for (let p = 0; p < proxies.length; p += 1) {
+      const proxy = proxies[p];
+      const broker = new DataRequestBroker(proxy);
+      broker.executeSingle();
+    }
+    if (proxies.length === 0) {
+      const broker = new DataRequestBroker();
+      broker.executeSingle();
+    }
   }
 
   static getDataRequest() {
@@ -25,9 +37,9 @@ export default class LocalDataRequestBroker {
       dataRequest,
     };
     if (!force) {
-      const firstTickObjects = Object.values(dataResult.ticks).filter(
+      const firstTickObjects = Object.values(dataResult.ticks).find(
         (tl) => tl !== null
-      )[0];
+      );
       if (
         !firstTickObjects ||
         !Object.values(firstTickObjects).find(
@@ -38,5 +50,18 @@ export default class LocalDataRequestBroker {
     }
 
     ProcessDataBroker.single(data);
+    count += 1;
   }
 }
+
+const logStatus = new CronJob(
+  "* * * * *",
+  () => {
+    console.log(count, count - lastCount, "per minute", Math.round((count - lastCount) / 60), "per second");
+    lastCount = count;
+  },
+  null,
+  false,
+  "Europe/Amsterdam"
+);
+logStatus.start();

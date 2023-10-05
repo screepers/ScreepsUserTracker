@@ -9,6 +9,7 @@ import {
   ActionListDefaultValuesFiller,
 } from "../helper.js";
 import GetIntents from "../intentsHelper.js";
+// import { GetUsernameById } from "../../../rooms/userHelper.js";
 
 const websocket = io(`ws://${process.env.TERMINAL_IP}`, { cookie: false });
 
@@ -137,9 +138,9 @@ export default function handleObjects(username, objects, extras = {}) {
         `constructionSites.progressPercentage`,
         constructionSites.length > 0
           ? constructionSites.reduce((acc, site) => {
-              acc += site.progress / site.progressTotal;
-              return acc;
-            }, 0) / constructionSites.length
+            acc += site.progress / site.progressTotal;
+            return acc;
+          }, 0) / constructionSites.length
           : 0,
         ActionType.FirstTickOnly
       )
@@ -299,6 +300,7 @@ export default function handleObjects(username, objects, extras = {}) {
   const terminals = structuresByType.terminal;
   if (terminals && terminals.length > 0) {
     const terminal = terminals[0];
+    // const username = GetUsernameById();
     websocket.emit(
       "terminal",
       JSON.stringify({

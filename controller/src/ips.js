@@ -42,9 +42,10 @@ export async function removeAllOfflineIps() {
 
 export function getRoomsPerCycle() {
   const ips = getIps();
+  const proxyCount = Number(process.env.WEBSHARE_PROXYAMOUNT) || 0;
   // tickSpeed * ticksPerCall * callsPerSecond
   const roomsPerIp = 4 * 100 * 2;
-  const roomsPerCycle = roomsPerIp * (ips.length || 1);
+  const roomsPerCycle = roomsPerIp * ((ips.length + proxyCount) || 1);
   return roomsPerCycle;
 }
 
