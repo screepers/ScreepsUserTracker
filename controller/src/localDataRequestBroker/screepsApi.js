@@ -1,11 +1,9 @@
-import "dotenv/config";
 import { ScreepsAPI } from "screeps-api";
 import axios from "axios";
 import { HttpsProxyAgent } from "https-proxy-agent";
-import settings from "./settings.js";
 
 let path;
-switch (settings.serverType) {
+switch (process.env.SERVER_TYPE) {
   case "seasonal":
     path = "/season/";
     break;

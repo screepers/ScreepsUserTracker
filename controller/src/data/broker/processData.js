@@ -10,17 +10,24 @@ import BaseDataBroker from "./base.js";
 export default class ProcessDataBroker {
   static lastTickTimestamp = {};
 
+  static lastTickTicks = {};
+
   static setTickRate(dataRequest, dataResult) {
-    BaseDataBroker.tickRates[dataRequest.shard] = this.lastTickTimestamp[
+    const tick = Number(dataRequest.tick);
+    const newTimestamp = this.lastTickTimestamp[
       dataRequest.shard
-    ]
-      ? Math.round(
-        (dataResult.timestamp - this.lastTickTimestamp[dataRequest.shard]) /
-        100
-      )
-      : undefined;
+    ] && this.lastTickTimestamp[
+    dataRequest.shard
+    ] < dataResult.timestamp;
+    const newTick = this.lastTickTicks[dataRequest.shard] && this.lastTickTicks[dataRequest.shard] < tick;
+    if (newTimestamp && newTick) {
+      const tickRate = (dataResult.timestamp - this.lastTickTimestamp[dataRequest.shard]) /
+        100;
+      BaseDataBroker.tickRates[dataRequest.shard] = Math.round(tickRate);
+    }
 
     this.lastTickTimestamp[dataRequest.shard] = dataResult.timestamp;
+    this.lastTickTicks[dataRequest.shard] = tick;
   }
 
   static single(roomData) {

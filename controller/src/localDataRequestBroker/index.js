@@ -1,18 +1,39 @@
-/* eslint-disable import/no-relative-packages */
-import { CronJob } from "cron";
-import ProcessDataBroker from "../data/broker/processData.js";
-import DataRequestsBroker from "../data/broker/requests.js";
-import DataRequestBroker from "../../../getter/src/dataRequestBroker.js";
-import { getAllProxies } from "../../../getter/src/helper.js";
+import axios from "axios";
+import DataRequestBroker from "./dataRequestBroker.js";
 
-let count = 0;
+async function getProxies(pageSize, pageIndex) {
+  const proxiesResponse = await axios.get(
+    `https://proxy.webshare.io/api/v2/proxy/list/?mode=direct&page=${pageIndex}&page_size=100`,
+    {
+      headers: {
+        Authorization: `Token ${process.env.WEBSHARE_TOKEN}`,
+      },
+    }
+  );
+  return proxiesResponse.data.results;
+}
+
+// eslint-disable-next-line import/prefer-default-export
+async function getAllProxies() {
+  try {
+    const targetProxiesCount = Number(process.env.WEBSHARE_PROXYAMOUNT);
+    const maxPageIndex = Math.ceil(targetProxiesCount / 100);
+
+    let proxies = []
+    for (let p = 1; p < maxPageIndex + 1; p += 1) {
+      proxies = proxies.concat(await getProxies(100, p));
+    }
+
+    console.log(`Loaded ${proxies.length} proxies`);
+    return proxies;
+  } catch (error) {
+    return [];
+  }
+}
+
 
 export default class LocalDataRequestBroker {
-
   static async start() {
-    DataRequestBroker.getDataRequest = this.getDataRequest;
-    DataRequestBroker.sendDataResult = this.sendDataResult;
-
     const proxies = await getAllProxies();
     for (let p = 0; p < proxies.length; p += 1) {
       const proxy = proxies[p];
@@ -24,43 +45,4 @@ export default class LocalDataRequestBroker {
       broker.executeSingle();
     }
   }
-
-  static getDataRequest() {
-    const request = DataRequestsBroker.getRequest();
-    return request;
-  }
-
-  static sendDataResult(dataResult, dataRequest, force = false) {
-    const data = {
-      dataResult,
-      dataRequest,
-    };
-    if (!force) {
-      const firstTickObjects = Object.values(dataResult.ticks).find(
-        (tl) => tl !== null
-      );
-      if (
-        !firstTickObjects ||
-        !Object.values(firstTickObjects).find(
-          (obj) => obj.type === "controller"
-        )
-      )
-        return;
-    }
-
-    ProcessDataBroker.single(data);
-    count += 1;
-  }
 }
-
-const logStatus = new CronJob(
-  "* * * * *",
-  () => {
-    console.log(count, "per minute", Math.round(count / 60), "per second");
-    count = 0;
-  },
-  null,
-  false,
-  "Europe/Amsterdam"
-);
-logStatus.start();

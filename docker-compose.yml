@@ -11,9 +11,9 @@ volumes:
 
 services:
   controller:
-    build: .
+    build: controller
     volumes:
-      - ./logs/controller:/app/controller/logs
+      - ./logs/controller:/app/logs
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
