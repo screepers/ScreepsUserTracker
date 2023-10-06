@@ -50,14 +50,12 @@ export async function GetWorldSize(shard) {
   }
 }
 
-let lastTickCache = {
-  tick: 0,
-  lastUpdate: 0,
+const lastTickCache = {
 }
 export async function GetGameTime(shard) {
   try {
-    if (lastTickCache.lastUpdate + 10 * 1000 > Date.now()) {
-      return lastTickCache.tick;
+    if (lastTickCache[shard] && lastTickCache[shard].lastUpdate + 10 * 1000 > Date.now()) {
+      return lastTickCache[shard].tick;
     }
     await sleep(500);
 
@@ -65,11 +63,11 @@ export async function GetGameTime(shard) {
     if (typeof timeResult !== "object" || !timeResult.ok)
       throw new Error(JSON.stringify(timeResult));
     logger.debug(timeResult);
-    lastTickCache = {
+    lastTickCache[shard] = {
       tick: timeResult.time,
       lastUpdate: Date.now(),
     }
-    return lastTickCache.tick;
+    return lastTickCache[shard].tick;
   } catch (error) {
     logger.error(error);
     return undefined;

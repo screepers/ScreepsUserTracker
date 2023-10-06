@@ -20,7 +20,7 @@ export default class DataRequestBroker {
     this.proxy = proxy;
   }
 
-  static async getDataRequest() {
+  static getDataRequest() {
     const request = DataRequestsBroker.getRequest();
     return request;
   }
@@ -48,7 +48,7 @@ export default class DataRequestBroker {
   }
 
   async executeSingle(forceDataRequest = undefined) {
-    const dataRequest = forceDataRequest || (await DataRequestBroker.getDataRequest());
+    const dataRequest = forceDataRequest || (DataRequestBroker.getDataRequest());
     if (!dataRequest) {
       await wait(10 * 1000);
       return this.executeSingle();
