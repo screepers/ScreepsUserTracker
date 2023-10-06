@@ -167,7 +167,8 @@ export default class DataRequestsBroker {
           }
 
           if (this.lastTickTimes[type][shard] !== requestTick) {
-            rooms.forEach((room) => {
+            for (let r = 0; r < rooms.length; r += 1) {
+              const room = rooms[r];
               const dataRequest = {
                 room,
                 shard,
@@ -175,7 +176,7 @@ export default class DataRequestsBroker {
                 type,
               };
               this.requests.push(dataRequest);
-            });
+            };
             this.lastTickTimes[type][shard] = requestTick;
             addedRequests = true;
           }

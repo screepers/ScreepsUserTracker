@@ -11,6 +11,7 @@ import { removeAllOfflineIps, getRoomsPerCycle, IpRouter } from "./ips.js";
 import adminUtilsStart from "./adminUtilsTracker/index.js";
 import LocalDataRequestBroker from "./localDataRequestBroker/index.js";
 
+
 const debug = process.env.DEBUG === "TRUE"
 const app = express();
 const port = 5001;
@@ -46,7 +47,7 @@ app.get("/api/healthCheck", (req, res) => {
   });
 });
 
-async function requestRoomUpdater() {
+async function initialRoomUpdater() {
   if (isOnlineMode < 1) return;
   const start = Date.now();
   await UpdateRooms();
@@ -91,9 +92,17 @@ async function requestRoomUpdater() {
   );
 }
 
-const requestRoomUpdaterJob = new CronJob(
+const initialRoomUpdaterJob = new CronJob(
   debug ? "*/10 * * * *" : "0 * * * *",
-  requestRoomUpdater,
+  initialRoomUpdater,
+  null,
+  false,
+  "Europe/Amsterdam"
+);
+
+const syncRequestsJob = new CronJob(
+  "*/5 * * * *",
+  DataRequestsBroker.syncRequests,
   null,
   false,
   "Europe/Amsterdam"
@@ -107,10 +116,11 @@ const httpServer = app.listen(port, async () => {
   isOnlineMode = 1;
 
   logger.info("Starting initial room update!");
-  await requestRoomUpdater();
+  await initialRoomUpdater();
   logger.info("Finished initial room update!");
 
-  requestRoomUpdaterJob.start();
+  initialRoomUpdaterJob.start();
+  syncRequestsJob.start();
   if (process.env.GETTER_DISABLED !== "TRUE") websocketConnection(httpServer);
   else LocalDataRequestBroker.start();
 });
