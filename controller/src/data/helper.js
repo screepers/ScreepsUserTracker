@@ -2,6 +2,7 @@ import "dotenv/config";
 
 const structureTypes = ['road',
   'constructedWall',
+  'rampart',
   'spawn',
   'extension',
   'link',
@@ -54,6 +55,7 @@ export function summarizeObjects(objects) {
     if (object) {
       switch (object.type) {
         case "road":
+        case "rampart":
         case "constructedWall":
         case "spawn":
         case "extension":
