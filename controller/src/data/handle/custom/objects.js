@@ -189,9 +189,9 @@ export default function handleObjects(username, objects, extras = {}) {
     // #endregion
 
     // #region Controller
-    const controllers = structuresByType.controller;
-    if (controllers && controllers.length > 0) {
-      const controller = controllers[0];
+    const originalControllers = summarize.controllers;
+    if (originalControllers && originalControllers.length > 0) {
+      const controller = originalControllers[0];
       actions.push(
         CreateAction(
           `controller.level`,

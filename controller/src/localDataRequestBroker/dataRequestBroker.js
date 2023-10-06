@@ -33,7 +33,7 @@ export default class DataRequestBroker {
     if (!force) {
       const firstTickObjects = Object.values(dataResult.ticks).find(
         (tl) => tl !== null
-    );
+      );
       if (
         !firstTickObjects ||
         !Object.values(firstTickObjects).find(
@@ -50,7 +50,7 @@ export default class DataRequestBroker {
   async executeSingle(forceDataRequest = undefined) {
     const dataRequest = forceDataRequest || (await DataRequestBroker.getDataRequest());
     if (!dataRequest) {
-      if (process.env.GETTER_DISABLED !== "TRUE") await wait(10 * 1000);
+      await wait(10 * 1000);
       return this.executeSingle();
     }
 
