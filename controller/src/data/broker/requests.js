@@ -17,7 +17,7 @@ function wait(ms) {
 export default class DataRequestsBroker {
   static requests;
 
-  static roomsBeingChecked;
+  static roomsBeingChecked = {};
 
   static lastTickTimes = {};
 
