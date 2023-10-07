@@ -50,8 +50,8 @@ export default async function start() {
   await api.socket.connect(); // connect socket
 
   // Subscribe to 'cpu' endpoint and get events
-  api.socket.subscribe('room:W1N1');
-  api.socket.on('room:W1N1', async () => {
+  api.socket.subscribe('room:E1N9');
+  api.socket.on('room:E1N9', async () => {
     try {
       const { data, error } = await getAdminUtilsStats();
       if (error) return;
