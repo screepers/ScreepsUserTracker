@@ -485,11 +485,6 @@
 		"type": 1
 	},
 	{
-		"path": "controller.rclPerTick",
-		"value": 0,
-		"type": 0
-	},
-	{
 		"path": "intents.income.harvest",
 		"value": 0,
 		"type": 0

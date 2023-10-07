@@ -316,23 +316,6 @@ export default function handleObjects(username, objects, extras = {}) {
 
   // #endregion
 
-  // #region Divide100
-
-  // #region Controller
-  const originalControllers = summarize.controllers;
-  let rclPerTick = 0;
-  if (originalControllers && originalControllers.length > 0) {
-    const originalController = originalControllers[0];
-    const controller = objects[originalController._id] || {};
-    if (controller._upgraded) {
-      rclPerTick = controller._upgraded;
-    }
-  }
-  actions.push(
-    CreateAction(`controller.rclPerTick`, rclPerTick, ActionType.Divide100)
-  );
-  // #endregion
-
   // #region IntentsCategories
   const intentsCategories = {
     income: {
