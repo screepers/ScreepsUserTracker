@@ -24,8 +24,8 @@ export default class DataRequestsBroker {
   static knownTickTimes = {};
 
   static async constructorAsync() {
-    this.requests = this.getRequests();
     this.roomsBeingChecked = this.getRoomsBeingChecked();
+    this.requests = this.getRequests();
     for (let dt = 0; dt < dataTypes.length; dt += 1) {
       const dataType = dataTypes[dt];
       this.lastTickTimes[dataType] = {};
