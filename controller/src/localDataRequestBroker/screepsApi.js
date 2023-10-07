@@ -16,11 +16,12 @@ const baseHistoryPath = process.env.PRIVATE_SERVER_USERNAME ?
   `${process.env.PRIVATE_SERVER_PROTOCOL}://${process.env.PRIVATE_SERVER_HOST
   }:${process.env.PRIVATE_SERVER_PORT}${path}` : `https://screeps.com${path}`;
 
+const isPrivateServer = process.env.PRIVATE_SERVER_USERNAME ? true : false;
 let historyApi = new ScreepsAPI({
   token: process.env.SCREEPS_TOKEN,
   path,
 });
-if (process.env.PRIVATE_SERVER_USERNAME) {
+if (isPrivateServer) {
   historyApi = new ScreepsAPI({
     token: process.env.SCREEPS_TOKEN,
     protocol: process.env.PRIVATE_SERVER_PROTOCOL || "https",
@@ -47,11 +48,14 @@ async function getHistory(proxy, room, tick, shard) {
   });
 
   const getHistoryPromise = new Promise((resolve) => {
+
     const agent = new HttpsProxyAgent(
       `http://${proxySettings.username}:${proxySettings.password}@${proxySettings.proxy_address}:${proxySettings.port}`
     );
     try {
-      const url = `${baseHistoryPath}room-history/${shard}/${room}/${tick}.json`;
+      const url = isPrivateServer ?
+        `${baseHistoryPath}room-history?room=${room}&time=${tick}` :
+        `${baseHistoryPath}room-history/${shard}/${room}/${tick}.json`;
       axios
         .get(url, {
           httpsAgent: agent,
