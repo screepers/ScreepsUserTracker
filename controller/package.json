@@ -18,7 +18,7 @@
 		"graphite": "^0.1.5",
 		"https-proxy-agent": "^7.0.2",
 		"postgres": "^3.3.5",
-		"screeps-advanced-api": "^1.1.1",
+		"screeps-advanced-api": "^1.1.2",
 		"screeps-api": "^1.16.0",
 		"socket.io": "^2.3.0",
 		"socket.io-client": "^2.3.0",
