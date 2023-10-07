@@ -100,9 +100,13 @@ const initialRoomUpdaterJob = new CronJob(
   "Europe/Amsterdam"
 );
 
+function callSyncRequests() {
+  DataRequestsBroker.syncRequests();
+}
+
 const syncRequestsJob = new CronJob(
-  "*/5 * * * *",
-  DataRequestsBroker.syncRequests,
+  "*/1 * * * *",
+  callSyncRequests,
   null,
   false,
   "Europe/Amsterdam"
