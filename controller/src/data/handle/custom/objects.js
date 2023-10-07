@@ -380,17 +380,16 @@ export default function handleObjects(username, objects, extras = {}) {
   // #endregion
 
   // #region Spawn
-  const originalSpawns = summarize.spawns;
-  const spawnCount = originalSpawns.length;
+  const spawns = summarize.structuresByType.spawn;
+  const spawnCount = spawns.length;
   let spawnDuration = 0;
-  originalSpawns.forEach((originalSpawn) => {
+  for (let s = 0; s < spawns.length; s += 1) {
+    const spawn = spawns[s];
     const maxSpawnTime = Math.floor(currentTick / 100) * 100 + 100;
-
-    const spawn = objects[originalSpawn._id] || {};
     if (spawn.spawning)
       spawnDuration +=
         Math.min(spawn.spawning.spawnTime, maxSpawnTime) - currentTick;
-  });
+  };
   actions.push(
     CreateAction(
       `spawning.spawnUptimePercentage`,
