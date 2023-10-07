@@ -155,7 +155,7 @@ export default class DataRequestsBroker {
           shard,
           this.knownTickTimes
         );
-        let requestTick = Math.max(currentTick - (currentTick % 100) - 1000, 0);
+        let requestTick = Math.max(currentTick - (currentTick % 100) - 250, 0);
 
         const rooms = this.roomsBeingChecked[type][shard];
         if (rooms && rooms.length > 0) {
