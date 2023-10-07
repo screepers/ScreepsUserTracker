@@ -40,6 +40,7 @@ export default class DataRequestsBroker {
   }
 
   static getRoomsBeingChecked() {
+    console.log('a')
     if (fs.existsSync(roomsCheckedPath)) {
       return JSON.parse(fs.readFileSync(roomsCheckedPath));
     }
@@ -147,6 +148,7 @@ export default class DataRequestsBroker {
     for (let i = 0; i < shards.length; i += 1) {
       const shard = shards[i];
 
+      console.log('b')
       const types = Object.keys(this.roomsBeingChecked);
       for (let t = 0; t < types.length; t += 1) {
         const type = types[t];
@@ -155,7 +157,7 @@ export default class DataRequestsBroker {
           shard,
           this.knownTickTimes
         );
-        let requestTick = Math.max(currentTick - (currentTick % 100) - 250, 0);
+        let requestTick = Math.max(currentTick - (currentTick % 100) - 200, 0);
 
         const rooms = this.roomsBeingChecked[type][shard];
         if (rooms && rooms.length > 0) {
