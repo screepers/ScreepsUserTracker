@@ -100,9 +100,17 @@ const initialRoomUpdaterJob = new CronJob(
   "Europe/Amsterdam"
 );
 
-function callSyncRequests() {
+async function callSyncRequests() {
   DataRequestsBroker.syncRequests();
   DataRequestsBroker.saveRequests()
+
+  const dataTypes = process.env.DATA_TYPES;
+  if (dataTypes.includes("owned")) {
+    await OwnedDataBroker.UploadStatus();
+  }
+  if (dataTypes.includes("reserved")) {
+    await ReservedDataBroker.UploadStatus();
+  }
 }
 
 const syncRequestsJob = new CronJob(
