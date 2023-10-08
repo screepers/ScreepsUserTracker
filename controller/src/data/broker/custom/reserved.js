@@ -6,12 +6,18 @@ import {
 } from "../../../rooms/userHelper.js";
 import { handleCombinedRoomStats } from "../../handle/helper.js";
 import DataRequestsBroker from "../requests.js";
+// eslint-disable-next-line import/no-cycle
+import OwnedDataBroker from "./owned.js";
+const dataTypes = process.env.DATA_TYPES.split(" ");
 
 export default class ReservedDataBroker extends BaseDataBroker {
   static Type = "reserved";
 
+  static OwnedRoomsOn = dataTypes.includes("owned");
+
   static AddRoomData(username, shard, roomName, data) {
-    super.AddRoomData(username, shard, roomName, data);
+    if (this.OwnedRoomsOn) OwnedDataBroker.AddRoomData(username, shard, roomName, data);
+    else super.AddRoomData(username, shard, roomName, data);
   }
 
   static async UploadStatus() {
@@ -55,10 +61,11 @@ export default class ReservedDataBroker extends BaseDataBroker {
       for (let j = 0; j < roomNames.length; j += 1) {
         const roomName = roomNames[j];
         const roomData = shardData[roomName];
-        userStats.shards[shardName][roomName] = roomData.stats;
-
-        if (!historyTicks[shardName]) historyTicks[shardName] = roomData.tick;
-        if (!timestamp) timestamp = roomData.timestamp;
+        if (roomData) {
+          userStats.shards[shardName][roomName] = roomData.stats;
+          if (!historyTicks[shardName]) historyTicks[shardName] = roomData.tick;
+          if (!timestamp) timestamp = roomData.timestamp;
+        }
       }
     }
 
@@ -84,7 +91,7 @@ export default class ReservedDataBroker extends BaseDataBroker {
     );
   }
 
-  static getRoomsToCheckByUsername(username, types, userData, includeOwned = false) {
+  static getRoomsToCheckByUsername(username, types, userData, fromOwned) {
     if (!types[this.Type]) types[this.Type] = {};
     const shardRooms = types[this.Type];
 
@@ -93,9 +100,7 @@ export default class ReservedDataBroker extends BaseDataBroker {
         shardRooms[shard] = [];
       }
       shardRooms[shard].push(...data.reserved);
-      const rooms = [...data.reserved];
-      if (includeOwned) rooms.push(...data.owned);
-      this.AddRooms(username, shard, rooms);
+      if (!fromOwned) this.AddRooms(username, shard, data.reserved);
     });
   }
 

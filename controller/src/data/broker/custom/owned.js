@@ -1,4 +1,5 @@
 import BaseDataBroker from "../base.js";
+// eslint-disable-next-line import/no-cycle
 import ReservedDataBroker from "./reserved.js";
 import {
   GetUsernames,
@@ -58,35 +59,36 @@ export default class OwnedDataBroker extends BaseDataBroker {
       for (let j = 0; j < roomNames.length; j += 1) {
         const roomName = roomNames[j];
         const roomData = shardData[roomName];
-        userStats.shards[shardName][roomName] = roomData.stats;
-
-        if (!historyTicks[shardName]) historyTicks[shardName] = roomData.tick;
-        if (!timestamp) timestamp = roomData.timestamp;
+        if (roomData) {
+          userStats.shards[shardName][roomName] = roomData.stats;
+          if (!historyTicks[shardName]) historyTicks[shardName] = roomData.tick;
+          if (!timestamp) timestamp = roomData.timestamp;
+        }
       }
-    }
 
-    userStats.combined.shards = handleCombinedRoomStats(
-      userStats.shards,
-      this.Type
-    );
-    if (process.env.ONLY_COMBINED_DATA_UPLOAD === "true")
-      delete userStats.shards;
-    stats[username] = { stats: userStats };
+      userStats.combined.shards = handleCombinedRoomStats(
+        userStats.shards,
+        this.Type
+      );
+      if (process.env.ONLY_COMBINED_DATA_UPLOAD === "true")
+        delete userStats.shards;
+      stats[username] = { stats: userStats };
 
-    await super.Upload(
-      {
-        users: stats,
-        ticks: {
-          history: historyTicks,
-          tickRates: BaseDataBroker.tickRates,
+      await super.Upload(
+        {
+          users: stats,
+          ticks: {
+            history: historyTicks,
+            tickRates: BaseDataBroker.tickRates,
+          },
         },
-      },
-      timestamp,
-      {
-        start,
-        type: this.Type,
-      }
-    );
+        timestamp,
+        {
+          start,
+          type: this.Type,
+        }
+      );
+    }
   }
 
   static getRoomsToCheck(roomsPerCycle, types, addReservedRooms) {
@@ -107,13 +109,13 @@ export default class OwnedDataBroker extends BaseDataBroker {
 
         if (!types[this.Type]) types[this.Type] = {};
         const shardRooms = types[this.Type];
-
         Object.entries(userData.shards).forEach(([shard, data]) => {
           if (!shardRooms[shard]) {
             shardRooms[shard] = [];
           }
           shardRooms[shard].push(...data.owned);
           this.AddRooms(username, shard, data.owned);
+          if (addReservedRooms) this.AddRooms(username, shard, [...data.owned, ...data.reserved])
         });
 
         if (addReservedRooms)
