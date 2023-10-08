@@ -65,30 +65,38 @@ export default class OwnedDataBroker extends BaseDataBroker {
           if (!timestamp) timestamp = roomData.timestamp;
         }
       }
-
-      userStats.combined.shards = handleCombinedRoomStats(
-        userStats.shards,
-        this.Type
-      );
-      if (process.env.ONLY_COMBINED_DATA_UPLOAD === "true")
-        delete userStats.shards;
-      stats[username] = { stats: userStats };
-
-      await super.Upload(
-        {
-          users: stats,
-          ticks: {
-            history: historyTicks,
-            tickRates: BaseDataBroker.tickRates,
-          },
-        },
-        timestamp,
-        {
-          start,
-          type: this.Type,
-        }
-      );
     }
+
+    userStats.combined.shards = handleCombinedRoomStats(
+      userStats.shards,
+      this.Type
+    );
+    if (process.env.ONLY_COMBINED_DATA_UPLOAD === "true")
+      delete userStats.shards;
+    stats[username] = { stats: userStats };
+
+    for (let i = 0; i < shardNames.length; i += 1) {
+      const shardName = shardNames[i];
+      const rooms = this.users[username][shardName];
+
+      const roomNames = Object.keys(rooms);
+      this.AddRooms(username, shardName, roomNames, true);
+    };
+
+    await super.Upload(
+      {
+        users: stats,
+        ticks: {
+          history: historyTicks,
+          tickRates: BaseDataBroker.tickRates,
+        },
+      },
+      timestamp,
+      {
+        start,
+        type: this.Type,
+      }
+    );
   }
 
   static getRoomsToCheck(roomsPerCycle, types, addReservedRooms) {

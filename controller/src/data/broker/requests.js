@@ -51,8 +51,8 @@ export default class DataRequestsBroker {
     fs.writeFileSync(roomsCheckedPath, JSON.stringify(rooms, null, 2));
 
     this.roomsBeingChecked = rooms;
-    this.saveRequests();
     this.syncRequests();
+    this.saveRequests();
   }
 
   static getRequests() {
@@ -80,13 +80,6 @@ export default class DataRequestsBroker {
 
     const noDuplicatedRequests = [];
     const noDuplicatedRequestsAggregator = {};
-
-    this.requests.sort((a, b) => {
-      if (a.tick !== b.tick) return a.tick - b.tick;
-      if (a.shard !== b.shard) return a.shard - b.shard;
-      if (a.room !== b.room) return a.room.localeCompare(b.room);
-      return a.type.localeCompare(b.type);
-    });
 
     this.requests.forEach((r) => {
       if (!noDuplicatedRequestsAggregator[r.type])
@@ -116,9 +109,19 @@ export default class DataRequestsBroker {
         );
       });
     });
-
-    fs.writeFileSync(requestsPath, JSON.stringify(this.requests, null, 2));
     this.requests = noDuplicatedRequests;
+
+    this.requests.sort((a, b) => {
+      a.tick = Number(a.tick);
+      b.tick = Number(b.tick);
+
+      if (a.tick !== b.tick) return a.tick - b.tick;
+      if (a.type !== b.type) return a.type.localeCompare(b.type);
+      if (a.shard !== b.shard) return a.shard - b.shard;
+      if (a.room !== b.room) return a.room.localeCompare(b.room);
+      return 0; // If all properties are the same, return 0 to maintain their relative order.
+    });
+    fs.writeFileSync(requestsPath, JSON.stringify(this.requests, null, 2));
   }
 
   static getRequest() {

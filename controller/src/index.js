@@ -102,6 +102,7 @@ const initialRoomUpdaterJob = new CronJob(
 
 function callSyncRequests() {
   DataRequestsBroker.syncRequests();
+  DataRequestsBroker.saveRequests()
 }
 
 const syncRequestsJob = new CronJob(

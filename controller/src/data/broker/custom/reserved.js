@@ -75,6 +75,14 @@ export default class ReservedDataBroker extends BaseDataBroker {
     );
     stats[username] = { stats: userStats };
 
+    for (let i = 0; i < shardNames.length; i += 1) {
+      const shardName = shardNames[i];
+      const rooms = this.users[username][shardName];
+
+      const roomNames = Object.keys(rooms);
+      this.AddRooms(username, shardName, roomNames, true);
+    };
+
     await super.Upload(
       {
         users: stats,

@@ -70,17 +70,17 @@ export default class BaseDataBroker {
       this.users[username][shard] = {};
     }
 
-    const knownRoomNames = Object.keys(this.users[username][shard]);
-    for (let kr = 0; kr < knownRoomNames.length; kr += 1) {
-      const roomName = knownRoomNames[kr];
-      if (!this.users[username][shard][roomName])
-        delete this.users[username][shard][roomName];
-    }
+    // const knownRoomNames = Object.keys(this.users[username][shard]);
+    // for (let kr = 0; kr < knownRoomNames.length; kr += 1) {
+    //   const roomName = knownRoomNames[kr];
+    //   if (!this.users[username][shard][roomName])
+    //     delete this.users[username][shard][roomName];
+    // }
 
     for (let r = 0; r < rooms.length; r += 1) {
       const roomName = rooms[r];
       if (!this.users[username][shard][roomName])
-        this.users[username][shard][roomName] = null;
+        this.users[username][shard][roomName] = 'noDataSet';
     }
   }
 
@@ -102,7 +102,7 @@ export default class BaseDataBroker {
       for (let r = 0; r < roomsKeys.length; r += 1) {
         const roomName = roomsKeys[r];
         const roomData = this.users[username][shardName][roomName];
-        if (roomData === undefined) hasMissingData = true;
+        if (roomData === 'noDataSet') hasMissingData = true;
       }
     }
 
