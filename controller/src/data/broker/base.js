@@ -89,8 +89,24 @@ export default class BaseDataBroker {
     if (!this.users[username][shard]) return;
     if (this.users[username][shard][roomName] === undefined) return;
 
-    if (this.users[username][shard][roomName]) this.UploadUsers(username);;
     this.users[username][shard][roomName] = data;
+    this.CheckUsers(username);
+  }
+
+  static async CheckUsers(username) {
+    let hasMissingData = false;
+    const shardsKeys = Object.keys(this.users[username]);
+    for (let s = 0; s < shardsKeys.length; s += 1) {
+      const shardName = shardsKeys[s];
+      const roomsKeys = Object.keys(this.users[username][shardName]);
+      for (let r = 0; r < roomsKeys.length; r += 1) {
+        const roomName = roomsKeys[r];
+        const roomData = this.users[username][shardName][roomName];
+        if (roomData === undefined) hasMissingData = true;
+      }
+    }
+
+    if (!hasMissingData) await this.UploadUsers(username);
   }
 
   static async Upload(data, timestamp, logInfo) {
