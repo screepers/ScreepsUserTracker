@@ -72,33 +72,33 @@ export default class OwnedDataBroker extends BaseDataBroker {
       this.Type
     );
 
-    const userData = GetUserData(username)
-    const ownedCount = GetRoomTotal(userData.shards, this.Type);
-    function getAveragedStatsObject() {
-      return {
-        spawning: {
-          spawnUptimePercentage: 0,
-        },
-      }
-    }
+    // const userData = GetUserData(username)
+    // const ownedCount = GetRoomTotal(userData.shards, this.Type);
+    // function getAveragedStatsObject() {
+    //   return {
+    //     spawning: {
+    //       spawnUptimePercentage: 0,
+    //     },
+    //   }
+    // }
 
-    userStats.averaged = {
-      shards: {},
-    };
+    // userStats.averaged = {
+    //   shards: {},
+    // };
 
-    for (let s = 0; s < shardNames.length; s += 1) {
-      const shardName = shardNames[s];
-      const shardData = this.users[username][shardName];
-      userStats.averaged.shards[shardName] = getAveragedStatsObject();
+    // for (let s = 0; s < shardNames.length; s += 1) {
+    //   const shardName = shardNames[s];
+    //   const shardData = this.users[username][shardName];
+    //   userStats.averaged.shards[shardName] = getAveragedStatsObject();
 
-      const roomNames = Object.keys(shardData).filter((roomName) =>
-        userData.shards[shardName].owned.includes(roomName));
-      for (let r = 0; r < roomNames.length; r += 1) {
-        const roomName = roomNames[r];
-        userStats.averaged.shards[shardName].spawning.spawnUptimePercentage +=
-          userStats.shards[shardName][roomName].spawning.spawnUptimePercentage / ownedCount;
-      }
-    }
+    //   const roomNames = Object.keys(shardData).filter((roomName) =>
+    //     userData.shards[shardName].owned.includes(roomName));
+    //   for (let r = 0; r < roomNames.length; r += 1) {
+    //     const roomName = roomNames[r];
+    //     userStats.averaged.shards[shardName].spawning.spawnUptimePercentage +=
+    //       userStats.shards[shardName][roomName].spawning.spawnUptimePercentage / ownedCount;
+    //   }
+    // }
 
     if (process.env.ONLY_COMBINED_DATA_UPLOAD === "true")
       delete userStats.shards;
