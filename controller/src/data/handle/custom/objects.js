@@ -36,6 +36,7 @@ export default function handleObjects(username, objects, extras = {}) {
   const summarize = summarizeObjects(objects);
   const { structures } = summarize;
   const { structuresByType } = summarize;
+  const { controller } = summarize;
   if (isFirstTick) {
     const { creeps } = summarize;
     const { constructionSites } = summarize;
@@ -189,9 +190,7 @@ export default function handleObjects(username, objects, extras = {}) {
     // #endregion
 
     // #region Controller
-    const originalControllers = summarize.controllers;
-    if (originalControllers && originalControllers.length > 0) {
-      const controller = originalControllers[0];
+    if (controller) {
       actions.push(
         CreateAction(
           `controller.level`,
@@ -231,6 +230,7 @@ export default function handleObjects(username, objects, extras = {}) {
           ActionType.FirstTickOnly
         )
       );
+      actions.push(CreateAction('controller.rclPerTick', controller._upgraded || 0))
     }
 
     // #region Spawning

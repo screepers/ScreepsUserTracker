@@ -40,7 +40,7 @@ export function summarizeObjects(objects) {
     creeps: [],
     constructionSites: [],
     minerals: [],
-    controllers: [],
+    controller: undefined,
     spawns: [],
   };
 
@@ -84,7 +84,7 @@ export function summarizeObjects(objects) {
           summarize.minerals.push(object);
           break;
         case "controller":
-          summarize.controllers.push(object);
+          summarize.controller = object;
           break;
         default:
           break;
