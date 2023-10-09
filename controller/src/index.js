@@ -131,6 +131,7 @@ const httpServer = app.listen(port, async () => {
   logger.info("Starting initial room update!");
   await initialRoomUpdater();
   logger.info("Finished initial room update!");
+  console.log('Finished')
 
   initialRoomUpdaterJob.start();
   syncRequestsJob.start();
