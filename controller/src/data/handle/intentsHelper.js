@@ -22,6 +22,16 @@ export default function GetIntents(objects, originalObjects) {
         delete originalObject.actionLog[intentName];
     }
 
+    if (object && object.actionLog) {
+      const newActionLogKeys = Object.keys(object.actionLog);
+      for (let i = 0; i < newActionLogKeys.length; i += 1) {
+        const intentName = newActionLogKeys[i];
+        if (object.actionLog[intentName]) {
+          originalObject.actionLog[intentName] = object.actionLog[intentName];
+        }
+      }
+    }
+
     const currentActions = Object.keys(originalObject.actionLog);
     for (let ca = 0; ca < currentActions.length; ca += 1) {
       const intentName = currentActions[ca];

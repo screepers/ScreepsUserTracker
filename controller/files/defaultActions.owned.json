@@ -955,12 +955,13 @@
     "type": 1
   },
   {
-    "path": "controller.rclPerTick",
-    "value": 0
-  },
-  {
     "path": "structureHits.constructedWall",
     "value": 0,
     "type": 1
+  },
+  {
+    "path": "controller.rclPerTick",
+    "value": 0,
+    "type": 0
   }
 ]

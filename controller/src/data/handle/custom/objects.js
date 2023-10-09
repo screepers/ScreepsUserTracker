@@ -230,7 +230,6 @@ export default function handleObjects(username, objects, extras = {}) {
           ActionType.FirstTickOnly
         )
       );
-      actions.push(CreateAction('controller.rclPerTick', controller._upgraded || 0))
     }
 
     // #region Spawning
@@ -296,6 +295,10 @@ export default function handleObjects(username, objects, extras = {}) {
   }
   // #endregion
 
+  // #endregion
+
+
+
   // #region Terminal storage changes
   const terminals = structuresByType.terminal;
   if (terminals && terminals.length > 0) {
@@ -313,6 +316,13 @@ export default function handleObjects(username, objects, extras = {}) {
     );
   }
   // #endregion
+
+  // #region Controller
+
+  if (controller) {
+    console.log('controller', extras.tick, controller._upgraded)
+    actions.push(CreateAction('controller.rclPerTick', controller._upgraded || 0, ActionType.Divide100))
+  }
 
   // #endregion
 
