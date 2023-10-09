@@ -74,19 +74,27 @@ export default class OwnedDataBroker extends BaseDataBroker {
 
     const userData = GetUserData(username)
     const ownedCount = GetRoomTotal(userData.shards, this.Type);
-    userStats.averaged = {
-      spawning: {
-        spawnUptimePercentage: 0,
+    function getAveragedStatsObject() {
+      return {
+        spawning: {
+          spawnUptimePercentage: 0,
+        },
       }
     }
+
+    userStats.averaged = {
+      shards: {},
+    };
 
     for (let s = 0; s < shardNames.length; s += 1) {
       const shardName = shardNames[s];
       const shardData = this.users[username][shardName];
       const roomNames = Object.keys(shardData);
+
+      userStats.averaged.shards[shardName] = getAveragedStatsObject();
       for (let r = 0; r < roomNames.length; r += 1) {
         const roomName = roomNames[r];
-        userStats.averaged.spawning.spawnUptimePercentage +=
+        userStats.averaged.shards[shardName].spawning.spawnUptimePercentage +=
           userStats.shards[shardName][roomName].spawning.spawnUptimePercentage / ownedCount;
       }
     }
