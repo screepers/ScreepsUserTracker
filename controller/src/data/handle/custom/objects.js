@@ -320,7 +320,6 @@ export default function handleObjects(username, objects, extras = {}) {
   // #region Controller
 
   if (controller) {
-    console.log('controller', extras.tick, controller._upgraded)
     actions.push(CreateAction('controller.rclPerTick', controller._upgraded || 0, ActionType.Divide100))
   }
 
