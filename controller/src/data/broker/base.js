@@ -6,7 +6,7 @@ import { graphiteLogger as logger } from "../../logger.js";
 import { GetShards } from "../helper.js";
 import { GetUsernames } from "../../rooms/userHelper.js";
 import handleUsers from "../handle/users.js";
-import { GetGameTime } from "../screepsApi.js";
+import GetGameTime from "../screepsApi.js";
 
 dotenv.config();
 

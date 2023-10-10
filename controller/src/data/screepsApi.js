@@ -36,23 +36,9 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export async function GetWorldSize(shard) {
-  await sleep(500);
-
-  try {
-    const size = await api.raw.game.worldSize(shard);
-    if (!size.ok) throw new Error(JSON.stringify(size));
-    logger.info(size);
-    return size;
-  } catch (error) {
-    logger.error(error);
-    return 0;
-  }
-}
-
 const lastTickCache = {
 }
-export async function GetGameTime(shard) {
+export default async function GetGameTime(shard) {
   try {
     if (lastTickCache[shard] && lastTickCache[shard].lastUpdate + 10 * 1000 > Date.now()) {
       return lastTickCache[shard].tick;
@@ -62,7 +48,7 @@ export async function GetGameTime(shard) {
     const timeResult = await api.raw.game.time(shard);
     if (typeof timeResult !== "object" || !timeResult.ok)
       throw new Error(JSON.stringify(timeResult));
-    logger.info(timeResult);
+    logger.info(`${shard}/${timeResult.time}`);
     lastTickCache[shard] = {
       tick: timeResult.time,
       lastUpdate: Date.now(),

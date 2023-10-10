@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import fs from "fs";
-import { GetGameTime } from "../screepsApi.js";
+import GetGameTime from "../screepsApi.js";
 
 const shards = process.env.SHARDS.split(" ");
 const dataTypes = process.env.DATA_TYPES.split(" ");
