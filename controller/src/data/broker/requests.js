@@ -19,9 +19,9 @@ export default class DataRequestsBroker {
 
   static roomsBeingChecked = {};
 
-  static lastRequestAddedTickTimes = {};
+  static lastRequestAddedTick = {};
 
-  static knownTickTimes = {};
+  static lastLiveTick = {};
 
   static lastRequestRemoved = {}
 
@@ -30,10 +30,10 @@ export default class DataRequestsBroker {
     this.requests = this.getRequests();
     for (let dt = 0; dt < dataTypes.length; dt += 1) {
       const dataType = dataTypes[dt];
-      this.lastRequestAddedTickTimes[dataType] = {};
+      this.lastRequestAddedTick[dataType] = {};
       for (let s = 0; s < shards.length; s += 1) {
         const shard = shards[s];
-        this.lastRequestAddedTickTimes[dataType][shard] =
+        this.lastRequestAddedTick[dataType][shard] =
           process.env.START_FROM_TICK ? Number(process.env.START_FROM_TICK) : await GetGameTime(shard);
       }
     }
@@ -71,9 +71,9 @@ export default class DataRequestsBroker {
   static getStatusObject(type) {
     return {
       requestCount: this.getRequestsByType(type).length,
-      lastRequestAddedTickTimes: this.lastRequestAddedTickTimes[type],
-      knownTickTimes: this.knownTickTimes,
       roomsBeingChecked: this.roomsBeingChecked[type],
+      lastLiveTick: this.lastLiveTick,
+      lastRequestAddedTick: this.lastRequestAddedTick[type],
       lastRequestRemoved: this.lastRequestRemoved[type]
     }
   }
@@ -138,19 +138,19 @@ export default class DataRequestsBroker {
 
   static async getCurrentTick(type, shard) {
     const time = Date.now();
-    if (this.knownTickTimes[shard]) {
-      const knownTick = this.knownTickTimes[shard];
+    if (this.lastLiveTick[shard]) {
+      const knownTick = this.lastLiveTick[shard];
       if (time - knownTick.time < 60 * 1000) return knownTick.data;
     }
 
     await wait(500);
     const tick = await GetGameTime(shard);
     if (tick) {
-      this.knownTickTimes[shard] = { data: tick, time };
+      this.lastLiveTick[shard] = { data: tick, time };
       return tick;
     }
 
-    return this.lastRequestAddedTickTimes[type][shard] || 0;
+    return this.lastRequestAddedTick[type][shard] || 0;
   }
 
   static async syncRequests() {
@@ -164,20 +164,20 @@ export default class DataRequestsBroker {
         const currentTick = await this.getCurrentTick(
           type,
           shard,
-          this.knownTickTimes
+          this.lastLiveTick
         );
         let requestTick = Math.max(currentTick - (currentTick % 100) - 200, 0);
 
         const rooms = this.roomsBeingChecked[type][shard];
         if (rooms && rooms.length > 0) {
           if (
-            this.lastRequestAddedTickTimes[type][shard] !== undefined &&
-            requestTick - 100 > this.lastRequestAddedTickTimes[type][shard]
+            this.lastRequestAddedTick[type][shard] !== undefined &&
+            requestTick - 100 > this.lastRequestAddedTick[type][shard]
           ) {
-            requestTick = this.lastRequestAddedTickTimes[type][shard] + 100;
+            requestTick = this.lastRequestAddedTick[type][shard] + 100;
           }
 
-          if (this.lastRequestAddedTickTimes[type][shard] !== requestTick) {
+          if (this.lastRequestAddedTick[type][shard] !== requestTick) {
             for (let r = 0; r < rooms.length; r += 1) {
               const room = rooms[r];
               const dataRequest = {
@@ -188,7 +188,7 @@ export default class DataRequestsBroker {
               };
               this.requests.push(dataRequest);
             };
-            this.lastRequestAddedTickTimes[type][shard] = requestTick;
+            this.lastRequestAddedTick[type][shard] = requestTick;
             addedRequests = true;
           }
         }
