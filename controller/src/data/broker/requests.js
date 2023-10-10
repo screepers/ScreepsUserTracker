@@ -129,8 +129,10 @@ export default class DataRequestsBroker {
 
   static getRequest() {
     const request = this.requests.shift()
-    if (!this.lastRequestRemoved[request.type]) this.lastRequestRemoved[request.type] = {}
-    this.lastRequestRemoved[request.type][request.shard] = request.tick
+    if (request) {
+      if (!this.lastRequestRemoved[request.type]) this.lastRequestRemoved[request.type] = {}
+      this.lastRequestRemoved[request.type][request.shard] = request.tick
+    }
     return request;
   }
 
