@@ -17,13 +17,10 @@ async function getProxies(pageSize, pageIndex) {
 async function getAllProxies() {
   try {
     const targetProxiesCount = Number(process.env.WEBSHARE_PROXYAMOUNT);
-    const maxPageIndex = Math.ceil(targetProxiesCount / 100);
-
 
     let proxies = []
-    for (let p = 1; p < maxPageIndex + 1; p += 1) {
-      const proxyCount = (targetProxiesCount - 100 * (maxPageIndex - 1)) % 100;
-      proxies = proxies.concat(await getProxies(proxyCount, p));
+    for (let p = 1; p < 2; p += 1) {
+      proxies = proxies.concat(await getProxies(targetProxiesCount, p));
     }
 
     console.log(`Loaded ${proxies.length} proxies`);

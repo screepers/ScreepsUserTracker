@@ -42,7 +42,7 @@ export async function GetWorldSize(shard) {
   try {
     const size = await api.raw.game.worldSize(shard);
     if (!size.ok) throw new Error(JSON.stringify(size));
-    logger.debug(size);
+    logger.info(size);
     return size;
   } catch (error) {
     logger.error(error);
@@ -62,7 +62,7 @@ export async function GetGameTime(shard) {
     const timeResult = await api.raw.game.time(shard);
     if (typeof timeResult !== "object" || !timeResult.ok)
       throw new Error(JSON.stringify(timeResult));
-    logger.debug(timeResult);
+    logger.info(timeResult);
     lastTickCache[shard] = {
       tick: timeResult.time,
       lastUpdate: Date.now(),
