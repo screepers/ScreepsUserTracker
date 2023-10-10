@@ -19,19 +19,21 @@ export default class DataRequestsBroker {
 
   static roomsBeingChecked = {};
 
-  static lastTickTimes = {};
+  static lastRequestAddedTickTimes = {};
 
   static knownTickTimes = {};
+
+  static lastRequestRemoved = {}
 
   static async constructorAsync() {
     this.roomsBeingChecked = this.getRoomsBeingChecked();
     this.requests = this.getRequests();
     for (let dt = 0; dt < dataTypes.length; dt += 1) {
       const dataType = dataTypes[dt];
-      this.lastTickTimes[dataType] = {};
+      this.lastRequestAddedTickTimes[dataType] = {};
       for (let s = 0; s < shards.length; s += 1) {
         const shard = shards[s];
-        this.lastTickTimes[dataType][shard] =
+        this.lastRequestAddedTickTimes[dataType][shard] =
           process.env.START_FROM_TICK ? Number(process.env.START_FROM_TICK) : await GetGameTime(shard);
       }
     }
@@ -69,9 +71,10 @@ export default class DataRequestsBroker {
   static getStatusObject(type) {
     return {
       requestCount: this.getRequestsByType(type).length,
-      lastTickTimes: this.lastTickTimes[type],
+      lastRequestAddedTickTimes: this.lastRequestAddedTickTimes[type],
       knownTickTimes: this.knownTickTimes,
-      roomsBeingChecked: this.roomsBeingChecked[type]
+      roomsBeingChecked: this.roomsBeingChecked[type],
+      lastRequestRemoved: this.lastRequestRemoved[type]
     }
   }
 
@@ -125,7 +128,10 @@ export default class DataRequestsBroker {
   }
 
   static getRequest() {
-    return this.requests.shift()
+    const request = this.requests.shift()
+    if (!this.lastRequestRemoved[request.type]) this.lastRequestRemoved[request.type] = {}
+    this.lastRequestRemoved[request.type][request.shard] = request.tick
+    return request;
   }
 
   static async getCurrentTick(type, shard) {
@@ -142,7 +148,7 @@ export default class DataRequestsBroker {
       return tick;
     }
 
-    return this.lastTickTimes[type][shard] || 0;
+    return this.lastRequestAddedTickTimes[type][shard] || 0;
   }
 
   static async syncRequests() {
@@ -163,13 +169,13 @@ export default class DataRequestsBroker {
         const rooms = this.roomsBeingChecked[type][shard];
         if (rooms && rooms.length > 0) {
           if (
-            this.lastTickTimes[type][shard] !== undefined &&
-            requestTick - 100 > this.lastTickTimes[type][shard]
+            this.lastRequestAddedTickTimes[type][shard] !== undefined &&
+            requestTick - 100 > this.lastRequestAddedTickTimes[type][shard]
           ) {
-            requestTick = this.lastTickTimes[type][shard] + 100;
+            requestTick = this.lastRequestAddedTickTimes[type][shard] + 100;
           }
 
-          if (this.lastTickTimes[type][shard] !== requestTick) {
+          if (this.lastRequestAddedTickTimes[type][shard] !== requestTick) {
             for (let r = 0; r < rooms.length; r += 1) {
               const room = rooms[r];
               const dataRequest = {
@@ -180,7 +186,7 @@ export default class DataRequestsBroker {
               };
               this.requests.push(dataRequest);
             };
-            this.lastTickTimes[type][shard] = requestTick;
+            this.lastRequestAddedTickTimes[type][shard] = requestTick;
             addedRequests = true;
           }
         }
