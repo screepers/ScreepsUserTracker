@@ -48,7 +48,7 @@ export default async function GetGameTime(shard) {
     const timeResult = await api.raw.game.time(shard);
     if (typeof timeResult !== "object" || !timeResult.ok)
       throw new Error(JSON.stringify(timeResult));
-    logger.info(`${shard}/${timeResult.time}`);
+    logger.info(`TickApi: ${shard}/${timeResult.time}`);
     lastTickCache[shard] = {
       tick: timeResult.time,
       lastUpdate: Date.now(),
