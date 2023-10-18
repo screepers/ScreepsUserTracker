@@ -1,15 +1,9 @@
-import io from "socket.io-client";
-import { dataRequestBroker as logger } from "./logger.js";
+import { CronJob } from "cron";
+import ProcessDataBroker from "../data/broker/processData.js";
+import DataRequestsBroker from "../data/broker/requests.js";
 import GetRoomHistory from "./screepsApi.js";
 
-let websocket = null;
-if (process.env.GETTER_DISABLED !== "TRUE") {
-  const controllerIp = process.env.CONTROLLER_IP;
-  websocket = io(
-    `ws://${controllerIp.replace("http://", "").replace("https://", "")}`,
-    { cookie: false }
-  );
-}
+let count = 0;
 
 function wait(ms) {
   // eslint-disable-next-line no-promise-executor-return
@@ -27,23 +21,9 @@ export default class DataRequestBroker {
     this.proxy = proxy;
   }
 
-  static async getDataRequest() {
-    const timeout = new Promise((resolve) => {
-      setTimeout(resolve, 60 * 1000, null);
-    });
-    const getRequest = new Promise((resolve) => {
-      websocket.emit("request");
-      websocket.on("request", (data) => {
-        resolve(JSON.parse(data));
-      });
-    });
-
-    const dataRequest = await Promise.race([timeout, getRequest]);
-    return dataRequest;
-  }
-
-  static async emitData(data) {
-    websocket.emit("data", JSON.stringify(data));
+  static getDataRequest() {
+    const request = DataRequestsBroker.getRequest();
+    return request;
   }
 
   static sendDataResult(dataResult, dataRequest, force = false) {
@@ -64,13 +44,14 @@ export default class DataRequestBroker {
         return;
     }
 
-    DataRequestBroker.emitData(data)
+    ProcessDataBroker.single(data);
+    count += 1;
   }
 
   async executeSingle(forceDataRequest = undefined) {
-    const dataRequest = forceDataRequest || (await DataRequestBroker.getDataRequest());
+    const dataRequest = forceDataRequest || (DataRequestBroker.getDataRequest());
     if (!dataRequest) {
-      if (process.env.GETTER_DISABLED !== "TRUE") await wait(10 * 1000);
+      await wait(10 * 1000);
       return this.executeSingle();
     }
 
@@ -79,10 +60,6 @@ export default class DataRequestBroker {
     const { tick } = dataRequest;
 
     const dataResult = await GetRoomHistory(this.proxy, shard, room, tick);
-
-    if (dataResult.status === "Success")
-      logger.debug(`Got data for ${shard}/${room}/${tick}`);
-    else logger.debug(`Failed to get data for ${shard}/${room}/${tick}`);
 
     if (dataResult.status === "Success")
       DataRequestBroker.sendDataResult(
@@ -98,11 +75,19 @@ export default class DataRequestBroker {
       if (dataRequest.retries < 2) return this.executeSingle(dataRequest);
       if (dataResult.status === "Not found")
         DataRequestBroker.sendDataResult(dataResult.result, dataRequest, true);
-      else
-        logger.debug(
-          `Failed to get data for ${dataRequest.shard}/${dataRequest.room}/${dataRequest.tick} after 2 retries`
-        );
     }
     return this.executeSingle();
   }
 }
+
+const logStatus = new CronJob(
+  "* * * * *",
+  () => {
+    console.log(count, "per minute", Math.round(count / 60), "per second");
+    count = 0;
+  },
+  null,
+  false,
+  "Europe/Amsterdam"
+);
+logStatus.start();

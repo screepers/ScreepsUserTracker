@@ -9,6 +9,7 @@ import {
   ActionListDefaultValuesFiller,
 } from "../helper.js";
 import GetIntents from "../intentsHelper.js";
+// import { GetUsernameById } from "../../../rooms/userHelper.js";
 
 const websocket = io(`ws://${process.env.TERMINAL_IP}`, { cookie: false });
 
@@ -35,6 +36,7 @@ export default function handleObjects(username, objects, extras = {}) {
   const summarize = summarizeObjects(objects);
   const { structures } = summarize;
   const { structuresByType } = summarize;
+  const { controller } = summarize;
   if (isFirstTick) {
     const { creeps } = summarize;
     const { constructionSites } = summarize;
@@ -137,9 +139,9 @@ export default function handleObjects(username, objects, extras = {}) {
         `constructionSites.progressPercentage`,
         constructionSites.length > 0
           ? constructionSites.reduce((acc, site) => {
-              acc += site.progress / site.progressTotal;
-              return acc;
-            }, 0) / constructionSites.length
+            acc += site.progress / site.progressTotal;
+            return acc;
+          }, 0) / constructionSites.length
           : 0,
         ActionType.FirstTickOnly
       )
@@ -188,9 +190,7 @@ export default function handleObjects(username, objects, extras = {}) {
     // #endregion
 
     // #region Controller
-    const controllers = structuresByType.controller;
-    if (controllers && controllers.length > 0) {
-      const controller = controllers[0];
+    if (controller) {
       actions.push(
         CreateAction(
           `controller.level`,
@@ -295,10 +295,15 @@ export default function handleObjects(username, objects, extras = {}) {
   }
   // #endregion
 
+  // #endregion
+
+
+
   // #region Terminal storage changes
   const terminals = structuresByType.terminal;
   if (terminals && terminals.length > 0) {
     const terminal = terminals[0];
+    // const username = GetUsernameById();
     websocket.emit(
       "terminal",
       JSON.stringify({
@@ -312,23 +317,12 @@ export default function handleObjects(username, objects, extras = {}) {
   }
   // #endregion
 
-  // #endregion
-
-  // #region Divide100
-
   // #region Controller
-  const originalControllers = summarize.controllers;
-  let rclPerTick = 0;
-  if (originalControllers && originalControllers.length > 0) {
-    const originalController = originalControllers[0];
-    const controller = objects[originalController._id] || {};
-    if (controller._upgraded) {
-      rclPerTick = controller._upgraded;
-    }
+
+  if (controller) {
+    actions.push(CreateAction('controller.rclPerTick', controller._upgraded || 0, ActionType.Divide100))
   }
-  actions.push(
-    CreateAction(`controller.rclPerTick`, rclPerTick, ActionType.Divide100)
-  );
+
   // #endregion
 
   // #region IntentsCategories
@@ -395,17 +389,16 @@ export default function handleObjects(username, objects, extras = {}) {
   // #endregion
 
   // #region Spawn
-  const originalSpawns = summarize.spawns;
-  const spawnCount = originalSpawns.length;
+  const spawns = summarize.structuresByType.spawn;
+  const spawnCount = spawns.length;
   let spawnDuration = 0;
-  originalSpawns.forEach((originalSpawn) => {
+  for (let s = 0; s < spawns.length; s += 1) {
+    const spawn = spawns[s];
     const maxSpawnTime = Math.floor(currentTick / 100) * 100 + 100;
-
-    const spawn = objects[originalSpawn._id] || {};
     if (spawn.spawning)
       spawnDuration +=
         Math.min(spawn.spawning.spawnTime, maxSpawnTime) - currentTick;
-  });
+  };
   actions.push(
     CreateAction(
       `spawning.spawnUptimePercentage`,

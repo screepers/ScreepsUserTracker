@@ -8,7 +8,11 @@ import DataRequestsBroker from "./data/broker/requests.js";
 import { ownedLogger as logger } from "./logger.js";
 import websocketConnection from "./websocket/connect.js";
 import { removeAllOfflineIps, getRoomsPerCycle, IpRouter } from "./ips.js";
+import adminUtilsStart from "./adminUtilsTracker/index.js";
+import LocalDataRequestBroker from "./localDataRequestBroker/index.js";
 
+
+const debug = process.env.DEBUG === "TRUE"
 const app = express();
 const port = 5001;
 let isOnlineMode = 0;
@@ -43,7 +47,7 @@ app.get("/api/healthCheck", (req, res) => {
   });
 });
 
-async function requestRoomUpdater() {
+async function initialRoomUpdater() {
   if (isOnlineMode < 1) return;
   const start = Date.now();
   await UpdateRooms();
@@ -67,6 +71,7 @@ async function requestRoomUpdater() {
     );
     userCount += roomsToCheck.userCount;
     roomCount += roomsToCheck.roomCount;
+    await OwnedDataBroker.UploadStatus();
   } else if (dataTypes.includes("reserved")) {
     const roomsToCheck = ReservedDataBroker.getRoomsToCheck(
       roomsPerCycle,
@@ -74,6 +79,7 @@ async function requestRoomUpdater() {
     );
     userCount += roomsToCheck.userCount;
     roomCount += roomsToCheck.roomCount;
+    await ReservedDataBroker.UploadStatus();
   }
 
   DataRequestsBroker.saveRoomsBeingChecked(types);
@@ -86,9 +92,30 @@ async function requestRoomUpdater() {
   );
 }
 
-const requestRoomUpdaterJob = new CronJob(
-  "0 * * * *",
-  requestRoomUpdater,
+const initialRoomUpdaterJob = new CronJob(
+  debug ? "*/10 * * * *" : "0 * * * *",
+  initialRoomUpdater,
+  null,
+  false,
+  "Europe/Amsterdam"
+);
+
+async function callSyncRequests() {
+  DataRequestsBroker.syncRequests();
+  DataRequestsBroker.saveRequests()
+
+  const dataTypes = process.env.DATA_TYPES;
+  if (dataTypes.includes("owned")) {
+    await OwnedDataBroker.UploadStatus();
+  }
+  if (dataTypes.includes("reserved")) {
+    await ReservedDataBroker.UploadStatus();
+  }
+}
+
+const syncRequestsJob = new CronJob(
+  "*/1 * * * *",
+  callSyncRequests,
   null,
   false,
   "Europe/Amsterdam"
@@ -102,9 +129,14 @@ const httpServer = app.listen(port, async () => {
   isOnlineMode = 1;
 
   logger.info("Starting initial room update!");
-  await requestRoomUpdater();
+  await initialRoomUpdater();
   logger.info("Finished initial room update!");
+  console.log('Finished')
 
-  requestRoomUpdaterJob.start();
-  websocketConnection(httpServer);
+  initialRoomUpdaterJob.start();
+  syncRequestsJob.start();
+  if (process.env.GETTER_DISABLED !== "TRUE") websocketConnection(httpServer);
+  else LocalDataRequestBroker.start();
 });
+
+if (process.env.POSTGRES_ENABLED === "TRUE" && process.env.PRIVATE_SERVER_HOST) adminUtilsStart();

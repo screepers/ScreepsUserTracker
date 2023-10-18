@@ -2,7 +2,19 @@ import fs from "fs";
 import AdvancedScreepsApi from "screeps-advanced-api";
 import { ownedLogger as logger } from "../logger.js";
 
-const advancedScreepsApi = new AdvancedScreepsApi(process.env.SCREEPS_TOKEN);
+let loginInfo = process.env.SCREEPS_TOKEN;
+if (process.env.PRIVATE_SERVER_USERNAME) {
+  loginInfo = {
+    protocol: process.env.PRIVATE_SERVER_PROTOCOL,
+    hostname: process.env.PRIVATE_SERVER_HOST,
+    port: process.env.PRIVATE_SERVER_PORT,
+    path: "/",
+    username: process.env.PRIVATE_SERVER_USERNAME,
+    password: process.env.PRIVATE_SERVER_PASSWORD
+  }
+}
+
+const advancedScreepsApi = new AdvancedScreepsApi(loginInfo);
 
 fs.mkdirSync("./files", { recursive: true });
 
@@ -21,10 +33,12 @@ function roomCount(shards) {
 
 async function UpdateRooms() {
   try {
-    const users = await advancedScreepsApi.getAllUsers();
+    const forcedUsers = process.env.USERNAMES.length > 0 ? process.env.USERNAMES.split(",") : [];
+    let users = (await advancedScreepsApi.getAllUsers())
+    users = users.filter(forcedUsers.length > 0 ? (user) => forcedUsers.includes(user.username) : () => true);
     users.sort((a, b) => roomCount(b.shards) - roomCount(a.shards));
 
-    fs.writeFileSync("./files/users.json", JSON.stringify(users));
+    fs.writeFileSync("./files/users.json", JSON.stringify(users, null, 2));
     await sleep(30 * 1000);
   } catch (error) {
     if (error.message && error.message.startsWith("Rate limit exceeded"))

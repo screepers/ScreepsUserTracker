@@ -81,7 +81,7 @@ export function getDefaultActions(type, isFirstTick = true) {
   const fileName = `./files/defaultActions.${type}.json`;
   let data = [];
   if (fs.existsSync(fileName)) data = JSON.parse(fs.readFileSync(fileName));
-  else fs.writeFileSync(fileName, JSON.stringify([]));
+  else fs.writeFileSync(fileName, JSON.stringify([], null, 2));
 
   defaultActionsPerType[type] = { data, time };
   return !isFirstTick ? getDivide100Data(data) : data;
@@ -94,7 +94,7 @@ function addNewDefaultAction(action, type) {
 
   action.value = 0;
   file.push(action);
-  fs.writeFileSync(fileName, JSON.stringify(file));
+  fs.writeFileSync(fileName, JSON.stringify(file, null, 2));
   defaultActionsPerType[type].data = file;
 }
 

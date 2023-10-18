@@ -16,7 +16,7 @@ async function getProxies(pageSize, pageIndex) {
 // eslint-disable-next-line import/prefer-default-export
 export async function getAllProxies() {
   try {
-    const targetProxiesCount = process.env.WEBSHARE_PROXYAMOUNT;
+    const targetProxiesCount = Number(process.env.WEBSHARE_PROXYAMOUNT);
     const maxPageIndex = Math.ceil(targetProxiesCount / 100);
 
     let proxies = []
@@ -27,7 +27,6 @@ export async function getAllProxies() {
     console.log(`Loaded ${proxies.length} proxies`);
     return proxies;
   } catch (error) {
-    console.log(`Failed to load proxies: ${error.message}`);
     return [];
   }
 }

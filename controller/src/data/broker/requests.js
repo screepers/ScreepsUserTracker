@@ -1,8 +1,6 @@
-import * as dotenv from "dotenv";
+import 'dotenv/config';
 import fs from "fs";
-import { GetGameTime } from "../screepsApi.js";
-
-dotenv.config();
+import GetGameTime from "../screepsApi.js";
 
 const shards = process.env.SHARDS.split(" ");
 const dataTypes = process.env.DATA_TYPES.split(" ");
@@ -19,23 +17,24 @@ function wait(ms) {
 export default class DataRequestsBroker {
   static requests;
 
-  static roomsBeingChecked;
+  static roomsBeingChecked = {};
 
-  static lastTickTimes = {};
+  static lastRequestAddedTick = {};
 
-  static knownTickTimes = {};
+  static lastLiveTick = {};
+
+  static lastRequestRemoved = {}
 
   static async constructorAsync() {
-    this.requests = this.getRequests();
     this.roomsBeingChecked = this.getRoomsBeingChecked();
+    this.requests = this.getRequests();
     for (let dt = 0; dt < dataTypes.length; dt += 1) {
       const dataType = dataTypes[dt];
-      this.lastTickTimes[dataType] = {};
+      this.lastRequestAddedTick[dataType] = {};
       for (let s = 0; s < shards.length; s += 1) {
         const shard = shards[s];
-        this.lastTickTimes[dataType][shard] =
-          Number(process.env[`START_FROM_TICK_${dataType.toUpperCase()}`]) ||
-          (await GetGameTime(shard));
+        this.lastRequestAddedTick[dataType][shard] =
+          process.env.START_FROM_TICK ? Number(process.env.START_FROM_TICK) : await GetGameTime(shard);
       }
     }
 
@@ -51,11 +50,11 @@ export default class DataRequestsBroker {
 
   static saveRoomsBeingChecked(rooms) {
     fs.mkdirSync(roomsCheckedFolderPath, { recursive: true });
-    fs.writeFileSync(roomsCheckedPath, JSON.stringify(rooms));
+    fs.writeFileSync(roomsCheckedPath, JSON.stringify(rooms, null, 2));
 
     this.roomsBeingChecked = rooms;
-    this.saveRequests();
     this.syncRequests();
+    this.saveRequests();
   }
 
   static getRequests() {
@@ -65,18 +64,25 @@ export default class DataRequestsBroker {
     return [];
   }
 
+  static getRequestsByType(type) {
+    return this.requests.filter((r) => r.type === type);
+  }
+
+  static getStatusObject(type) {
+    return {
+      requestCount: this.getRequestsByType(type).length,
+      roomsBeingChecked: this.roomsBeingChecked[type],
+      lastLiveTick: this.lastLiveTick,
+      lastRequestAddedTick: this.lastRequestAddedTick[type],
+      lastRequestRemoved: this.lastRequestRemoved[type]
+    }
+  }
+
   static saveRequests() {
     fs.mkdirSync(requestsFolderPath, { recursive: true });
 
     const noDuplicatedRequests = [];
     const noDuplicatedRequestsAggregator = {};
-
-    this.requests.sort((a, b) => {
-      if (a.tick !== b.tick) return a.tick - b.tick;
-      if (a.shard !== b.shard) return a.shard - b.shard;
-      if (a.room !== b.room) return a.room.localeCompare(b.room);
-      return a.type.localeCompare(b.type);
-    });
 
     this.requests.forEach((r) => {
       if (!noDuplicatedRequestsAggregator[r.type])
@@ -106,30 +112,45 @@ export default class DataRequestsBroker {
         );
       });
     });
-
-    fs.writeFileSync(requestsPath, JSON.stringify(this.requests));
     this.requests = noDuplicatedRequests;
+
+    this.requests.sort((a, b) => {
+      a.tick = Number(a.tick);
+      b.tick = Number(b.tick);
+
+      if (a.tick !== b.tick) return a.tick - b.tick;
+      if (a.type !== b.type) return a.type.localeCompare(b.type);
+      if (a.shard !== b.shard) return a.shard - b.shard;
+      if (a.room !== b.room) return a.room.localeCompare(b.room);
+      return 0; // If all properties are the same, return 0 to maintain their relative order.
+    });
+    fs.writeFileSync(requestsPath, JSON.stringify(this.requests, null, 2));
   }
 
   static getRequest() {
-    return this.requests.shift()
+    const request = this.requests.shift()
+    if (request) {
+      if (!this.lastRequestRemoved[request.type]) this.lastRequestRemoved[request.type] = {}
+      this.lastRequestRemoved[request.type][request.shard] = request.tick
+    }
+    return request;
   }
 
   static async getCurrentTick(type, shard) {
     const time = Date.now();
-    if (this.knownTickTimes[shard]) {
-      const knownTick = this.knownTickTimes[shard];
+    if (this.lastLiveTick[shard]) {
+      const knownTick = this.lastLiveTick[shard];
       if (time - knownTick.time < 60 * 1000) return knownTick.data;
     }
 
     await wait(500);
     const tick = await GetGameTime(shard);
     if (tick) {
-      this.knownTickTimes[shard] = { data: tick, time };
+      this.lastLiveTick[shard] = { data: tick, time };
       return tick;
     }
 
-    return this.lastTickTimes[type][shard] || 0;
+    return this.lastRequestAddedTick[type][shard] || 0;
   }
 
   static async syncRequests() {
@@ -143,21 +164,22 @@ export default class DataRequestsBroker {
         const currentTick = await this.getCurrentTick(
           type,
           shard,
-          this.knownTickTimes
+          this.lastLiveTick
         );
-        let requestTick = Math.max(currentTick - (currentTick % 100) - 1000, 0);
+        let requestTick = Math.max(currentTick - (currentTick % 100) - 200, 0);
 
         const rooms = this.roomsBeingChecked[type][shard];
         if (rooms && rooms.length > 0) {
           if (
-            this.lastTickTimes[type][shard] !== undefined &&
-            requestTick - 100 > this.lastTickTimes[type][shard]
+            this.lastRequestAddedTick[type][shard] !== undefined &&
+            requestTick - 100 > this.lastRequestAddedTick[type][shard]
           ) {
-            requestTick = this.lastTickTimes[type][shard] + 100;
+            requestTick = this.lastRequestAddedTick[type][shard] + 100;
           }
 
-          if (this.lastTickTimes[type][shard] !== requestTick) {
-            rooms.forEach((room) => {
+          if (this.lastRequestAddedTick[type][shard] !== requestTick) {
+            for (let r = 0; r < rooms.length; r += 1) {
+              const room = rooms[r];
               const dataRequest = {
                 room,
                 shard,
@@ -165,15 +187,15 @@ export default class DataRequestsBroker {
                 type,
               };
               this.requests.push(dataRequest);
-            });
-            this.lastTickTimes[type][shard] = requestTick;
+            };
+            this.lastRequestAddedTick[type][shard] = requestTick;
             addedRequests = true;
           }
         }
       }
     }
 
-    if (addedRequests) {
+    if (addedRequests && this.requests.length < 100 * 1000) {
       this.syncRequests();
     }
   }

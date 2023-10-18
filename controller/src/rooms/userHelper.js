@@ -2,6 +2,7 @@ import fs from "fs";
 
 const roomsCache = {
   data: {},
+  userById: {},
   lastUpdate: 0,
 };
 
@@ -11,6 +12,12 @@ function updateCacheIfRequired() {
   if (fs.existsSync(`files/users.json`)) {
     const rooms = fs.readFileSync(`files/users.json`);
     roomsCache.data = JSON.parse(rooms);
+
+    const users = Object.values(roomsCache.data);
+    for (let u = 0; u < users.length; u += 1) {
+      const user = users[u];
+      roomsCache.userById[user.id] = user;
+    }
   }
   roomsCache.lastUpdate = Date.now();
 }
@@ -69,12 +76,6 @@ export function GetUsername(room, shard) {
 export function GetUsernameById(id) {
   updateCacheIfRequired();
 
-  const usernames = GetUsernames();
-  for (let u = 0; u < usernames.length; u += 1) {
-    const username = usernames[u];
-    const user = GetUserData(username);
-    if (user.id === id) {
-      return username;
-    }
-  }
+  const user = roomsCache.userById[id];
+  if (user) return user.username;
 }

@@ -1,4 +1,5 @@
 import BaseDataBroker from "../base.js";
+// eslint-disable-next-line import/no-cycle
 import ReservedDataBroker from "./reserved.js";
 import {
   GetUsernames,
@@ -6,6 +7,7 @@ import {
   GetRoomTotal,
 } from "../../../rooms/userHelper.js";
 import { handleCombinedRoomStats } from "../../handle/helper.js";
+import DataRequestsBroker from "../requests.js";
 
 export default class OwnedDataBroker extends BaseDataBroker {
   static Type = "owned";
@@ -14,6 +16,21 @@ export default class OwnedDataBroker extends BaseDataBroker {
 
   static AddRoomData(username, shard, roomName, data) {
     super.AddRoomData(username, shard, roomName, data);
+  }
+
+  static async UploadStatus() {
+    const start = Date.now();
+
+    await super.Upload(
+      {
+        status: { [this.Type]: DataRequestsBroker.getStatusObject(this.Type) },
+      },
+      undefined,
+      {
+        start,
+        type: `${this.Type}Status`,
+      }
+    );
   }
 
   static async UploadUsers(username) {
@@ -42,9 +59,11 @@ export default class OwnedDataBroker extends BaseDataBroker {
       for (let j = 0; j < roomNames.length; j += 1) {
         const roomName = roomNames[j];
         const roomData = shardData[roomName];
-        userStats.shards[shardName][roomName] = roomData.stats;
-
-        if (!historyTicks[shardName]) historyTicks[shardName] = roomData.tick;
+        if (roomData) {
+          userStats.shards[shardName][roomName] = roomData.stats;
+          if (!historyTicks[shardName]) historyTicks[shardName] = roomData.tick;
+          if (!timestamp) timestamp = roomData.timestamp;
+        }
       }
     }
 
@@ -52,9 +71,49 @@ export default class OwnedDataBroker extends BaseDataBroker {
       userStats.shards,
       this.Type
     );
+
+    const userData = GetUserData(username)
+    const ownedCount = GetRoomTotal(userData.shards, this.Type);
+    function getAveragedStatsObject() {
+      return {
+        spawning: {
+          spawnUptimePercentage: 0,
+        },
+      }
+    }
+
+    userStats.averaged = {
+      shards: {},
+    };
+
+    for (let s = 0; s < shardNames.length; s += 1) {
+      const shardName = shardNames[s];
+      const shardData = this.users[username][shardName];
+      userStats.averaged.shards[shardName] = getAveragedStatsObject();
+
+      const roomNames = Object.keys(shardData);
+      for (let r = 0; r < roomNames.length; r += 1) {
+        const roomName = roomNames[r];
+
+        const isOwned = userStats.shards[shardName][roomName].spawning !== undefined;
+        if (isOwned) {
+          userStats.averaged.shards[shardName].spawning.spawnUptimePercentage +=
+            userStats.shards[shardName][roomName].spawning.spawnUptimePercentage / ownedCount;
+        }
+      }
+    }
+
     if (process.env.ONLY_COMBINED_DATA_UPLOAD === "true")
       delete userStats.shards;
     stats[username] = { stats: userStats };
+
+    for (let i = 0; i < shardNames.length; i += 1) {
+      const shardName = shardNames[i];
+      const rooms = this.users[username][shardName];
+
+      const roomNames = Object.keys(rooms);
+      this.AddRooms(username, shardName, roomNames, true);
+    };
 
     await super.Upload(
       {
@@ -77,7 +136,8 @@ export default class OwnedDataBroker extends BaseDataBroker {
     let userCount = 0;
     let roomCount = 0;
 
-    usernames.forEach((username) => {
+    for (let u = 0; u < usernames.length; u += 1) {
+      const username = usernames[u];
       const userData = GetUserData(username);
 
       userData.total = !addReservedRooms
@@ -89,23 +149,24 @@ export default class OwnedDataBroker extends BaseDataBroker {
 
         if (!types[this.Type]) types[this.Type] = {};
         const shardRooms = types[this.Type];
-
         Object.entries(userData.shards).forEach(([shard, data]) => {
           if (!shardRooms[shard]) {
             shardRooms[shard] = [];
           }
           shardRooms[shard].push(...data.owned);
           this.AddRooms(username, shard, data.owned);
+          if (addReservedRooms) this.AddRooms(username, shard, [...data.owned, ...data.reserved])
         });
 
         if (addReservedRooms)
           ReservedDataBroker.getRoomsToCheckByUsername(
             username,
             types,
-            userData
+            userData,
+            true
           );
       }
-    });
+    };
 
     return { userCount, roomCount };
   }

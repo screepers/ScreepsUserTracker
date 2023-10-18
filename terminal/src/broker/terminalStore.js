@@ -11,9 +11,12 @@ export default class TerminalStoreBroker {
     if (!this.terminals[data.shard]) this.terminals[data.shard] = {};
     if (!this.terminals[data.shard][data.tick]) this.terminals[data.shard][data.tick] = {};
 
-    const completeStore = this.completeTerminals[data.shard] && this.completeTerminals[data.shard][data.room] ? this.completeTerminals[data.shard][data.room] : {};
+    const completeStore =
+      this.completeTerminals[data.shard] &&
+        this.completeTerminals[data.shard][data.room] ? this.completeTerminals[data.shard][data.room] : {};
     if (!this.completeTerminals[data.shard]) this.completeTerminals[data.shard] = {};
-    if (!this.completeTerminals[data.shard][data.room]) this.completeTerminals[data.shard][data.room] = data.terminalStore;
+    if (!this.completeTerminals[data.shard][data.room])
+      this.completeTerminals[data.shard][data.room] = data.terminalStore;
 
     const changesInStore = {};
     const resourceTypes = Object.keys(data.terminalStore);
@@ -23,7 +26,8 @@ export default class TerminalStoreBroker {
         changesInStore[resourceType] = data.terminalStore[resourceType];
       } else if (completeStore[resourceType] && !data.terminalStore[resourceType]) {
         changesInStore[resourceType] = -completeStore[resourceType];
-      } else if (completeStore[resourceType] && data.terminalStore[resourceType] && completeStore[resourceType] - data.terminalStore[resourceType] !== 0) {
+      } else if (completeStore[resourceType] &&
+        data.terminalStore[resourceType] && completeStore[resourceType] - data.terminalStore[resourceType] !== 0) {
         changesInStore[resourceType] = data.terminalStore[resourceType] - completeStore[resourceType];
       }
 

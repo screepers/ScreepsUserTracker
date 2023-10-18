@@ -60,13 +60,15 @@ export default class TickBroker {
         if (amount === 0) continue;
 
         if (!groupedByResourceTypeByAmount[resourceType]) groupedByResourceTypeByAmount[resourceType] = {};
-        if (!groupedByResourceTypeByAmount[resourceType][amount]) groupedByResourceTypeByAmount[resourceType][amount] = [];
+        if (!groupedByResourceTypeByAmount[resourceType][amount])
+          groupedByResourceTypeByAmount[resourceType][amount] = [];
         groupedByResourceTypeByAmount[resourceType][amount].push(roomName);
       }
     }
 
     // 2
-    // Loop through all transactions and check if the source terminal had the desired resource change, then find using the grouped data the room where the resources came/went to.
+    // Loop through all transactions and check if the source terminal had the desired resource change
+    // Then find using the grouped data the room where the resources came/went to.
     roomNameKeys = Object.keys(transactions);
     for (let i = 0; i < roomNameKeys.length; i += 1) {
       const roomName = roomNameKeys[i];
@@ -105,7 +107,8 @@ export default class TickBroker {
     }
 
 
-    console.log(`Found ${ordersFound.length} out of ${totalTransactionsToBeFound} orders for tick ${tick} on shard "${shard}"`)
+    console.log(
+      `Found ${ordersFound.length} out of ${totalTransactionsToBeFound} orders for tick ${tick} on shard "${shard}"`)
 
     Upload(ordersFoundObject)
 

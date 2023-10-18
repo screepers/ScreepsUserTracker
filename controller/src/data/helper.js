@@ -1,5 +1,22 @@
 import "dotenv/config";
 
+const structureTypes = ['road',
+  'constructedWall',
+  'rampart',
+  'spawn',
+  'extension',
+  'link',
+  'storage',
+  'tower',
+  'observer',
+  'powerSpawn',
+  'extractor',
+  'lab',
+  'terminal',
+  'container',
+  'nuker',
+]
+
 export function GetShards() {
   return process.env.SHARDS.split(" ");
 }
@@ -23,23 +40,23 @@ export function summarizeObjects(objects) {
     creeps: [],
     constructionSites: [],
     minerals: [],
-    controllers: [],
+    controller: undefined,
     spawns: [],
   };
 
-  const objectKeys = Object.keys(objects);
-  for (let o = 0; o < objectKeys.length; o += 1) {
-    const object = objectKeys[o];
-    if (object) {
-      if (object.type) {
-        if (!summarize.structuresByType[object.type])
-          summarize.structuresByType[object.type] = [];
-        summarize.structuresByType[object.type].push(object);
-      }
+  for (let t = 0; t < structureTypes.length; t += 1) {
+    const type = structureTypes[t];
+    summarize.structuresByType[type] = [];
+  }
 
+  const objectValues = Object.values(objects);
+  for (let o = 0; o < objectValues.length; o += 1) {
+    const object = objectValues[o];
+    if (object) {
       switch (object.type) {
         case "road":
-        case "wall":
+        case "rampart":
+        case "constructedWall":
         case "spawn":
         case "extension":
         case "link":
@@ -55,6 +72,7 @@ export function summarizeObjects(objects) {
           summarize.structures.push(object);
 
           if (object.type === "spawn") summarize.spawns.push(object);
+          summarize.structuresByType[object.type].push(object);
           break;
         case "creep":
           summarize.creeps.push(object);
@@ -66,7 +84,7 @@ export function summarizeObjects(objects) {
           summarize.minerals.push(object);
           break;
         case "controller":
-          summarize.controllers.push(object);
+          summarize.controller = object;
           break;
         default:
           break;

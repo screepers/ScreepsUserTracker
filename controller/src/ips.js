@@ -26,7 +26,7 @@ async function ipIsOnline(ip) {
 }
 function removeIp(ip) {
   const ips = getIps().filter((i) => i !== ip);
-  fs.writeFileSync("./files/ips.json", JSON.stringify(ips));
+  fs.writeFileSync("./files/ips.json", JSON.stringify(ips, null, 2));
 }
 
 export async function removeAllOfflineIps() {
@@ -42,10 +42,11 @@ export async function removeAllOfflineIps() {
 
 export function getRoomsPerCycle() {
   const ips = getIps();
+  const proxyCount = Number(process.env.WEBSHARE_PROXYAMOUNT) || 0;
   // tickSpeed * ticksPerCall * callsPerSecond
   const roomsPerIp = 4 * 100 * 2;
-  const roomsPerCycle = roomsPerIp * ips.length;
-  return roomsPerCycle * 100;
+  const roomsPerCycle = roomsPerIp * ((ips.length + proxyCount) || 1);
+  return roomsPerCycle;
 }
 
 export function IpRouter() {
@@ -70,7 +71,7 @@ export function IpRouter() {
 
       logger.info(`${req.ip}: Added! ${ip}`);
       ips.push(ip);
-      fs.writeFileSync("./files/ips.json", JSON.stringify(ips));
+      fs.writeFileSync("./files/ips.json", JSON.stringify(ips, null, 2));
       res.json("Success");
     } catch (e) {
       logger.error(`${e.message}\nStack of ${e.stack}`);
