@@ -11,7 +11,7 @@ volumes:
 
 services:
   controller:
-    build: controller
+    build: .
     volumes:
       - ./logs/controller:/app/logs
     restart: unless-stopped
