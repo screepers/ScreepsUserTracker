@@ -2,7 +2,7 @@ import * as dotenv from "dotenv";
 
 import graphite from "graphite";
 import postgres from 'postgres'
-import { graphiteLogger as logger } from "../../logger.js";
+import { graphiteLogger as logger } from "../../helper/logger.js";
 import { GetShards } from "../helper.js";
 import { GetUsernames } from "../../rooms/userHelper.js";
 import handleUsers from "../handle/users.js";

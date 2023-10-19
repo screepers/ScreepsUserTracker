@@ -1,7 +1,7 @@
 import { ScreepsAPI } from "screeps-api";
 import axios from "axios";
 import { HttpsProxyAgent } from "https-proxy-agent";
-import { apiLogger } from "../logger.js";
+import { apiLogger } from "../helper/logger.js";
 
 let path;
 switch (process.env.SERVER_TYPE) {

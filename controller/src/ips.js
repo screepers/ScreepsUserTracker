@@ -1,7 +1,7 @@
 import fs from "fs";
 import axios from "axios";
 import express from "express";
-import { ownedLogger as logger } from "./logger.js";
+import { ownedLogger as logger } from "./helper/logger.js";
 
 const DEBUG = process.env.DEBUG === "TRUE";
 const settings = {

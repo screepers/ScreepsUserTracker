@@ -5,7 +5,7 @@ import UpdateRooms from "./rooms/updateRooms.js";
 import OwnedDataBroker from "./data/broker/custom/owned.js";
 import ReservedDataBroker from "./data/broker/custom/reserved.js";
 import DataRequestsBroker from "./data/broker/requests.js";
-import { ownedLogger as logger } from "./logger.js";
+import { ownedLogger as logger } from "./helper/logger.js";
 import websocketConnection from "./websocket/connect.js";
 import { removeAllOfflineIps, getRoomsPerCycle, IpRouter } from "./ips.js";
 import adminUtilsStart from "./adminUtilsTracker/index.js";
