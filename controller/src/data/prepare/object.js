@@ -1,4 +1,4 @@
-import { GetUsernameById } from "../../rooms/userHelper.js";
+import { GetUsernameById } from "../../setup/userHelper.js";
 
 export default function prepareObject(object, originalObject) {
   if (originalObject.user) {

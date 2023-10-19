@@ -5,7 +5,7 @@ import {
   GetUsernames,
   GetUserData,
   GetRoomTotal,
-} from "../../../rooms/userHelper.js";
+} from "../../../setup/userHelper.js";
 import { handleCombinedRoomStats } from "../../handle/helper.js";
 import DataRequestsBroker from "../requests.js";
 

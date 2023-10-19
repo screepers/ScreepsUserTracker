@@ -1,7 +1,7 @@
 import handleOwnedObjects from "../handle/custom/objects.js";
 import handleReservedObjects from "../handle/custom/reservedRoom.js";
 
-import { GetUsername } from "../../rooms/userHelper.js";
+import { GetUsername } from "../../setup/userHelper.js";
 import { getStats, FindNewDefaultActions } from "../handle/helper.js";
 import OwnedDataBroker from "./custom/owned.js";
 import ReservedDataBroker from "./custom/reserved.js";

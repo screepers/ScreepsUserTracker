@@ -1,5 +1,5 @@
 import * as dotenv from "dotenv";
-import { GetUserData } from "../../rooms/userHelper.js";
+import { GetUserData } from "../../setup/userHelper.js";
 import { GetShards } from "../helper.js";
 // import { GetLeaderboardRankObject } from "../screepsApi.js"
 // import { GetGclObject} from "./helper.js"

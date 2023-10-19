@@ -1,45 +1,63 @@
-import AdvancedScreepsApi from "screeps-advanced-api";
-import fs from "fs";
 import { CronJob } from "cron";
 const debug = process.env.DEBUG === "TRUE"
+import { cleanSource } from "../helper";
 
-let loginInfo = process.env.SCREEPS_TOKEN;
-if (process.env.PRIVATE_SERVER_USERNAME) {
-  loginInfo = {
-    protocol: process.env.PRIVATE_SERVER_PROTOCOL,
-    hostname: process.env.PRIVATE_SERVER_HOST,
-    port: process.env.PRIVATE_SERVER_PORT,
-    path: "/",
-    username: process.env.PRIVATE_SERVER_USERNAME,
-    password: process.env.PRIVATE_SERVER_PASSWORD
-  }
+const baseCache = {
+  data: {},
+  lastUpdate: 0,
 }
-const advancedScreepsApi = new AdvancedScreepsApi(loginInfo);
-fs.mkdirSync("./files", { recursive: true });
+const roomsCache = cleanSource(baseCache)
+const usersCache = cleanSource(baseCache)
+const userRoomsCache = cleanSource(baseCache)
+const userByIdCache = cleanSource(baseCache)
 
-
-function roomCount(shards) {
-  let count = 0;
-  const shardNames = Object.keys(shards);
-  for (let s = 0; s < shardNames.length; s++) {
-    const shardName = shardNames[s];
-    const owned = shards[shardName].owned;
-    count += owned.length;
+function getCacheData(type) {
+  let cache = {}
+  switch (type) {
+    case 'rooms':
+      cache = roomsCache;
+      break;
+    case 'users':
+      cache = usersCache;
+      break;
+    case 'userRooms':
+      cache = userRoomsCache;
+      break;
+    case 'userById':
+      cache = userByIdCache;
+      break;
+    default:
+      break;
   }
-  return count;
+
+  const shouldUpdate = Date.now() - cache.lastUpdate > 1000 * 60;
+  if (!shouldUpdate) return cache.data;
+  cache.lastUpdate = Date.now();
+  switch (type) {
+    case 'rooms':
+      break;
+    case 'users':
+      break;
+    case 'userRooms':
+      break;
+    case 'userById':
+      break;
+    default:
+      break;
+  }
+  return cache.data;
 }
 
-async function UpdateRooms() {
-  try {
-    const forcedUsers = process.env.USERNAMES.length > 0 ? process.env.USERNAMES.split(",") : [];
-    let users = await advancedScreepsApi.getAllUsers()
-    users = users.filter(forcedUsers.length > 0 ? (user) => forcedUsers.includes(user.username) : () => true);
-    users.sort((a, b) => roomCount(b.shards) - roomCount(a.shards));
-
-    fs.writeFileSync("./files/users.json", JSON.stringify(users, null, 2));
-  } catch (error) {
-    logger.error(error);
+export default class Setup {
+  constructor() {
+    UpdateRooms();
   }
+
+
+  static get rooms() { return getCacheData('rooms') };
+  static get users() { return getCacheData('users') };
+  static get userRooms() { return getCacheData('userRooms') };
+  static get userById() { return getCacheData('userById') };
 }
 
 UpdateRooms();

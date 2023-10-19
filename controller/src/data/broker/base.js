@@ -4,7 +4,7 @@ import graphite from "graphite";
 import postgres from 'postgres'
 import { graphiteLogger as logger } from "../../helper/logger.js";
 import { GetShards } from "../helper.js";
-import { GetUsernames } from "../../rooms/userHelper.js";
+import { GetUsernames } from "../../setup/userHelper.js";
 import handleUsers from "../handle/users.js";
 import GetGameTime from "../screepsApi.js";
 
