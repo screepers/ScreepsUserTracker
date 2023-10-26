@@ -51,9 +51,9 @@ export default class Cache {
     return shouldUpdate;
   }
 
-  static getRoomsCache() {
+  static async getRoomsCache() {
     if (Cache.shouldUpdateCache('rooms')) {
-      Cache.updateRoomsCache();
+      await Cache.updateRoomsCache();
     }
     return roomsCache.data;
   }
@@ -65,22 +65,45 @@ export default class Cache {
     return usersCache.data;
   }
 
-  static getUserRoomsCache() {
+  static async getUserRoomsCache() {
     if (Cache.shouldUpdateCache('userRooms')) {
-      Cache.updateUserRoomsCache();
+      await Cache.updateUserRoomsCache();
     }
     return userRoomsCache.data;
   }
 
-  static getUserByIdCache() {
+  static async getUserByIdCache() {
     if (Cache.shouldUpdateCache('userById')) {
-      Cache.updateUserByIdCache();
+      await Cache.updateUserByIdCache();
     }
     return userByIdCache.data;
   }
 
-  static updateRoomsCache() {
+  static async updateRoomsCache() {
+    const userRooms = await Cache.getUserRoomsCache();
+    const shards = {};
+    const usernameKeys = Object.keys(userRooms);
+    for (let s = 0; s < usernameKeys.length; s += 1) {
+      const username = usernameKeys[s];
+      const shards = userRooms[username];
+      const shardKeys = Object.keys(shards);
+      for (let r = 0; r < shardKeys.length; r += 1) {
+        const shardName = shardKeys[r];
+        const shard = shards[shardName];
+        const shardRooms = shard.rooms;
+        const roomKeys = Object.keys(shardRooms);
+        for (let i = 0; i < roomKeys.length; i += 1) {
+          const roomName = roomKeys[i];
+          const room = {}
+          room.username = username;
+          room.shard = shardName;
+          room.type = shard.type;
+          shards[roomName] = room;
+        }
+      }
+    }
 
+    roomsCache.data = shards;
   }
 
   static async updateUsersCache() {
@@ -93,14 +116,21 @@ export default class Cache {
     usersCache.data = users;
   }
 
-  static updateUserRoomsCache() {
+  static async updateUserRoomsCache() {
+    const users = await Cache.getUsersCache();
+    const userRooms = {};
+    for (let u = 0; u < users.length; u += 1) {
+      const user = users[u];
+      userRooms[user.username] = user.shards;
+    }
 
+    userRoomsCache.data = userRooms;
   }
 
-  static updateUserByIdCache() {
+  static async updateUserByIdCache() {
     const userById = {};
 
-    const users = this.getUsersCache();
+    const users = await this.getUsersCache();
     const userValues = Object.values(users);
     for (let u = 0; u < userValues.length; u += 1) {
       const user = userValues[u];

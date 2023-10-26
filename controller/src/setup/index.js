@@ -6,9 +6,9 @@ const debug = process.env.DEBUG === "TRUE"
 export default class Setup {
   static async init() {
     await Cache.updateUsersCache();
-    Cache.updateRoomsCache();
-    Cache.updateUserRoomsCache();
-    Cache.updateUserByIdCache();
+    await Cache.updateRoomsCache();
+    await Cache.updateUserRoomsCache();
+    await Cache.updateUserByIdCache();
   }
 }
 
