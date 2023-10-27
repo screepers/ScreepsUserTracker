@@ -1,7 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import { CronJob } from "cron";
-import UpdateRooms from "./rooms/updateRooms.js";
+import InitCache from "./setup/index.js";
 import OwnedDataBroker from "./data/broker/custom/owned.js";
 import ReservedDataBroker from "./data/broker/custom/reserved.js";
 import DataRequestsBroker from "./data/broker/requests.js";
@@ -50,7 +50,7 @@ app.get("/api/healthCheck", (req, res) => {
 async function initialRoomUpdater() {
   if (isOnlineMode < 1) return;
   const start = Date.now();
-  await UpdateRooms();
+  await InitCache.init();
 
   const roomsPerCycle = getRoomsPerCycle();
 

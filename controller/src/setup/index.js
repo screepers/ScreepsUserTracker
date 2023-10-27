@@ -12,12 +12,11 @@ export default class Setup {
   }
 }
 
-// UpdateRooms();
-// const initialRoomUpdaterJob = new CronJob(
-//   debug ? "*/10 * * * *" : "0 * * * *",
-//   UpdateRooms,
-//   null,
-//   false,
-//   "Europe/Amsterdam"
-// );
-// initialRoomUpdaterJob.start();
+const initialRoomUpdaterJob = new CronJob(
+  debug ? "*/10 * * * *" : "0 * * * *",
+  Setup.init,
+  null,
+  false,
+  "Europe/Amsterdam"
+);
+initialRoomUpdaterJob.start();

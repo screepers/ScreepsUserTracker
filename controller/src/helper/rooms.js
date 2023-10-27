@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/prefer-default-export
 export function GetRoomTotal(shards, type) {
   let total = 0;
   const shardNames = Object.keys(shards);
@@ -19,4 +18,26 @@ export function GetRoomTotal(shards, type) {
   };
 
   return total;
+}
+
+export async function GetRoomToRequests(type) {
+  const shards = await Cache.getRoomsCache();
+  const rooms = [];
+  const shardNames = Object.keys(shards);
+  for (let s = 0; s < shardNames.length; s += 1) {
+    const shardName = shardNames[s];
+    const shardRooms = shards[shardName];
+    switch (type) {
+      case "owned":
+      case "reserved":
+        rooms.push(...shardRooms.filter(room => room.type === type));
+        break;
+      case "total":
+      default:
+        rooms.push(...shardRooms);
+        break;
+    }
+  }
+
+  return rooms;
 }

@@ -85,12 +85,13 @@ export default class Cache {
     const usernameKeys = Object.keys(userRooms);
     for (let s = 0; s < usernameKeys.length; s += 1) {
       const username = usernameKeys[s];
-      const shards = userRooms[username];
-      const shardKeys = Object.keys(shards);
+
+      const userShards = userRooms[username];
+      const shardKeys = Object.keys(userShards);
       for (let r = 0; r < shardKeys.length; r += 1) {
         const shardName = shardKeys[r];
-        const shard = shards[shardName];
-        const shardRooms = shard.rooms;
+
+        const shardRooms = userShards[shardName];
         const roomKeys = Object.keys(shardRooms);
         for (let i = 0; i < roomKeys.length; i += 1) {
           const roomName = roomKeys[i];
