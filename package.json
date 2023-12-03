@@ -1,20 +1,43 @@
 {
-  "name": "screeps-user-tracker",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
+	"name": "anew",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"testLoop": "node testHelper/index.js",
+    "test": "jest",
+		"start": "node src/index.js",
     "lint": "eslint controller/**/*.js && eslint getter/**/*.js && eslint terminal/**/*.js",
     "lint:fix": "eslint controller/**/*.js --fix && eslint getter/**/*.js --fix && eslint terminal/**/*.js --fix"
-  },
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
+	},
+    "jest": {
+      "transform": {
+        "^.+\\.jsx?$": "babel-jest"
+      }
+    },
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"axios": "^1.6.2",
+		"cron": "^3.1.6",
+		"dotenv": "^16.3.1",
+		"graphite": "^0.1.5",
+		"https-proxy-agent": "^7.0.2",
+		"jest": "^29.7.0",
+		"postgres": "^3.4.3",
+		"screeps-advanced-api": "^1.2.2",
+		"screeps-api": "^1.16.0",
+		"socket.io-client": "^4.7.2",
+		"winston": "^3.11.0",
+		"winston-daily-rotate-file": "^4.7.1",
     "eslint": "^8.23.1",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1"
-  },
-  "dependencies": {}
+	},
+	"type": "module",
+	"devDependencies": {
+		"babel-jest": "^29.7.0"
+	}
 }
