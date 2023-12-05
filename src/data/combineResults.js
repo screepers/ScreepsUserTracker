@@ -32,7 +32,7 @@ function groupBy(acc, value) {
 }
 
 export default function handleCombinedRoomStats(shardsData, userData) {
-  const username = userData.username;
+  const { username } = userData;
   const stats = {};
   function getStatsObject() {
     return {

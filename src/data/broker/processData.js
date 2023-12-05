@@ -1,3 +1,4 @@
+import { startSpan, finish } from "../../setup/tracer.js";
 import handleOwnedObjects from "../converter/manage/ownedRoom.js";
 import handleReservedObjects from "../converter/manage/reservedRoom.js";
 
@@ -29,6 +30,7 @@ export default class ProcessDataBroker {
   }
 
   static async single(roomData, opts) {
+    const span = startSpan("ProcessDataBroker.single")
     this.setTickRate(roomData, opts);
 
     let actionsArray = [];
@@ -71,6 +73,7 @@ export default class ProcessDataBroker {
             type: opts.type,
             isFirstTick: t === 0,
             shard: opts.shard,
+            userId: opts.userId,
           })
         );
       }
@@ -81,6 +84,7 @@ export default class ProcessDataBroker {
     if (process.env.CHECK_FOR_NEW_ACTIONS === "TRUE")
       ActionProcessor.FindNewDefaultActions(actionsArray, opts.type);
 
+    finish(span)
     return ActionProcessor.getStats(actionsArray);
   }
 }

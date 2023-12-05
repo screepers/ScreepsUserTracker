@@ -6,6 +6,7 @@ import ActionProcessor from "../../broker/defaultActions.js"
 import GetIntents from "../intentsHelper.js";
 
 export default async function handleObjects(username, objects, extras = {}) {
+  let actions = [];
   const originalObjects = extras.originalObjects || {};
   const currentTick = parseInt(extras.tick, 10);
 
@@ -16,10 +17,9 @@ export default async function handleObjects(username, objects, extras = {}) {
     const originalObject = originalObjects[id];
     if (object && originalObject) {
       await prepareObject(object, originalObject);
-      if (object.username && object.username !== username) delete objects[id];
+      if (extras.userId !== originalObject.user) delete objects[id];
     }
   }
-  const actions = [];
 
   // #region FirstTick
   const { isFirstTick } = extras;
@@ -289,6 +289,7 @@ export default async function handleObjects(username, objects, extras = {}) {
 
   // #endregion
 
+
   // #region Controller
 
   if (controller) {
@@ -386,5 +387,6 @@ export default async function handleObjects(username, objects, extras = {}) {
     ActionProcessor.CreateAction("totals.intents", intents.length, ActionProcessor.ActionType.Divide100)
   );
 
-  return ActionProcessor.ActionListDefaultValuesFiller(actions, extras.type, isFirstTick);
+  actions = ActionProcessor.ActionListDefaultValuesFiller(actions, extras.type, isFirstTick);
+  return actions;
 }

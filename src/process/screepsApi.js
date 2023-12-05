@@ -1,8 +1,8 @@
 import "dotenv/config";
 import { ScreepsAPI } from "screeps-api";
-import { apiLogger as logger } from "../helper/logger.js";
 import axios from "axios";
 import { HttpsProxyAgent } from "https-proxy-agent";
+import { apiLogger as logger } from "../helper/logger.js";
 
 let path;
 switch (process.env.SERVER_TYPE) {
@@ -48,6 +48,7 @@ const lastTickCache = {
 export async function GetGameTime(shard) {
   try {
     if (lastTickCache[shard] && lastTickCache[shard].lastUpdate + 10 * 1000 > Date.now()) {
+      logger.info(`GetGameTime: ${shard}/${lastTickCache[shard].tick}`);
       return lastTickCache[shard].tick;
     }
     await sleep(500);
@@ -55,14 +56,14 @@ export async function GetGameTime(shard) {
     const timeResult = await api.raw.game.time(shard);
     if (typeof timeResult !== "object" || !timeResult.ok)
       throw new Error(JSON.stringify(timeResult));
-    logger.info(`TickApi: ${shard}/${timeResult.time}`);
+    logger.info(`GetGameTime: ${shard}/${timeResult.time}`);
     lastTickCache[shard] = {
       tick: timeResult.time,
       lastUpdate: Date.now(),
     }
     return lastTickCache[shard].tick;
   } catch (error) {
-    logger.error(error);
+    logger.error(`GetGameTIme / ${error.message} / ${error.stack}`)
     return undefined;
   }
 }
@@ -74,15 +75,15 @@ async function getHistory(proxy, room, tick, shard) {
       `${baseHistoryPath}room-history/${shard}/${room}/${tick}.json`;
     try {
       const response = await axios.get(url);
-      // apiLogger.info(`Success: ${url}`);
+      logger.info(`GetHistory - Success: ${url}`);
       return { status: "Success", result: response.data };
     } catch (error) {
       if (error.message && error.message.includes("404 Not Found")) {
-        // apiLogger.info(`${url} / ${error.message}`)
+        logger.info(`GetHistory - ${url} / ${error.message}`)
         return { status: "Not found", message: error };
       }
 
-      // apiLogger.error(`${url} / ${error.stack}`)
+      logger.error(`GetHistory - ${url} / ${error.message} / ${error.stack}`)
       return { status: "Error", message: error };
     }
   }
@@ -91,7 +92,7 @@ async function getHistory(proxy, room, tick, shard) {
 
   const timeoutPromise = new Promise((resolve) => {
     setTimeout(resolve, 10 * 1000, () => {
-      // apiLogger.info('Failed: Timeout')
+      logger.info('Failed: Proxy Timeout')
       return { status: "Timeout" }
     });
   });

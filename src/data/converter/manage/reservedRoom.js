@@ -13,7 +13,7 @@ export default async function handleObjects(username, objects, extras = {}) {
     const originalObject = originalObjects[id];
     if (object && originalObject) {
       await prepareObject(object, originalObject);
-      if (object.username && object.username !== username) delete objects[id];
+      if (extras.userId !== originalObject.user) delete objects[id];
     }
   }
 

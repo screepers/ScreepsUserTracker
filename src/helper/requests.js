@@ -1,6 +1,8 @@
 import { CronJob } from "cron";
 import Cache from "../setup/cache.js";
 import { GetGameTime } from "../process/screepsApi.js"
+import { requestLogger as logger } from "./logger.js"
+import { GetUserData } from "./users.js";
 
 const syncedTicks = {}
 const lastLiveTicks = {}
@@ -12,9 +14,10 @@ export function getLiveTick(shard) {
 export function getSyncedTick(shard) {
   const liveTick = getLiveTick(shard) - 1000;
   if (syncedTicks[shard] < liveTick) {
-    return syncedTicks[shard] += 100;
+    syncedTicks[shard] += 100;
+    return syncedTicks[shard];
   }
-  else if (!syncedTicks[shard]) {
+  if (!syncedTicks[shard]) {
     let tick = (lastLiveTicks[shard] ? lastLiveTicks[shard] - 1000 : 0)
       || Number.parseInt(process.env.MIN_TICK || "-1", 10);
     tick = Math.round(tick / 100) * 100
@@ -22,6 +25,8 @@ export function getSyncedTick(shard) {
     syncedTicks[shard] = tick;
     return tick;
   }
+
+  return undefined;
 }
 
 export async function getCycle() {
@@ -39,14 +44,18 @@ export async function getCycle() {
       for (let r = 0; r < roomNames.length; r += 1) {
         const roomName = roomNames[r];
         const room = shardRooms[roomName];
+        const userData = await GetUserData(room.username);
         cycle.push({
           shard: shardName,
           room: roomName,
           username: room.username,
+          userId: userData.id,
           type: room.type,
           tick,
         });
       }
+
+      logger.info(`Cycle shard:${shardName} tick:${tick} items:${cycle.length}`)
     }
   }
 

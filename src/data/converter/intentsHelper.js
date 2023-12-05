@@ -2,8 +2,8 @@ import { getIntentEffect } from "./helper.js";
 
 export default function GetIntents(objects, originalObjects) {
   const intents = [];
-  const originalIds = Object.keys(originalObjects);
 
+  const originalIds = Object.keys(originalObjects);
   for (let oi = 0; oi < originalIds.length; oi += 1) {
     const originalId = originalIds[oi];
     const originalObject = originalObjects[originalId] || {};
@@ -11,7 +11,12 @@ export default function GetIntents(objects, originalObjects) {
     if (!originalObject.actionLog) {
       originalObject.actionLog = {};
     }
+    const newActionLogKeys = object ? Object.keys(object.actionLog || {}) : {};
+    if (newActionLogKeys.length === 0) {
+      return originalObject.cachedIntentsEffect || []
+    }
 
+    // Remove old intents
     const actionLogKeys = Object.keys(originalObject.actionLog);
     for (let i = 0; i < actionLogKeys.length; i += 1) {
       const intentName = actionLogKeys[i];
@@ -22,8 +27,8 @@ export default function GetIntents(objects, originalObjects) {
         delete originalObject.actionLog[intentName];
     }
 
+    // Add new intents
     if (object && object.actionLog) {
-      const newActionLogKeys = Object.keys(object.actionLog);
       for (let i = 0; i < newActionLogKeys.length; i += 1) {
         const intentName = newActionLogKeys[i];
         if (object.actionLog[intentName]) {
@@ -32,12 +37,14 @@ export default function GetIntents(objects, originalObjects) {
       }
     }
 
+    // Get intent effects
     const currentActions = Object.keys(originalObject.actionLog);
     for (let ca = 0; ca < currentActions.length; ca += 1) {
       const intentName = currentActions[ca];
       const intentEffect = getIntentEffect(intentName, originalObject);
       if (intentEffect) intents.push(intentEffect);
     };
+    originalObject.cachedIntentsEffect = intents;
   };
 
   return intents;

@@ -1,4 +1,6 @@
+import "dotenv/config";
 import fs from "fs";
+import { finish, startSpan } from "../src/setup/tracer.js";
 import ProcessDataBroker from "../src/data/broker/processData.js";
 import handleCombinedRoomStats from "../src/data/combineResults.js";
 
@@ -20,11 +22,14 @@ const callTimes = 125 * 60;
 
 const start = Date.now();
 console.profile();
-while (callTimes > currentCallTimes) {
+while (currentCallTimes < callTimes) {
+  // while (true) {
+  const span = startSpan("single");
   const stats = await ProcessDataBroker.single(roomData, opts);
   const shards = { [opts.shard]: { [opts.room]: stats } }
   handleCombinedRoomStats(shards, userData);
   currentCallTimes += 1;
+  finish(span)
 }
 console.profileEnd();
 const timeTaken = Date.now() - start;

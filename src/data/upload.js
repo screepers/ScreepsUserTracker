@@ -1,4 +1,5 @@
 import graphite from "graphite";
+import { graphiteLogger as logger } from '../helper/logger.js'
 // import postgres from 'postgres'
 
 // let sql = null;
@@ -32,13 +33,9 @@ export default function UploadStats(data, timestamp) {
           (err) => {
             if (err) {
               logger.error(err);
-            } else if (logInfo)
-              logger.info(
-                `Written data for ${logInfo.type}, took ${(
-                  (Date.now() - logInfo.start) /
-                  1000
-                ).toFixed(2)}s`
-              );
+            } else logger.info(
+              `Written data`
+            );
 
             resolve();
           }

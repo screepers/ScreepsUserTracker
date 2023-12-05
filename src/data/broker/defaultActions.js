@@ -1,4 +1,5 @@
 import fs from "fs";
+import { startSpan, finish } from "../../setup/tracer.js";
 
 class ActionProcessor {
   static defaultActionsPerType = {};
@@ -13,6 +14,7 @@ class ActionProcessor {
   }
 
   static finalizeActions(actions) {
+    const span = startSpan("ActionProcessor.finalizeActions")
     const finalActions = [];
 
     const actionsByPath = {};
@@ -47,6 +49,7 @@ class ActionProcessor {
       });
     });
 
+    finish(span)
     return finalActions;
   }
 

@@ -25,12 +25,20 @@ function createCustomLogger(type) {
   });
 }
 
-const ownedLogger = createCustomLogger("owned");
-const apiLogger = createCustomLogger("api");
+const requestLogger = createCustomLogger("request");
+
 const graphiteLogger = createCustomLogger("graphite");
 
+const apiLogger = createCustomLogger("api");
+const cacheLogger = createCustomLogger("cache");
+
 if (process.env.NODE_ENV !== "production") {
-  ownedLogger.add(
+  cacheLogger.add(
+    new transports.Console({
+      format: format.combine(),
+    })
+  );
+  requestLogger.add(
     new transports.Console({
       format: format.combine(),
     })
@@ -47,4 +55,4 @@ if (process.env.NODE_ENV !== "production") {
   );
 }
 
-export { ownedLogger, apiLogger, graphiteLogger };
+export { requestLogger, apiLogger, graphiteLogger, cacheLogger };

@@ -2,6 +2,7 @@ import AdvancedScreepsApi from "screeps-advanced-api";
 import fs from "fs";
 import { cleanSource } from "../helper/index.js";
 import { GetRoomTotal } from "../helper/rooms.js";
+import { cacheLogger as logger } from "../helper/logger.js";
 
 let loginInfo = process.env.SCREEPS_TOKEN;
 if (process.env.PRIVATE_SERVER_USERNAME) {
@@ -53,33 +54,41 @@ export default class Cache {
 
   static async getRoomsCache() {
     if (Cache.shouldUpdateCache('rooms')) {
+      logger.info('Updating rooms cache');
       await Cache.updateRoomsCache();
       roomsCache.lastUpdate = Date.now();
     }
+    logger.info('Returning rooms cache');
     return roomsCache.data;
   }
 
   static async getUsersCache() {
     if (Cache.shouldUpdateCache('users')) {
+      logger.info('Updating users cache');
       await Cache.updateUsersCache();
       usersCache.lastUpdate = Date.now();
     }
+    logger.info('Returning users cache');
     return usersCache.data;
   }
 
   static async getUserRoomsCache() {
     if (Cache.shouldUpdateCache('userRooms')) {
+      logger.info('Updating userRooms cache');
       await Cache.updateUserRoomsCache();
       userRoomsCache.lastUpdate = Date.now();
     }
+    logger.info('Returning userRooms cache');
     return userRoomsCache.data;
   }
 
   static async getUserByIdCache() {
     if (Cache.shouldUpdateCache('userById')) {
+      logger.info('Updating userById cache');
       await Cache.updateUserByIdCache();
       userByIdCache.lastUpdate = Date.now();
     }
+    logger.info('Returning userById cache');
     return userByIdCache.data;
   }
 

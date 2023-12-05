@@ -1,10 +1,4 @@
-import { GetUsernameById } from "../../../helper/users.js";
-
 export default async function prepareObject(object, originalObject) {
-  if (originalObject.user) {
-    object.username = await GetUsernameById(originalObject.user);
-  }
-
   if (originalObject.type === "creep") {
     if (Array.isArray(object.body))
       object.body = object.body.reduce((acc, part) => {
