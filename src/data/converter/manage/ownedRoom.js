@@ -223,6 +223,7 @@ export default async function handleObjects(username, objects, extras = {}) {
         )
       );
     }
+    // #endregion
 
     // #region Spawning
     let storedSpawningEnergy = 0;
@@ -381,11 +382,14 @@ export default async function handleObjects(username, objects, extras = {}) {
     )
   );
   // #endregion
-  // #endregion
 
+  // #region Totals
   actions.push(
     ActionProcessor.CreateAction("totals.intents", intents.length, ActionProcessor.ActionType.Divide100)
   );
+  // #endregion
+
+  // #endregion
 
   actions = ActionProcessor.ActionListDefaultValuesFiller(actions, extras.type, isFirstTick);
   return actions;
