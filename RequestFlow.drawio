@@ -1,0 +1,45 @@
+<mxfile host="app.diagrams.net" modified="2024-01-04T16:24:31.059Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0" etag="whFnKoar8Oi0Tb5cIdjv" version="22.1.16" type="device">
+  <diagram name="Page-1" id="vAc464kT18DR3h8ibPFw">
+    <mxGraphModel dx="794" dy="494" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="bSY4HhRqpQ4pCLOTyvWD-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="bSY4HhRqpQ4pCLOTyvWD-1" target="bSY4HhRqpQ4pCLOTyvWD-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="bSY4HhRqpQ4pCLOTyvWD-1" value="Execute cycle" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="335" y="130" width="165" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="bSY4HhRqpQ4pCLOTyvWD-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="bSY4HhRqpQ4pCLOTyvWD-3" target="bSY4HhRqpQ4pCLOTyvWD-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="bSY4HhRqpQ4pCLOTyvWD-3" value="&lt;div&gt;Loop through all requests and process them&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;1. Download data&lt;/div&gt;&lt;div&gt;2. Simplify data&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="357.5" y="460" width="120" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="bSY4HhRqpQ4pCLOTyvWD-5" value="Combine stats per user and upload stats" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="357.5" y="580" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="bSY4HhRqpQ4pCLOTyvWD-12" value="== 0" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=1;fontSize=11;fontStyle=1" edge="1" parent="1" source="bSY4HhRqpQ4pCLOTyvWD-9" target="bSY4HhRqpQ4pCLOTyvWD-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="bSY4HhRqpQ4pCLOTyvWD-15" value="&lt;div&gt;&amp;gt; 0&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontStyle=1" edge="1" parent="1" source="bSY4HhRqpQ4pCLOTyvWD-9" target="bSY4HhRqpQ4pCLOTyvWD-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="bSY4HhRqpQ4pCLOTyvWD-9" value="&#xa;&lt;div&gt;GetCycleHelper&lt;/div&gt;&lt;div&gt;Get requests to be processed&lt;br&gt;&lt;/div&gt;&#xa;&#xa;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="310" y="310" width="215" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="bSY4HhRqpQ4pCLOTyvWD-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="bSY4HhRqpQ4pCLOTyvWD-11" target="bSY4HhRqpQ4pCLOTyvWD-9">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="640" y="240" />
+              <mxPoint x="418" y="240" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bSY4HhRqpQ4pCLOTyvWD-11" value="Wait 10 seconds" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="320" width="120" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
