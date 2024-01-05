@@ -1,21 +1,18 @@
 import handleCombinedRoomStats from "../data/combineResults.js";
 import UploadStats from "../data/upload.js";
 import { sleep } from "../helper/index.js";
-import { getCycle as getCycleHelper, cycleStatus } from "../helper/requests.js";
+import { getCycle, cycleStatus } from "../helper/requests.js";
 import process from "../process/index.js";
 import { GetUserData } from "../helper/users.js"
 import { requestLogger as logger } from "../helper/logger.js"
-import { finish, startSpan } from "../setup/tracer.js";
 
 export default class Requests {
   static async executeCycle() {
-    const cycle = await getCycleHelper();
+    const cycle = await getCycle();
     if (cycle.length === 0) {
       await sleep(1000 * 10);
     }
     else {
-      const span = startSpan("executeCycle")
-
       logger.info(`Executing cycle ${cycle.length}`)
       for (let i = 0; i < cycle.length; i += 1) {
         const opts = cycle[i];
@@ -43,8 +40,6 @@ export default class Requests {
         const stats = handleCombinedRoomStats(user, userData);
         await UploadStats(stats, timestamp)
       }
-
-      finish(span)
     }
     this.executeCycle();
   }
