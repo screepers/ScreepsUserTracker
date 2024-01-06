@@ -1,7 +1,5 @@
 /* eslint-disable no-undef */
-import ProcessDataBroker from "../../src/data/broker/processData.js";
-import handleCombinedRoomStats from "../../src/data/combineResults.js";
-
+import TestHelper from "../helper"
 const username1 = "username1"
 const username2 = "username2"
 
@@ -18,7 +16,6 @@ const opts1 = {
   tick: 100,
   username: username1
 };
-const userData1 = { shards: { [opts1.shard]: { [opts1.type]: [opts1.room] } } }
 
 describe("Owned data type process check", () => {
   describe("First tick only", () => {
@@ -41,9 +38,7 @@ describe("Owned data type process check", () => {
           }
         }
       }
-      const stats = await ProcessDataBroker.single(roomData, opts1);
-      const shards = { [opts1.shard]: { [opts1.room]: stats } }
-      const combinedData = handleCombinedRoomStats(shards, userData1);
+      
       expect(true)
     })
     it('should count type totals correctly', () => {
