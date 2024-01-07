@@ -114,10 +114,10 @@ export function getIntentEffect(action, originalObject) {
       case "rangedAttack":
         return {
           action,
-          damage: originalObject.body.rangedAttack * 10,
+          damage: originalObject.body.ranged_attack * 10,
         };
       case "rangedMassAttack":
-        return { action, damage: originalObject.body.rangedAttack * 4 };
+        return { action, damage: originalObject.body.ranged_attack * 4 };
       case "heal":
         if (originalObject.type === "tower") {
           return { action, energy: 10, damage: 200 };

@@ -6,6 +6,7 @@
 	"scripts": {
 		"testLoop": "node testHelper/index.js",
 		"test": "jest",
+		"test:cov": "jest --coverage",
 		"start": "node src/index.js",
 		"lint": "eslint controller/**/*.js && eslint getter/**/*.js && eslint terminal/**/*.js",
 		"lint:fix": "eslint controller/**/*.js --fix && eslint getter/**/*.js --fix && eslint terminal/**/*.js --fix"
@@ -13,7 +14,8 @@
 	"jest": {
 		"transform": {
 			"^.+\\.jsx?$": "babel-jest"
-		}
+		},
+		"automock": false
 	},
 	"author": "",
 	"license": "ISC",

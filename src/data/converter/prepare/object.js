@@ -6,6 +6,7 @@ export default async function prepareObject(object, originalObject) {
         acc[part.type] += 1;
         return acc;
       }, {});
+    originalObject.body = object.body
   }
 
   object.type = originalObject.type;
@@ -16,7 +17,7 @@ export default async function prepareObject(object, originalObject) {
         originalObject._upgraded = object._upgraded;
         if (object._upgraded === null) object._upgraded = 0;
       }
-      if (object._upgraded === undefined) {
+      if (object._upgraded === undefined && originalObject._upgraded) {
         object._upgraded = originalObject._upgraded;
       }
       break;

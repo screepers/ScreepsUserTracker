@@ -1,31 +1,16 @@
 /* eslint-disable no-param-reassign  */
 
-import prepareObject from "../prepare/object.js";
-import { summarizeObjects } from "../helper.js";
 import ActionProcessor from "../../broker/defaultActions.js"
-import GetIntents from "../intentsHelper.js";
 
-export default async function handleObjects(username, objects, extras = {}) {
+export default async function handleObjects(data, opts) {
+  const { summarize, intents } = data;
+
   let actions = [];
-  const originalObjects = extras.originalObjects || {};
-  const currentTick = parseInt(extras.tick, 10);
-
-  const objectKeys = Object.keys(objects);
-  for (let o = objectKeys.length - 1; o >= 0; o -= 1) {
-    const id = objectKeys[o];
-    const object = objects[id];
-    const originalObject = originalObjects[id];
-    if (object && originalObject) {
-      await prepareObject(object, originalObject);
-      if (extras.userId !== originalObject.user) delete objects[id];
-    }
-  }
+  const currentTick = opts.tick
 
   // #region FirstTick
-  const { isFirstTick } = extras;
-  const intents = GetIntents(objects, originalObjects);
+  const { isFirstTick } = opts;
 
-  const summarize = summarizeObjects(objects);
   const { structures } = summarize;
   const { structuresByType } = summarize;
   const { controller } = summarize;
@@ -52,17 +37,26 @@ export default async function handleObjects(username, objects, extras = {}) {
         ActionProcessor.ActionType.FirstTickOnly
       )
     );
+    let totalResourcesStored = structures.reduce((acc, structure) => {
+      if (structure.store) {
+        Object.values(structure.store).forEach((amount) => {
+          acc += amount;
+        });
+      }
+      return acc;
+    }, 0)
+    totalResourcesStored += creeps.reduce((acc, creep) => {
+      if (creep.store) {
+        Object.values(creep.store).forEach((amount) => {
+          acc += amount;
+        });
+      }
+      return acc;
+    }, 0)
     actions.push(
       ActionProcessor.CreateAction(
         "totals.resourcesStored",
-        structures.reduce((acc, structure) => {
-          if (structure.store) {
-            Object.values(structure.store).forEach((amount) => {
-              acc += amount;
-            });
-          }
-          return acc;
-        }, 0),
+        totalResourcesStored,
         ActionProcessor.ActionType.FirstTickOnly
       )
     );
@@ -114,15 +108,16 @@ export default async function handleObjects(username, objects, extras = {}) {
       return acc;
     }, {});
     const constructionSitesByTypeKeys = Object.keys(constructionSitesByType);
-    constructionSitesByTypeKeys.forEach((type) => {
+    for (let cst = 0; cst < constructionSitesByTypeKeys.length; cst += 1) {
+      const type = constructionSitesByTypeKeys[cst];
       actions.push(
         ActionProcessor.CreateAction(
           `countByType.constructionSites.${type}`,
-          constructionSitesByType[type].length,
+          constructionSitesByType[type],
           ActionProcessor.ActionType.FirstTickOnly
         )
       );
-    });
+    }
     // #endregion
 
     // #region Construction
@@ -130,18 +125,21 @@ export default async function handleObjects(username, objects, extras = {}) {
       ActionProcessor.CreateAction(
         `constructionSites.progressPercentage`,
         constructionSites.length > 0
-          ? constructionSites.reduce((acc, site) => {
+          ? Math.round(constructionSites.reduce((acc, site) => {
             acc += site.progress / site.progressTotal;
             return acc;
-          }, 0) / constructionSites.length
+          }, 0) / constructionSites.length * 100) / 100
           : 0,
         ActionProcessor.ActionType.FirstTickOnly
       )
     );
     actions.push(
       ActionProcessor.CreateAction(
-        `constructionSites.count`,
-        constructionSites.length,
+        `constructionSites.progressNeeded`,
+        constructionSites.reduce((acc, site) => {
+          acc += site.progressTotal - site.progress;
+          return acc;
+        }, 0),
         ActionProcessor.ActionType.FirstTickOnly
       )
     );
@@ -229,22 +227,20 @@ export default async function handleObjects(username, objects, extras = {}) {
     let storedSpawningEnergy = 0;
     let capacitySpawningEnergy = 0;
 
-    if (structuresByType.spawn) {
-      structuresByType.spawn.forEach((spawn) => {
-        if (spawn.store) storedSpawningEnergy += spawn.store.energy || 0;
-        if (spawn.storeCapacityResource)
-          capacitySpawningEnergy += spawn.storeCapacityResource.energy || 0;
-      });
-    }
+    for (let s = 0; s < structuresByType.spawn.length; s += 1) {
+      const spawn = structuresByType.spawn[s];
+      if (spawn.store) storedSpawningEnergy += spawn.store.energy || 0;
+      if (spawn.storeCapacityResource)
+        capacitySpawningEnergy += spawn.storeCapacityResource.energy || 0;
+    };
 
-    if (structuresByType.extension) {
-      structuresByType.extension.forEach((extension) => {
-        if (extension.store)
-          storedSpawningEnergy += extension.store.energy || 0;
-        if (extension.storeCapacityResource)
-          capacitySpawningEnergy += extension.storeCapacityResource.energy || 0;
-      });
-    }
+    for (let s = 0; s < structuresByType.extension.length; s += 1) {
+      const extension = structuresByType.extension[s];
+      if (extension.store)
+        storedSpawningEnergy += extension.store.energy || 0;
+      if (extension.storeCapacityResource)
+        capacitySpawningEnergy += extension.storeCapacityResource.energy || 0;
+    };
     actions.push(
       ActionProcessor.CreateAction(
         `spawning.storedSpawningEnergy`,
@@ -264,15 +260,13 @@ export default async function handleObjects(username, objects, extras = {}) {
     // #region StructureHits
     const structureHitsByType = {};
     structuresByTypeKeys.forEach((structureKey) => {
-      if (structureKey !== "controller") {
-        const strs = structuresByType[structureKey];
-        const hitsTotal = strs.reduce((acc, structure) => {
-          acc += structure.hits || 0;
-          return acc;
-        }, 0);
+      const strs = structuresByType[structureKey];
+      const hitsTotal = strs.reduce((acc, structure) => {
+        acc += structure.hits || 0;
+        return acc;
+      }, 0);
 
-        structureHitsByType[structureKey] = hitsTotal / strs.length;
-      }
+      structureHitsByType[structureKey] = hitsTotal / strs.length;
     });
 
     const structureHitsByTypeKeys = Object.keys(structureHitsByType);
@@ -280,7 +274,7 @@ export default async function handleObjects(username, objects, extras = {}) {
       actions.push(
         ActionProcessor.CreateAction(
           `structureHits.${structureKey}`,
-          structureHitsByType[structureKey],
+          structureHitsByType[structureKey] || 0,
           ActionProcessor.ActionType.FirstTickOnly
         )
       );
@@ -391,6 +385,6 @@ export default async function handleObjects(username, objects, extras = {}) {
 
   // #endregion
 
-  actions = ActionProcessor.ActionListDefaultValuesFiller(actions, extras.type, isFirstTick);
+  actions = ActionProcessor.ActionListDefaultValuesFiller(actions, opts.type, isFirstTick);
   return actions;
 }

@@ -20,13 +20,16 @@ function groupBy(acc, value) {
     for (let i = 0; i < valueKeys.length; i += 1) {
       const key = valueKeys[i];
       const innerValue = value[key];
-      if (acc[key] === undefined) acc[key] = innerValue;
-
-      const typeOfValue = typeof innerValue;
-      if (typeOfValue === "number") {
-        acc[key] += innerValue;
+      if (acc[key] === undefined) {
+        acc[key] = innerValue;
       }
-      else groupBy(acc[key], innerValue, acc, value);
+      else {
+        const typeOfValue = typeof innerValue;
+        if (typeOfValue === "number") {
+          acc[key] += innerValue;
+        }
+        else groupBy(acc[key], innerValue, acc, value);
+      }
     }
   }
 }

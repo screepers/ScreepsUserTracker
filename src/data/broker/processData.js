@@ -1,6 +1,11 @@
 import handleOwnedObjects from "../converter/manage/ownedRoom.js";
 import handleReservedObjects from "../converter/manage/reservedRoom.js";
 
+import prepareObject from "../converter/prepare/object.js";
+import { summarizeObjects } from "../converter/helper.js";
+import GetIntents from "../converter/intentsHelper.js";
+
+import { cleanSource } from "../../helper/index.js";
 import ActionProcessor from "./defaultActions.js"
 
 export default class ProcessDataBroker {
@@ -28,24 +33,53 @@ export default class ProcessDataBroker {
     this.lastTickTicks[opts.shard] = tick;
   }
 
-  static async single(roomData, opts) {
-    this.setTickRate(roomData, opts);
-
-    let actionsArray = [];
-    const { ticks } = roomData;
-
-    const originalObjects = {};
+  static async prepareObjects(ticks, opts) {
+    const uniqueObjects = {};
+    const data = {
+      ticks: {}
+    }
     const tickKeys = Object.keys(ticks);
     for (let t = 0; t < tickKeys.length; t += 1) {
       const tick = tickKeys[t];
-      const tickList = ticks[tick] || [];
-      const objectKeys = Object.keys(tickList);
+      const objects = ticks[tick] || {};
+      const objectKeys = Object.keys(objects);
+
       for (let o = 0; o < objectKeys.length; o += 1) {
         const objectId = objectKeys[o];
-        const object = tickList[objectId];
-        if (!originalObjects[objectId]) originalObjects[objectId] = object;
+        const object = objects[objectId];
+        if (!uniqueObjects[objectId]) uniqueObjects[objectId] = cleanSource(object);
+
+        const uniqueObject = uniqueObjects[objectId];
+        await prepareObject(object, uniqueObject);
+        if (opts.userId !== uniqueObject.user) delete objects[objectId];
+      }
+
+      const uniqueObjectKeys = Object.keys(uniqueObjects)
+      for (let uo = 0; uo < uniqueObjectKeys.length; uo += 1) {
+        const objectId = uniqueObjectKeys[uo];
+        const uniqueObject = uniqueObjects[objectId]
+        if (!objects[objectId]) {
+          objects[objectId] = { type: uniqueObject.type }
+          await prepareObject(objects[objectId], uniqueObject);
+        }
+      }
+
+      const summarize = summarizeObjects(objects);
+      const intents = GetIntents(objects, uniqueObjects);
+      data.ticks[tick] = {
+        objects,
+        summarize,
+        intents
       }
     }
+
+    data.uniqueObjects = uniqueObjects
+
+    return data
+  }
+
+  static async single(roomData, opts) {
+    this.setTickRate(roomData, opts);
 
     let handleObjects = null;
     switch (opts.type) {
@@ -59,24 +93,22 @@ export default class ProcessDataBroker {
         break;
     }
 
+    let actionsArray = [];
+    const { ticks, uniqueObjects } = await this.prepareObjects(roomData.ticks, opts);
+
+    opts.uniqueObjects = uniqueObjects
+
+    const tickKeys = Object.keys(ticks);
     for (let t = 0; t < tickKeys.length; t += 1) {
       const tick = tickKeys[t];
+      opts.isFirstTick = t === 0
+      opts.tick = parseInt(tick, 10);
       if (ticks[tick]) {
         actionsArray = actionsArray.concat(
-          await handleObjects(opts.username, ticks[tick], {
-            previousObjects: ticks[tickKeys[t - 1]],
-            originalObjects,
-            ticks,
-            tick,
-            type: opts.type,
-            isFirstTick: t === 0,
-            shard: opts.shard,
-            userId: opts.userId,
-          })
+          await handleObjects(ticks[tick], opts)
         );
       }
     }
-
 
 
     if (process.env.CHECK_FOR_NEW_ACTIONS === "TRUE")
