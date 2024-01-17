@@ -56,7 +56,7 @@ export default async function handleObjects(data, opts) {
 
     // #region CountByType
     const creepPartsByType = creeps.reduce((acc, creep) => {
-      Object.entries(creep.body).forEach(([part, count]) => {
+      Object.entries(creep.groupedBody).forEach(([part, count]) => {
         if (!acc[part]) acc[part] = 0;
         acc[part] += count;
       });

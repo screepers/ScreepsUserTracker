@@ -5,6 +5,7 @@ import { GetRoomTotal } from "../helper/rooms.js";
 import { cacheLogger as logger } from "../helper/logger.js";
 
 let loginInfo = process.env.SCREEPS_TOKEN;
+const settings = process.env.PRIVATE_SERVER_SETTINGS ? JSON.parse(process.env.PRIVATE_SERVER_SETTINGS) : {};
 if (process.env.PRIVATE_SERVER_USERNAME) {
   loginInfo = {
     protocol: process.env.PRIVATE_SERVER_PROTOCOL,
@@ -12,15 +13,16 @@ if (process.env.PRIVATE_SERVER_USERNAME) {
     port: process.env.PRIVATE_SERVER_PORT,
     path: "/",
     username: process.env.PRIVATE_SERVER_USERNAME,
-    password: process.env.PRIVATE_SERVER_PASSWORD
+    password: process.env.PRIVATE_SERVER_PASSWORD,
   }
 }
-const advancedScreepsApi = new AdvancedScreepsApi(loginInfo);
+const advancedScreepsApi = new AdvancedScreepsApi(loginInfo, settings);
 fs.mkdirSync("./files", { recursive: true });
 
 const baseCache = {
   data: {},
   lastUpdate: 0,
+  isUpdating: false,
 }
 
 const roomsCache = cleanSource(baseCache)
@@ -48,15 +50,18 @@ export default class Cache {
         break;
     }
 
-    const shouldUpdate = Date.now() - cache.lastUpdate > 1000 * 60;
+    const shouldUpdate = Date.now() - cache.lastUpdate > 1000 * 60 * 60;
     return shouldUpdate;
   }
 
   static async getRoomsCache() {
     if (Cache.shouldUpdateCache('rooms')) {
+      if (roomsCache.isUpdating) return roomsCache.data;
+      roomsCache.isUpdating = true;
       logger.info('Updating rooms cache');
       await Cache.updateRoomsCache();
       roomsCache.lastUpdate = Date.now();
+      roomsCache.isUpdating = false;
     }
     logger.info('Returning rooms cache');
     return roomsCache.data;
@@ -64,9 +69,12 @@ export default class Cache {
 
   static async getUsersCache() {
     if (Cache.shouldUpdateCache('users')) {
+      if (usersCache.isUpdating) return usersCache.data;
+      usersCache.isUpdating = true;
       logger.info('Updating users cache');
       await Cache.updateUsersCache();
       usersCache.lastUpdate = Date.now();
+      usersCache.isUpdating = false;
     }
     logger.info('Returning users cache');
     return usersCache.data;
@@ -74,9 +82,12 @@ export default class Cache {
 
   static async getUserRoomsCache() {
     if (Cache.shouldUpdateCache('userRooms')) {
+      if (userRoomsCache.isUpdating) return userRoomsCache.data;
+      userRoomsCache.isUpdating = true;
       logger.info('Updating userRooms cache');
       await Cache.updateUserRoomsCache();
       userRoomsCache.lastUpdate = Date.now();
+      userRoomsCache.isUpdating = false;
     }
     logger.info('Returning userRooms cache');
     return userRoomsCache.data;
@@ -84,9 +95,12 @@ export default class Cache {
 
   static async getUserByIdCache() {
     if (Cache.shouldUpdateCache('userById')) {
+      if (userByIdCache.isUpdating) return userByIdCache.data;
+      userByIdCache.isUpdating = true;
       logger.info('Updating userById cache');
       await Cache.updateUserByIdCache();
       userByIdCache.lastUpdate = Date.now();
+      userByIdCache.isUpdating = false;
     }
     logger.info('Returning userById cache');
     return userByIdCache.data;
@@ -125,7 +139,8 @@ export default class Cache {
   }
 
   static async updateUsersCache() {
-    const forcedUsers = process.env.USERNAMES.length > 0 ? process.env.USERNAMES.split(",") : [];
+    const forcedUsers = process.env.USERNAMES && process.env.USERNAMES.length > 0
+      ? process.env.USERNAMES.split(",") : [];
     let users = await advancedScreepsApi.getAllUsers()
     users = users.filter(forcedUsers.length > 0 ? (user) => forcedUsers.includes(user.username) : () => true);
     users.sort((a, b) => GetRoomTotal(b.shards, 'type') - GetRoomTotal(a.shards, 'type'));

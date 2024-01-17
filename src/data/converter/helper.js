@@ -97,34 +97,34 @@ export function getIntentEffect(action, originalObject) {
   try {
     switch (action) {
       case "harvest":
-        return { action, energy: originalObject.body.work * 2 };
+        return { action, energy: originalObject.groupedBody.work * 2 };
       case "build":
-        return { action, energy: originalObject.body.work * 5 };
+        return { action, energy: originalObject.groupedBody.work * 5 };
       case "repair":
         if (originalObject.type === "tower") return { action, energy: 10 };
-        return { action, energy: originalObject.body.work * 1 };
+        return { action, energy: originalObject.groupedBody.work * 1 };
       case "upgradeController":
-        return { action, energy: originalObject.body.work * 1 };
+        return { action, energy: originalObject.groupedBody.work * 1 };
       case "dismantle":
-        return { action, energy: originalObject.body.work * 0.25 };
+        return { action, energy: originalObject.groupedBody.work * 0.25 };
       case "attack":
         if (originalObject.type === "tower")
           return { action, energy: 10, damage: 300 };
-        return { action, damage: originalObject.body.attack * 30 };
+        return { action, damage: originalObject.groupedBody.attack * 30 };
       case "rangedAttack":
         return {
           action,
-          damage: originalObject.body.ranged_attack * 10,
+          damage: originalObject.groupedBody.ranged_attack * 10,
         };
       case "rangedMassAttack":
-        return { action, damage: originalObject.body.ranged_attack * 4 };
+        return { action, damage: originalObject.groupedBody.ranged_attack * 4 };
       case "heal":
         if (originalObject.type === "tower") {
           return { action, energy: 10, damage: 200 };
         }
-        return { action, damage: originalObject.body.heal * 12 };
+        return { action, damage: originalObject.groupedBody.heal * 12 };
       case "rangedHeal":
-        return { action, damage: originalObject.body.heal * 4 };
+        return { action, damage: originalObject.groupedBody.heal * 4 };
       default:
         return null;
     }

@@ -1,0 +1,23 @@
+version: "3"
+
+x-logging: &default-logging
+  driver: "local"
+  options:
+    max-size: "20m"
+    max-file: "5"
+
+networks:
+  traefik-net:
+    external: true
+
+services:
+  usertracker:
+    build: .
+    logging: *default-logging
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - "./logs:/usr/app/logs"
+    networks:
+      - traefik-net

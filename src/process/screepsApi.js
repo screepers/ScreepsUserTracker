@@ -100,7 +100,8 @@ async function getHistory(proxy, room, tick, shard) {
   const getHistoryPromise = new Promise((resolve) => {
 
     const agent = new HttpsProxyAgent(
-      `http://${proxySettings.username}:${proxySettings.password}@${proxySettings.proxy_address}:${proxySettings.port}`
+      // eslint-disable-next-line max-len
+      `http://${proxySettings.username}:${proxySettings.password}@${proxySettings.proxy_address}:${proxySettings.ports.http}`
     );
     const url = isPrivateServer ?
       `${baseHistoryPath}room-history?room=${room}&time=${tick}` :

@@ -1,10 +1,12 @@
 import handleCombinedRoomStats from "../data/combineResults.js";
-import UploadStats from "../data/upload.js";
+import UploadStats, { UploadStatus } from "../data/upload.js";
 import { sleep } from "../helper/index.js";
 import { getCycle, cycleStatus } from "../helper/requests.js";
-import process from "../process/index.js";
+import processOpts from "../process/index.js";
 import { GetUserData } from "../helper/users.js"
 import { requestLogger as logger } from "../helper/logger.js"
+
+const useProxy = process.env.WEBSHARE_TOKEN === "TRUE";
 
 export default class Requests {
   static async executeCycle() {
@@ -13,12 +15,19 @@ export default class Requests {
       await sleep(1000 * 10);
     }
     else {
+      const start = Date.now();
       logger.info(`Executing cycle ${cycle.length}`)
-      for (let i = 0; i < cycle.length; i += 1) {
-        const opts = cycle[i];
-        console.log(`${i + 1} / ${cycle.length} of cycle ${opts.shard}/${opts.tick}`)
-        await process(opts);
-      }
+
+      // make the request execute in parallel while the data is being processed, await results at the end
+      await Promise.all(cycle.map(async (opts) => {
+        await processOpts(opts, useProxy);
+      }))
+
+      // for (let i = cycle.length - 1; i >= 0; i -= 1) {
+      //   const opts = cycle[i];
+      //   console.log(`${cycle.length - i} / ${cycle.length} of cycle ${opts.shard}/${opts.tick}`)
+      //   await processOpts(opts, useProxy);
+      // }
 
       const status = cycleStatus(cycle);
       const users = {}
@@ -33,17 +42,16 @@ export default class Requests {
       }
 
       const usernames = Object.keys(users);
+      const stats = {};
       for (let u = 0; u < usernames.length; u += 1) {
         const username = usernames[u];
         const user = users[username];
         const userData = await GetUserData(username)
-        const stats = handleCombinedRoomStats(user, userData);
-        await UploadStats(stats, timestamp)
+        stats[username] = handleCombinedRoomStats(user, userData);
       }
+      await UploadStats(stats, timestamp)
+      UploadStatus({ amountPerCycle: cycle.length, timePerRoom: (Date.now() - start) / cycle.length })
     }
     this.executeCycle();
   }
 }
-
-
-

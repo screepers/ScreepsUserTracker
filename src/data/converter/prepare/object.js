@@ -1,12 +1,12 @@
 export default async function prepareObject(object, originalObject) {
   if (originalObject.type === "creep") {
-    if (Array.isArray(object.body))
-      object.body = object.body.reduce((acc, part) => {
+    if (Array.isArray(originalObject.body))
+      object.groupedBody = originalObject.body.reduce((acc, part) => {
         if (!acc[part.type]) acc[part.type] = 0;
         acc[part.type] += 1;
         return acc;
       }, {});
-    originalObject.body = object.body
+    originalObject.groupedBody = object.groupedBody || []
   }
 
   object.type = originalObject.type;

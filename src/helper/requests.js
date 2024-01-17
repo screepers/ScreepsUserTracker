@@ -3,6 +3,7 @@ import Cache from "../setup/cache.js";
 import { GetGameTime } from "../process/screepsApi.js"
 import { requestLogger as logger } from "./logger.js"
 import { GetUserData } from "./users.js";
+import { UploadStatus } from "../data/upload.js";
 
 const syncedTicks = {}
 const lastLiveTicks = {}
@@ -18,11 +19,15 @@ export function getSyncedTick(shard) {
     return syncedTicks[shard];
   }
   if (!syncedTicks[shard]) {
-    let tick = (lastLiveTicks[shard] ? lastLiveTicks[shard] - 1000 : 0)
-      || Number.parseInt(process.env.MIN_TICK || "-1", 10);
+    // eslint-disable-next-line no-nested-ternary
+    let tick = process.env.MIN_TICK !== undefined
+      ? Number.parseInt(process.env.MIN_TICK || "-1", 10)
+      : lastLiveTicks[shard] ? lastLiveTicks[shard] - 1000 : 0;
     tick = Math.round(tick / 100) * 100
 
     syncedTicks[shard] = tick;
+
+    UploadStatus({ syncedTicks, liveTicks: lastLiveTicks })
     return tick;
   }
 

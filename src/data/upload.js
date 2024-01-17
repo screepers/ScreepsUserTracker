@@ -65,3 +65,33 @@ export default function UploadStats(data, timestamp) {
 
   // return Promise.all([graphiteQuery, postgresQuery]);
 }
+
+export function UploadStatus(data) {
+  const graphiteQuery = new Promise((resolve) => {
+    try {
+      if (process.env.GRAPHITE_ONLINE !== "TRUE") resolve();
+      else {
+        client.write(
+          {
+            [process.env.GRAPHITE_PREFIX || '']: {
+              userTracker: { [process.env.SERVER_TYPE]: { status: data } },
+            },
+          },
+          Date.now(),
+          (err) => {
+            if (err) {
+              logger.error(err);
+            } else logger.info(
+              `Written data`
+            );
+
+            resolve();
+          }
+        );
+      }
+    } catch {
+      resolve();
+    }
+  });
+  return Promise.all([graphiteQuery]);
+}

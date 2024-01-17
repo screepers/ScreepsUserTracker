@@ -35,7 +35,6 @@ function groupBy(acc, value) {
 }
 
 export default function handleCombinedRoomStats(shardsData, userData) {
-  const { username } = userData;
   const stats = {};
   function getStatsObject() {
     return {
@@ -101,9 +100,6 @@ export default function handleCombinedRoomStats(shardsData, userData) {
 
   if (process.env.ONLY_COMBINED_DATA_UPLOAD === "true")
     delete userStats.shards;
-  stats[username] = { stats: userStats };
 
-  return {
-    users: stats,
-  };
+  return { stats: userStats }
 }

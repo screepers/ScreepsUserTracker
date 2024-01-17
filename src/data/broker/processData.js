@@ -47,21 +47,25 @@ export default class ProcessDataBroker {
       for (let o = 0; o < objectKeys.length; o += 1) {
         const objectId = objectKeys[o];
         const object = objects[objectId];
-        if (!uniqueObjects[objectId]) uniqueObjects[objectId] = cleanSource(object);
+        if (object) {
+          if (!uniqueObjects[objectId]) uniqueObjects[objectId] = cleanSource(object);
 
-        const uniqueObject = uniqueObjects[objectId];
-        await prepareObject(object, uniqueObject);
-        if (opts.userId !== uniqueObject.user) delete objects[objectId];
+          const uniqueObject = uniqueObjects[objectId];
+          if (opts.userId !== uniqueObject.user) {
+            delete objects[objectId];
+            delete uniqueObjects[objectId];
+          }
+        }
       }
 
       const uniqueObjectKeys = Object.keys(uniqueObjects)
       for (let uo = 0; uo < uniqueObjectKeys.length; uo += 1) {
         const objectId = uniqueObjectKeys[uo];
         const uniqueObject = uniqueObjects[objectId]
-        if (!objects[objectId]) {
-          objects[objectId] = { type: uniqueObject.type }
-          await prepareObject(objects[objectId], uniqueObject);
+        if (!objects[objectId]) objects[objectId] = {
+          type: uniqueObject.type,
         }
+        await prepareObject(objects[objectId], uniqueObject);
       }
 
       const summarize = summarizeObjects(objects);
