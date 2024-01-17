@@ -82,7 +82,7 @@ export function UploadStatus(data) {
             if (err) {
               logger.error(err);
             } else logger.info(
-              `Written data`
+              `Written status`
             );
 
             resolve();

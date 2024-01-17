@@ -558,5 +558,85 @@
     "path": "countByType.intents.rangedMassAttack",
     "value": 0,
     "type": 0
+  },
+  {
+    "path": "resourcesStored.energy",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.GO",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.KO",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.LO",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.ZH",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.UH",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.U",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.mist",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.K",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.L",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.biomass",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.O",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.X",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.H",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.Z",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.power",
+    "value": 0,
+    "type": 1
   }
 ]

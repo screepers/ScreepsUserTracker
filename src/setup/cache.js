@@ -3,6 +3,8 @@ import fs from "fs";
 import { cleanSource } from "../helper/index.js";
 import { GetRoomTotal } from "../helper/rooms.js";
 import { cacheLogger as logger } from "../helper/logger.js";
+// eslint-disable-next-line
+import { UpdateLocalUsersCache } from "../helper/users.js";
 
 let loginInfo = process.env.SCREEPS_TOKEN;
 const settings = process.env.PRIVATE_SERVER_SETTINGS ? JSON.parse(process.env.PRIVATE_SERVER_SETTINGS) : {};
@@ -146,6 +148,7 @@ export default class Cache {
     users.sort((a, b) => GetRoomTotal(b.shards, 'type') - GetRoomTotal(a.shards, 'type'));
 
     fs.writeFileSync("./files/users.json", JSON.stringify(users, null, 2));
+    UpdateLocalUsersCache(users);
     usersCache.data = users;
   }
 

@@ -2,10 +2,10 @@ import ProcessDataBroker from "../data/broker/processData.js";
 import { GetRoomHistory } from "./screepsApi.js";
 import getProxy from "../helper/proxy.js";
 
-export default async function process(opts, useProxy = false) {
+export default async function process(opts, proxyIndex) {
   let proxy = null;
-  if (useProxy) {
-    proxy = await getProxy();
+  if (proxyIndex !== undefined) {
+    proxy = await getProxy(proxyIndex);
   }
   const dataResult = await GetRoomHistory(proxy, opts.shard, opts.room, opts.tick);
   if (dataResult.status === "Success") {
@@ -24,5 +24,5 @@ export default async function process(opts, useProxy = false) {
   }
 
   opts.failed = true;
-  return process(opts);
+  return process(opts, proxyIndex);
 }

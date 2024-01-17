@@ -6,9 +6,13 @@ export async function GetUsernameById(id) {
   if (user) return user.username;
 }
 
+let usersCache = [];
+export function UpdateLocalUsersCache(cache) {
+  usersCache = cache;
+}
+
 export async function GetUserData(username) {
-  const users = await Cache.getUsersCache();
-  const user = users.find((u) => u.username === username);
+  const user = usersCache.find((u) => u.username === username);
   if (!user) return { shards: [] };
   return user;
 }

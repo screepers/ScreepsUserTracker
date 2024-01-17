@@ -49,7 +49,7 @@ export async function getCycle() {
       for (let r = 0; r < roomNames.length; r += 1) {
         const roomName = roomNames[r];
         const room = shardRooms[roomName];
-        const userData = await GetUserData(room.username);
+        const userData = GetUserData(room.username);
         cycle.push({
           shard: shardName,
           room: roomName,
