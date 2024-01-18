@@ -64,11 +64,8 @@ export default class ProcessDataBroker {
       fs.appendFileSync('log.txt', `prepareObject: ${timeTaken1}ms\n`);
     })
     await Promise.all(firstTickObjectsPromises);
-    const endTime = Date.now();
-    const timeTaken = endTime - startTime;
-    fs.appendFileSync('log2.txt', `prepareObject: ${timeTaken}ms\n`);
 
-    for (let t = 0; t < tickKeys.length; t += 1) {
+    const summarizeObjectPromises = Array.from({ length: 100 }, (_, t) => {
       const tick = tickKeys[t];
       const objects = ticks[tick] || {};
 
@@ -77,10 +74,14 @@ export default class ProcessDataBroker {
         objects,
         summarize,
       }
-    }
+    });
+    await Promise.all(summarizeObjectPromises);
 
     data.uniqueObjects = uniqueObjects
 
+    const endTime = Date.now();
+    const timeTaken = endTime - startTime;
+    fs.appendFileSync('log2.txt', `prepareObject: ${timeTaken}ms\n`);
     return data
   }
 
