@@ -145,6 +145,6 @@ export default class TestHelper {
     const roomData = this.generateData(settings);
     const stats = await ProcessDataBroker.single(roomData, this.opts);
     const shards = { [this.shard]: { [this.room]: stats } }
-    return { stats: handleCombinedRoomStats(shards, this.userData), opts: this.opts };
+    return { opts: this.opts, stats: { users: { [this.username]: handleCombinedRoomStats(shards, this.userData) } } };
   }
 }
