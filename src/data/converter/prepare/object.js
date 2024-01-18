@@ -1,5 +1,5 @@
 export default async function prepareObject(object, originalObject) {
-  if (originalObject.type === "creep" && originalObject.body && !originalObject.body.groupedBody) {
+  if (originalObject.type === "creep" && originalObject.body && !originalObject.groupedBody) {
     originalObject.groupedBody = originalObject.body.reduce((acc, part) => {
       if (!acc[part.type]) acc[part.type] = 0;
       acc[part.type] += 1;
