@@ -1,3 +1,5 @@
+import { getIntentEffect } from "../helper.js";
+
 export default async function prepareObject(object, originalObject) {
   if (originalObject.type === "creep" && originalObject.body && !originalObject.groupedBody) {
     originalObject.groupedBody = originalObject.body.reduce((acc, part) => {
@@ -22,5 +24,51 @@ export default async function prepareObject(object, originalObject) {
       break;
     default:
       break;
+  }
+
+  const intents = [];
+  if (!originalObject.cachedIntentsEffect) {
+    object.cachedIntentsEffect = [];
+    originalObject.cachedIntentsEffect = [];
+  }
+  else {
+    object.cachedIntentsEffect = originalObject.cachedIntentsEffect;
+  }
+  if (!originalObject.actionLog) {
+    object.actionLog = {};
+    originalObject.actionLog = {};
+  }
+  const newActionLogKeys = object ? Object.keys(object.actionLog || {}) : {};
+  if (newActionLogKeys.length > 0) {
+    // Remove old intents
+    const actionLogKeys = Object.keys(originalObject.actionLog);
+    for (let i = 0; i < actionLogKeys.length; i += 1) {
+      const intentName = actionLogKeys[i];
+      if (object && object.actionLog && object.actionLog[intentName] !== undefined)
+        originalObject.actionLog[intentName] = object.actionLog[intentName];
+
+      if (!originalObject.actionLog[intentName])
+        delete originalObject.actionLog[intentName];
+    }
+
+    // Add new intents
+    if (object && object.actionLog) {
+      for (let i = 0; i < newActionLogKeys.length; i += 1) {
+        const intentName = newActionLogKeys[i];
+        if (object.actionLog[intentName]) {
+          originalObject.actionLog[intentName] = object.actionLog[intentName];
+        }
+      }
+    }
+
+    // Get intent effects
+    const currentActions = Object.keys(originalObject.actionLog);
+    for (let ca = 0; ca < currentActions.length; ca += 1) {
+      const intentName = currentActions[ca];
+      const intentEffect = getIntentEffect(intentName, originalObject);
+      if (intentEffect) intents.push(intentEffect);
+    };
+    originalObject.cachedIntentsEffect = intents;
+    object.cachedIntentsEffect = intents;
   }
 }

@@ -53,12 +53,12 @@ export default class Requests {
       }
 
       const usernames = Object.keys(users);
-      const stats = {};
+      const stats = { users: {} };
       for (let u = 0; u < usernames.length; u += 1) {
         const username = usernames[u];
         const user = users[username];
         const userData = GetUserData(username)
-        stats[username] = handleCombinedRoomStats(user, userData);
+        stats.users[username] = handleCombinedRoomStats(user, userData);
       }
       await UploadStats(stats, timestamp)
       const timeTaken = Date.now() - start;

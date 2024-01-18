@@ -40,6 +40,7 @@ export function summarizeObjects(objects) {
     minerals: [],
     controller: undefined,
     spawns: [],
+    intents: [],
   };
 
   for (let t = 0; t < structureTypes.length; t += 1) {
@@ -87,6 +88,7 @@ export function summarizeObjects(objects) {
         default:
           break;
       }
+      summarize.intents = summarize.intents.concat(object.cachedIntentsEffect)
     }
   }
 

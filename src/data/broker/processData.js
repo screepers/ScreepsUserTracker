@@ -1,9 +1,10 @@
+import fs from 'fs';
+
 import handleOwnedObjects from "../converter/manage/ownedRoom.js";
 import handleReservedObjects from "../converter/manage/reservedRoom.js";
 
 import prepareObject from "../converter/prepare/object.js";
 import { summarizeObjects } from "../converter/helper.js";
-import GetIntents from "../converter/intentsHelper.js";
 
 import { cleanSource } from "../../helper/index.js";
 import ActionProcessor from "./defaultActions.js"
@@ -38,47 +39,49 @@ export default class ProcessDataBroker {
     const data = {
       ticks: {}
     }
+
     const tickKeys = Object.keys(ticks);
-    for (let t = 0; t < tickKeys.length; t += 1) {
+    const firstTickObjects = Object.entries(ticks[tickKeys[0]] || {});
+
+    const startTime = Date.now();
+    const firstTickObjectsPromises = firstTickObjects.map(async ([id, firstTickObject]) => {
+      const startTime1 = Date.now();
+      if (opts.userId === firstTickObject.user) {
+        const uniqueObject = cleanSource(firstTickObject);
+        uniqueObjects[id] = uniqueObject;
+
+        for (let t = 0; t < tickKeys.length; t += 1) {
+          const tick = tickKeys[t];
+          let object = ticks[tick][id];
+          if (!object) ticks[tick][id] = {
+            type: uniqueObject.type,
+          }
+          await prepareObject(ticks[tick][id], uniqueObject);
+        }
+      }
+      const endTime1 = Date.now();
+      const timeTaken1 = endTime1 - startTime1;
+      fs.appendFileSync('log.txt', `prepareObject: ${timeTaken1}ms\n`);
+    })
+    await Promise.all(firstTickObjectsPromises);
+
+    const summarizeObjectPromises = Array.from({ length: 100 }, (_, t) => {
       const tick = tickKeys[t];
       const objects = ticks[tick] || {};
-      const objectKeys = Object.keys(objects);
-
-      for (let o = 0; o < objectKeys.length; o += 1) {
-        const objectId = objectKeys[o];
-        const object = objects[objectId];
-        if (object) {
-          if (!uniqueObjects[objectId]) uniqueObjects[objectId] = cleanSource(object);
-
-          const uniqueObject = uniqueObjects[objectId];
-          if (opts.userId !== uniqueObject.user) {
-            delete objects[objectId];
-            delete uniqueObjects[objectId];
-          }
-        }
-      }
-
-      const uniqueObjectKeys = Object.keys(uniqueObjects)
-      for (let uo = 0; uo < uniqueObjectKeys.length; uo += 1) {
-        const objectId = uniqueObjectKeys[uo];
-        const uniqueObject = uniqueObjects[objectId]
-        if (!objects[objectId]) objects[objectId] = {
-          type: uniqueObject.type,
-        }
-        await prepareObject(objects[objectId], uniqueObject);
-      }
 
       const summarize = summarizeObjects(objects);
-      const intents = GetIntents(objects, uniqueObjects);
       data.ticks[tick] = {
         objects,
         summarize,
-        intents
       }
-    }
+    });
+    await Promise.all(summarizeObjectPromises);
 
     data.uniqueObjects = uniqueObjects
 
+    const endTime = Date.now();
+    const timeTaken = endTime - startTime;
+    fs.appendFileSync('log2.txt', `prepareObject: ${timeTaken}ms\n`);
     return data
   }
 

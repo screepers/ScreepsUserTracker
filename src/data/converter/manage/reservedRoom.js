@@ -1,7 +1,8 @@
 import ActionProcessor from "../../broker/defaultActions.js"
 
 export default async function handleObjects(data, opts) {
-  const { summarize, intents } = data;
+  const { summarize } = data;
+  const intents = summarize.intents || [];
 
   let actions = [];
   const { isFirstTick } = opts;
@@ -170,7 +171,7 @@ export default async function handleObjects(data, opts) {
       actions.push(
         ActionProcessor.CreateAction(
           `structureHits.${structureKey}`,
-          structureHitsByType[structureKey],
+          structureHitsByType[structureKey] || 0,
           ActionProcessor.ActionType.FirstTickOnly
         )
       );
