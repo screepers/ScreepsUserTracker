@@ -2,7 +2,7 @@ import ActionProcessor from "../../broker/defaultActions.js"
 
 export default async function handleObjects(data, opts) {
   const { summarize } = data;
-  const intents = summarize.intents || [];
+  const { intents } = summarize
 
   let actions = [];
   const { isFirstTick } = opts;

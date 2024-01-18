@@ -88,7 +88,9 @@ export function summarizeObjects(objects) {
         default:
           break;
       }
-      summarize.intents = summarize.intents.concat(object.cachedIntentsEffect)
+      if (object.cachedIntentsEffect && object.cachedIntentsEffect.length > 0) {
+        summarize.intents = summarize.intents.concat(object.cachedIntentsEffect)
+      }
     }
   }
 

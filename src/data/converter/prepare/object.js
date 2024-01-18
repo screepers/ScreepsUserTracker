@@ -2,11 +2,12 @@ import { getIntentEffect } from "../helper.js";
 
 export default async function prepareObject(object, originalObject) {
   if (originalObject.type === "creep" && originalObject.body && !originalObject.groupedBody) {
-    originalObject.groupedBody = originalObject.body.reduce((acc, part) => {
-      if (!acc[part.type]) acc[part.type] = 0;
-      acc[part.type] += 1;
-      return acc;
-    }, {});
+    originalObject.groupedBody = {}
+    for (let b = 0; b < originalObject.body.length; b += 1) {
+      const part = originalObject.body[b];
+      if (!originalObject.groupedBody[part.type]) originalObject.groupedBody[part.type] = 0;
+      originalObject.groupedBody[part.type] += 1;
+    }
   }
   object.groupedBody = originalObject.groupedBody || []
 

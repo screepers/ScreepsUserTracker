@@ -1,5 +1,3 @@
-import fs from 'fs';
-
 import handleOwnedObjects from "../converter/manage/ownedRoom.js";
 import handleReservedObjects from "../converter/manage/reservedRoom.js";
 
@@ -43,45 +41,38 @@ export default class ProcessDataBroker {
     const tickKeys = Object.keys(ticks);
     const firstTickObjects = Object.entries(ticks[tickKeys[0]] || {});
 
-    const startTime = Date.now();
+    for (let t = 0; t < tickKeys.length; t += 1) {
+      const tick = tickKeys[t];
+      data.ticks[tick] = {
+        objects: {}
+      }
+    }
     const firstTickObjectsPromises = firstTickObjects.map(async ([id, firstTickObject]) => {
-      const startTime1 = Date.now();
       if (opts.userId === firstTickObject.user) {
         const uniqueObject = cleanSource(firstTickObject);
         uniqueObjects[id] = uniqueObject;
 
         for (let t = 0; t < tickKeys.length; t += 1) {
           const tick = tickKeys[t];
-          let object = ticks[tick][id];
-          if (!object) ticks[tick][id] = {
+          let object = ticks[tick] ? ticks[tick][id] : null;
+          if (!object) object = {
             type: uniqueObject.type,
           }
-          await prepareObject(ticks[tick][id], uniqueObject);
+          await prepareObject(object, uniqueObject);
+          data.ticks[tick].objects[id] = object;
         }
       }
-      const endTime1 = Date.now();
-      const timeTaken1 = endTime1 - startTime1;
-      fs.appendFileSync('log.txt', `prepareObject: ${timeTaken1}ms\n`);
     })
     await Promise.all(firstTickObjectsPromises);
 
     const summarizeObjectPromises = Array.from({ length: 100 }, (_, t) => {
       const tick = tickKeys[t];
-      const objects = ticks[tick] || {};
-
-      const summarize = summarizeObjects(objects);
-      data.ticks[tick] = {
-        objects,
-        summarize,
-      }
+      data.ticks[tick].summarize = summarizeObjects(data.ticks[tick].objects);
+      return Promise.resolve();
     });
     await Promise.all(summarizeObjectPromises);
 
     data.uniqueObjects = uniqueObjects
-
-    const endTime = Date.now();
-    const timeTaken = endTime - startTime;
-    fs.appendFileSync('log2.txt', `prepareObject: ${timeTaken}ms\n`);
     return data
   }
 

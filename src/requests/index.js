@@ -9,17 +9,20 @@ import { requestLogger as logger } from "../helper/logger.js"
 const useProxy = process.env.WEBSHARE_TOKEN !== undefined;
 const maxProxyIndex = process.env.WEBSHARE_PROXYAMOUNT;
 
+let proxyCycles = [];
+
 async function proxy(cycle, proxyIndex) {
   while (cycle.length > 0) {
     const opts = cycle.pop();
     await processOpts(opts, proxyIndex);
+    proxyCycles.push(opts);
   }
 }
 
 
 export default class Requests {
   static async executeCycle() {
-    const cycle = await getCycle();
+    let cycle = await getCycle();
     const cycleLength = cycle.length;
     if (cycleLength === 0) {
       await sleep(1000 * 10);
@@ -29,8 +32,10 @@ export default class Requests {
       logger.info(`Executing cycle ${cycleLength}`)
 
       if (useProxy) {
+        proxyCycles = [];
         const proxies = Array.from({ length: maxProxyIndex }, (_, index) => proxy(cycle, index));
         await Promise.all(proxies);
+        cycle = proxyCycles;
       }
       else {
         for (let i = cycleLength - 1; i >= 0; i -= 1) {
@@ -63,7 +68,8 @@ export default class Requests {
       await UploadStats(stats, timestamp)
       const timeTaken = Date.now() - start;
       const percentageOnTarget = (cycleLength * 500 * 60) / timeTaken;
-      UploadStatus({ amountPerCycle: cycleLength, timePerRoom: (Date.now() - start) / cycleLength, percentageOnTarget })
+      const timePerRoom = (Date.now() - start) / cycleLength
+      UploadStatus({ amountPerCycle: cycleLength, timePerRoom, percentageOnTarget })
     }
     this.executeCycle();
   }

@@ -4,7 +4,7 @@ import ActionProcessor from "../../broker/defaultActions.js"
 
 export default async function handleObjects(data, opts) {
   const { summarize } = data;
-  const intents = summarize.intents || []
+  const { intents } = summarize
 
   let actions = [];
   const currentTick = opts.tick
@@ -75,7 +75,7 @@ export default async function handleObjects(data, opts) {
 
     // #region CountByType
     const creepPartsByType = creeps.reduce((acc, creep) => {
-      Object.entries(creep.groupedBody).forEach(([part, count]) => {
+      Object.entries(creep.groupedBody || {}).forEach(([part, count]) => {
         if (!acc[part]) acc[part] = 0;
         acc[part] += count;
       });
