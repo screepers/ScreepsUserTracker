@@ -1,0 +1,56 @@
+<mxfile host="app.diagrams.net" modified="2024-01-05T15:08:06.613Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0" etag="Gh5HTP-iMnaoAHryLcwv" version="22.1.16" type="device">
+  <diagram name="Page-1" id="vAc464kT18DR3h8ibPFw">
+    <mxGraphModel dx="794" dy="494" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="T4asyIqsFbMNS3IrbjR--4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="T4asyIqsFbMNS3IrbjR--2" target="T4asyIqsFbMNS3IrbjR--3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="T4asyIqsFbMNS3IrbjR--2" value="&#xa;&lt;br&gt;Execute cycle&lt;br&gt;&lt;br&gt;&#xa;&#xa;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="50" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="T4asyIqsFbMNS3IrbjR--6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="T4asyIqsFbMNS3IrbjR--3">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="180" y="230" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="T4asyIqsFbMNS3IrbjR--3" value="Get cycle" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="140" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="T4asyIqsFbMNS3IrbjR--7" value="Restart" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="T4asyIqsFbMNS3IrbjR--8" target="T4asyIqsFbMNS3IrbjR--3">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="230" y="260" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="290" y="265" />
+              <mxPoint x="290" y="170" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="T4asyIqsFbMNS3IrbjR--10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="T4asyIqsFbMNS3IrbjR--8" target="T4asyIqsFbMNS3IrbjR--9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="T4asyIqsFbMNS3IrbjR--8" value="&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;When requests &amp;gt; 0&lt;/div&gt;&lt;div&gt;Continue&lt;br&gt;&lt;/div&gt;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="230" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="T4asyIqsFbMNS3IrbjR--12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="T4asyIqsFbMNS3IrbjR--9" target="T4asyIqsFbMNS3IrbjR--11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="T4asyIqsFbMNS3IrbjR--9" value="&lt;div&gt;Process&lt;/div&gt;&lt;div&gt;1. Get room history&lt;/div&gt;&lt;div&gt;2. Transform data&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="330" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="T4asyIqsFbMNS3IrbjR--15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="T4asyIqsFbMNS3IrbjR--11">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="180" y="510" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="T4asyIqsFbMNS3IrbjR--11" value="&lt;div&gt;Combine room stats&lt;/div&gt;&lt;div&gt;- Group all stats&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="420" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="T4asyIqsFbMNS3IrbjR--16" value="Upload stats" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="510" width="120" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

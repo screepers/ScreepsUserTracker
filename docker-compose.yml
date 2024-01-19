@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3"
 
 x-logging: &default-logging
   driver: "local"
@@ -6,26 +6,18 @@ x-logging: &default-logging
     max-size: "20m"
     max-file: "5"
 
-volumes:
-  postgres_data:
+networks:
+  traefik-net:
+    external: true
 
 services:
-  controller:
-    build: controller
-    volumes:
-      - ./logs/controller:/app/logs
+  usertracker:
+    build: .
+    logging: *default-logging
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    ports:
-      - 5001:5001
-    logging: *default-logging
-  getter:
-    build: getter
-    ports:
-      - 4000:4000
     volumes:
-      - ./logs/getter:/app/logs
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    logging: *default-logging
+      - "./logs:/usr/app/logs"
+    networks:
+      - traefik-net
