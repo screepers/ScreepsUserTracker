@@ -95,3 +95,33 @@ export function UploadStatus(data) {
   });
   return Promise.all([graphiteQuery]);
 }
+
+export function UploadAdminUtils(data) {
+  const graphiteQuery = new Promise((resolve) => {
+    try {
+      if (process.env.GRAPHITE_ONLINE !== "TRUE") resolve();
+      else {
+        client.write(
+          {
+            [process.env.GRAPHITE_PREFIX || '']: {
+              userTracker: { [process.env.SERVER_TYPE]: { adminUtils: data } },
+            },
+          },
+          Date.now(),
+          (err) => {
+            if (err) {
+              logger.error(err);
+            } else logger.info(
+              `Written status`
+            );
+
+            resolve();
+          }
+        );
+      }
+    } catch {
+      resolve();
+    }
+  });
+  return Promise.all([graphiteQuery]);
+}

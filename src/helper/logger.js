@@ -26,7 +26,7 @@ function createCustomLogger(type) {
 }
 
 const requestLogger = createCustomLogger("request");
-
+const socketLogger = createCustomLogger("socket");
 const graphiteLogger = createCustomLogger("graphite");
 
 const apiLogger = createCustomLogger("api");
@@ -43,6 +43,11 @@ if (process.env.NODE_ENV !== "production") {
       format: format.combine(),
     })
   );
+  socketLogger.add(
+    new transports.Console({
+      format: format.combine(),
+    })
+  );
   apiLogger.add(
     new transports.Console({
       format: format.combine(),
@@ -55,4 +60,4 @@ if (process.env.NODE_ENV !== "production") {
   );
 }
 
-export { requestLogger, apiLogger, graphiteLogger, cacheLogger };
+export { requestLogger, apiLogger, graphiteLogger, cacheLogger, socketLogger };
