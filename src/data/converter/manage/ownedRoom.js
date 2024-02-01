@@ -288,6 +288,10 @@ export default async function handleObjects(data, opts) {
         )
       );
     });
+
+    actions.push(
+      ActionProcessor.CreateAction("totals.rooms.owned", 1, ActionProcessor.ActionType.FirstTickOnly)
+    );
   }
   // #endregion
 

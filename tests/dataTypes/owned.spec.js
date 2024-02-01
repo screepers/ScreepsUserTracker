@@ -105,6 +105,13 @@ describe("Owned data type process check", () => {
           expect(base.totals.minerals).toBe(i * 100)
         }
       })
+      it('should count room totals correctly', async () => {
+        for (let i = 1; i <= 10; i += 1) {
+          const data = await testHelper1.process([])
+          const base = data.stats.users[data.opts.username].stats.combined.shards[data.opts.shard]
+          expect(base.totals.rooms.owned).toBe(1)
+        }
+      })
     })
     describe("should count type totals correctly", () => {
       it('should count creepParts totals correctly', async () => {

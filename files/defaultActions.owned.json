@@ -898,5 +898,10 @@
     "path": "controller.progressCombined",
     "value": 0,
     "type": 1
+  },
+  {
+    "path": "totals.rooms.owned",
+    "value": 0,
+    "type": 1
   }
 ]
