@@ -893,5 +893,10 @@
     "path": "countByType.constructionSites.spawn",
     "value": 0,
     "type": 1
+  },
+  {
+    "path": "controller.progressCombined",
+    "value": 0,
+    "type": 1
   }
 ]
