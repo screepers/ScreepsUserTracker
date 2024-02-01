@@ -190,6 +190,7 @@ export default async function handleObjects(data, opts) {
         )
       );
 
+      const combinedRCLByLevel = [0, 0, 200, 45200, 180200, 585200, 1800200, 5445200, 16380200];
       if (controller.level < 8) {
         actions.push(
           ActionProcessor.CreateAction(
@@ -207,6 +208,13 @@ export default async function handleObjects(data, opts) {
         );
       }
 
+      actions.push(
+        ActionProcessor.CreateAction(
+          `controller.progressCombined`,
+          combinedRCLByLevel[controller.level] + (controller.level < 8 ? controller.progress : 0),
+          ActionProcessor.ActionType.FirstTickOnly
+        )
+      );
       actions.push(
         ActionProcessor.CreateAction(
           `controller.ticksToDowngrade`,

@@ -336,6 +336,20 @@ describe("Owned data type process check", () => {
           expect(base.controller.progress).toBe(0)
         }
       })
+      it("should handle progress combined correctly", async () => {
+        const combinedRCLByLevel = [0, 0, 200, 45200, 180200, 585200, 1800200, 5445200, 16380200];
+        for (let i = 1; i <= 8; i += 1) {
+          let settings = [{
+            type: TestHelper.dataTypes.controller, data: {
+              0: { progress: 0, level: i }
+            }
+          }]
+
+          let data = await testHelper1.process(settings)
+          let base = data.stats.users[data.opts.username].stats.combined.shards[data.opts.shard]
+          expect(base.controller.progressCombined).toBe(combinedRCLByLevel[i])
+        }
+      })
       it("should handle progressTotal correctly", async () => {
         for (let i = 1; i <= 10; i += 1) {
           let settings = [{
