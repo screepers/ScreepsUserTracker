@@ -11,6 +11,7 @@ export default async function process(opts, proxyIndex) {
   if (dataResult.status === "Success") {
     const { data } = dataResult;
     if (opts.username) {
+      opts.timestamp = data.timestamp;
       opts.data = await ProcessDataBroker.single(data, opts);;
     }
     return {
