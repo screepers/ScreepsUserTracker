@@ -114,7 +114,7 @@ export default class ProcessDataBroker {
       if (process.env.CHECK_FOR_NEW_ACTIONS === "TRUE")
         ActionProcessor.FindNewDefaultActions(actionsArray, opts.type);
 
-      return { data: ActionProcessor.getStats(actionsArray) };
+      return ActionProcessor.getStats(actionsArray);
     } catch (e) {
       console.error(e);
       throw e;

@@ -21,9 +21,13 @@ export function getSyncedTick(shard) {
   }
   if (!syncedTicks[shard]) {
     // eslint-disable-next-line no-nested-ternary
-    let tick = process.env.MIN_TICK !== undefined
-      ? Number.parseInt(process.env.MIN_TICK || "-1", 10)
-      : lastLiveTicks[shard] ? lastLiveTicks[shard] - 1000 : 0;
+    let tick;
+
+    if (process.env.MIN_TICK !== undefined) tick = Number.parseInt(process.env.MIN_TICK || "-1", 10)
+    else if (lastLiveTicks[shard]) tick = lastLiveTicks[shard] - 1000;
+    else {
+      return undefined;
+    }
     tick = Math.round(tick / 100) * 100
 
     syncedTicks[shard] = tick;

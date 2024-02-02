@@ -101,5 +101,7 @@ export default function handleCombinedRoomStats(shardsData, userData) {
   if (process.env.ONLY_COMBINED_DATA_UPLOAD === "true")
     delete userStats.shards;
 
+  userStats.userData = userData;
+
   return { stats: userStats }
 }
