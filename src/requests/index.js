@@ -69,7 +69,7 @@ export default class Requests {
       const timeTaken = Date.now() - start;
       const percentageOnTarget = (cycleLength * 500 * 60) / timeTaken;
       const timePerRoom = (Date.now() - start) / cycleLength
-      UploadStatus({ amountPerCycle: cycleLength, timePerRoom, percentageOnTarget })
+      UploadStatus({ amountPerCycle: cycleLength, timePerRoom, percentageOnTarget, timeTaken })
     }
     this.executeCycle();
   }
