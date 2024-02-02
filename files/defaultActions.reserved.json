@@ -883,5 +883,10 @@
     "path": "countByType.constructionSites.rampart",
     "value": 0,
     "type": 1
+  },
+  {
+    "path": "totals.rooms.reserved",
+    "value": 0,
+    "type": 1
   }
 ]

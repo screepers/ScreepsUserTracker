@@ -67,7 +67,7 @@ export default class ProcessDataBroker {
 
     const summarizeObjectPromises = Array.from({ length: 100 }, (_, t) => {
       const tick = tickKeys[t];
-      data.ticks[tick].summarize = summarizeObjects(data.ticks[tick].objects);
+      if (tick) data.ticks[tick].summarize = summarizeObjects(data.ticks[tick].objects);
       return Promise.resolve();
     });
     await Promise.all(summarizeObjectPromises);
