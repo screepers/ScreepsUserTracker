@@ -1,4 +1,4 @@
-# Complete Data
+# defaultActions.owned.json
 
 ## totals
 
@@ -12,7 +12,6 @@
 ### rooms
 
 - owned
-- reserved
 
 ## countByType
 
