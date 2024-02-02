@@ -28,7 +28,8 @@ async function downloadAndUploadProxyStatistics() {
   try {
     // it requires in the query the timestamp_lte and timestamp_gte an do it in a string like 2022-09-09T23:34:00.095501-07:00
     const timestamp_lte = new Date().toISOString();
-    const timestamp_gte = new Date(new Date().getTime() - 1000 * 60 * 60 * 24).toISOString();
+    // gte is at start of month
+    const timestamp_gte = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
     const url = `https://proxy.webshare.io/api/v2/stats/aggregate?timestamp__lte=${timestamp_lte}&timestamp__gte=${timestamp_gte}`;
     const headers = {
       Authorization: `Token ${WEBSHARE_TOKEN}`,
