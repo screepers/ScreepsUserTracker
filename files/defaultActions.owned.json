@@ -110,11 +110,6 @@
     "type": 1
   },
   {
-    "path": "minerals.undefined",
-    "type": 1,
-    "value": 0
-  },
-  {
     "path": "controller.level",
     "value": 0,
     "type": 1
