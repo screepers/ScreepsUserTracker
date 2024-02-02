@@ -176,6 +176,10 @@ export default async function handleObjects(data, opts) {
         )
       );
     });
+
+    actions.push(
+      ActionProcessor.CreateAction("totals.rooms.reserved", 1, ActionProcessor.ActionType.FirstTickOnly)
+    );
   }
   // #endregion
 

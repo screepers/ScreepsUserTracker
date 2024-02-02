@@ -16,7 +16,7 @@ switch (process.env.SERVER_TYPE) {
 }
 const baseHistoryPath = process.env.PRIVATE_SERVER_USERNAME ?
   `${process.env.PRIVATE_SERVER_PROTOCOL}://${process.env.PRIVATE_SERVER_HOST
-  }:${process.env.PRIVATE_SERVER_PORT}${path}` : `https://screeps.com${path}`;
+  }:${process.env.PRIVATE_SERVER_PORT}/` : `https://screeps.com/`;
 
 
 const isPrivateServer = !!process.env.PRIVATE_SERVER_USERNAME;
@@ -69,10 +69,11 @@ export async function GetGameTime(shard) {
 }
 
 async function getHistory(proxy, room, tick, shard) {
+  const url = isPrivateServer ?
+    `${baseHistoryPath}room-history?room=${room}&time=${tick}` :
+    `${baseHistoryPath}room-history/${shard}/${room}/${tick}.json`;
+
   if (!proxy) {
-    const url = isPrivateServer ?
-      `${baseHistoryPath}room-history?room=${room}&time=${tick}` :
-      `${baseHistoryPath}room-history/${shard}/${room}/${tick}.json`;
     try {
       const response = await axios.get(url);
       logger.info(`GetHistory - Success: ${url}`);
@@ -104,9 +105,6 @@ async function getHistory(proxy, room, tick, shard) {
     const agent = new HttpsProxyAgent(
       proxyUrl
     );
-    const url = isPrivateServer ?
-      `${baseHistoryPath}room-history?room=${room}&time=${tick}` :
-      `${baseHistoryPath}room-history/${shard}/${room}/${tick}.json`;
     axios
       .get(url, {
         httpsAgent: agent,

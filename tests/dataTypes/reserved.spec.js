@@ -158,6 +158,13 @@ describe("Reserved data type process check", () => {
           expect(base.countByType.constructionSites[type]).toBe(5)
         }
       })
+      it('should count room totals correctly', async () => {
+        for (let i = 1; i <= 10; i += 1) {
+          const data = await testHelper1.process([])
+          const base = data.stats.users[data.opts.username].stats.combined.shards[data.opts.shard]
+          expect(base.totals.rooms.reserved).toBe(1)
+        }
+      })
     })
     describe("should handle construction correctly", () => {
       it('should handle progressPercentage correctly', async () => {

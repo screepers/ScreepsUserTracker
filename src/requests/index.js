@@ -54,7 +54,7 @@ export default class Requests {
         users[username] = users[username] || {};
         users[username][shard] = users[username][shard] || {}
         users[username][shard][room] = data;
-        timestamp = data.timestamp;
+        timestamp = opts.timestamp;
       }
 
       const usernames = Object.keys(users);

@@ -35,6 +35,7 @@ const userByIdCache = cleanSource(baseCache)
 export default class Cache {
   static shouldUpdateCache(type) {
     let cache;
+    const shouldUpdateInterval = 1000 * 60 * 60;
     switch (type) {
       case 'rooms':
         cache = roomsCache;
@@ -52,8 +53,7 @@ export default class Cache {
         break;
     }
 
-    const shouldUpdate = Date.now() - cache.lastUpdate > 1000 * 60 * 60;
-    return shouldUpdate;
+    return Date.now() - cache.lastUpdate > shouldUpdateInterval;
   }
 
   static async getRoomsCache() {
