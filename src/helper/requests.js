@@ -77,6 +77,7 @@ export function cycleStatus(cycle) {
     processed: [],
     failed: [],
   };
+
   for (let i = 0; i < cycle.length; i += 1) {
     const opts = cycle[i];
     if (opts.data) {
@@ -86,6 +87,22 @@ export function cycleStatus(cycle) {
       status.failed.push(opts)
     }
   }
+
+  // get usernames in status.failed
+  const usernames = status.failed.map((opts) => opts.username);
+  const uniqueFailedUsernames = [...new Set(usernames)];
+  let actuallyProccessed = [];
+  for (let i = 0; i < status.processed.length; i += 1) {
+    const opts = status.processed[i];
+    if (!uniqueFailedUsernames.includes(opts.username)) {
+      actuallyProccessed.push(opts);
+    }
+    else {
+      status.failed.push(opts);
+    }
+  }
+
+  status.processed = actuallyProccessed;
   return status;
 }
 
