@@ -24,10 +24,7 @@ export default class Requests {
   static async executeCycle() {
     let cycle = await getCycle();
     const cycleLength = cycle.length;
-    if (cycleLength === 0) {
-      await sleep(1000 * 10);
-    }
-    else {
+    if (cycleLength > 0) {
       const start = Date.now();
       logger.info(`Executing cycle ${cycleLength}`)
 
@@ -71,6 +68,8 @@ export default class Requests {
       const timePerRoom = (Date.now() - start) / cycleLength
       UploadStatus({ cycleDetails: { amount: cycleLength, success: status.processed.length, failed: status.failed.length, successRate: Math.round((status.processed.length / cycleLength) * 100) }, timePerRoom, percentageOnTarget, timeTaken })
     }
+    await sleep(1000 * 5);
+
     this.executeCycle();
   }
 }
