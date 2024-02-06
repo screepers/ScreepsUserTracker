@@ -47,5 +47,5 @@ export default async function processData(opts, proxyIndex) {
   }
 
   opts.failed = true;
-  return process(opts, proxyIndex);
+  return processData(opts, proxyIndex);
 }
