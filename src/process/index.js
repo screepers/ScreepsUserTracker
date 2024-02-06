@@ -3,6 +3,7 @@ import getProxy from "../helper/proxy.js";
 import { FixedThreadPool } from "poolifier";
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import ProcessDataBroker from "../data/broker/processData.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
