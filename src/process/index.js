@@ -6,17 +6,20 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const pool = new FixedThreadPool(4, __dirname + "/processThreadWorker.js",
-  {
-    errorHandler: (e) => {
-      console.error(e);
-    },
-    onlineHandler: () => {
-      console.log("A thread came online");
-    }
-  });
+let pool = null;
+if (process.env.USE_MULTITHREADING_CORES) {
+  pool = new FixedThreadPool(process.env.USE_MULTITHREADING_CORES, __dirname + "/processThreadWorker.js",
+    {
+      errorHandler: (e) => {
+        console.error(e);
+      },
+      onlineHandler: () => {
+        console.log("A thread came online");
+      }
+    });
+}
 
-export default async function process(opts, proxyIndex) {
+export default async function processData(opts, proxyIndex) {
   let proxy = null;
   if (proxyIndex !== undefined) {
     proxy = await getProxy(proxyIndex);
@@ -26,8 +29,12 @@ export default async function process(opts, proxyIndex) {
     const { data } = dataResult;
     if (opts.username) {
       opts.timestamp = data.timestamp;
-      opts.data = await pool.execute({ roomData: data, opts });
-      // opts.data = await ProcessDataBroker.single(data, opts);;
+      if (process.env.USE_MULTITHREADING_CORES) {
+        opts.data = await pool.execute({ roomData: data, opts });
+      }
+      else {
+        opts.data = await ProcessDataBroker.single({ roomData: data, opts });;
+      }
     }
     return {
       status: "Success",
