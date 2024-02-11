@@ -4,7 +4,6 @@ import { sleep } from "../helper/index.js";
 import { getCycle, cycleStatus } from "../helper/requests.js";
 import processOpts from "../process/index.js";
 import { GetUserData } from "../helper/users.js"
-import { requestLogger as logger } from "../helper/logger.js"
 
 const useProxy = process.env.WEBSHARE_TOKEN !== undefined;
 const maxProxyIndex = process.env.WEBSHARE_PROXYAMOUNT;
@@ -68,26 +67,14 @@ export default class Requests {
       const timeTaken = Date.now() - start;
       const percentageOnTarget = (cycleLength * 500 * 60) / timeTaken;
       const timePerRoom = (Date.now() - start) / cycleLength
-      await UploadStatus({ amountPerCycle: cycleLength, timePerRoom, percentageOnTarget })
-        if (opts.timestamp) timestamp = opts.timestamp;
-      }
-
-      if (timestamp) {
-        const usernames = Object.keys(users);
-        const stats = { users: {} };
-        for (let u = 0; u < usernames.length; u += 1) {
-          const username = usernames[u];
-          const user = users[username];
-          const userData = GetUserData(username)
-          stats.users[username] = handleCombinedRoomStats(user, userData);
-        }
-        await UploadStats(stats, timestamp)
-        const timeTaken = Date.now() - start;
-        const percentageOnTarget = (cycleLength * 500 * 60) / timeTaken;
-        const timePerRoom = (Date.now() - start) / cycleLength
-        await UploadStatus({ cycleDetails: { amount: cycleLength, success: status.processed.length, failed: status.failed.length, successRate: Math.round((status.processed.length / cycleLength) * 100) }, timePerRoom, percentageOnTarget, timeTaken })
-      }
-      await sleep(1000 * 1);
+      await UploadStatus({
+        cycleDetails:
+        {
+          amount: cycleLength, success: status.processed.length, failed: status.failed.length,
+          successRate: Math.round((status.processed.length / cycleLength) * 100)
+        },
+        timePerRoom, percentageOnTarget, timeTaken
+      })
     }
     else {
       await sleep(1000 * 60);
