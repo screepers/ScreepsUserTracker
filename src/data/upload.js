@@ -34,7 +34,7 @@ export default function UploadStats(data, timestamp) {
             if (err) {
               logger.error(err);
             } else logger.info(
-              `Written data`
+              `Written data at ${new Date(_timestamp)}`
             );
 
             resolve();
@@ -112,7 +112,7 @@ export function UploadAdminUtils(data) {
             if (err) {
               logger.error(err);
             } else logger.info(
-              `Written status`
+              `Written admin utils`
             );
 
             resolve();

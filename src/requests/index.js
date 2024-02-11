@@ -26,7 +26,6 @@ export default class Requests {
     const cycleLength = cycle.length;
     if (cycleLength > 0) {
       const start = Date.now();
-      logger.info(`Executing cycle ${cycleLength}`)
 
       if (useProxy) {
         proxyCycles = [];
@@ -51,24 +50,29 @@ export default class Requests {
         users[username] = users[username] || {};
         users[username][shard] = users[username][shard] || {}
         users[username][shard][room] = data;
-        timestamp = opts.timestamp;
+        if (opts.timestamp) timestamp = opts.timestamp;
       }
 
-      const usernames = Object.keys(users);
-      const stats = { users: {} };
-      for (let u = 0; u < usernames.length; u += 1) {
-        const username = usernames[u];
-        const user = users[username];
-        const userData = GetUserData(username)
-        stats.users[username] = handleCombinedRoomStats(user, userData);
+      if (timestamp) {
+        const usernames = Object.keys(users);
+        const stats = { users: {} };
+        for (let u = 0; u < usernames.length; u += 1) {
+          const username = usernames[u];
+          const user = users[username];
+          const userData = GetUserData(username)
+          stats.users[username] = handleCombinedRoomStats(user, userData);
+        }
+        await UploadStats(stats, timestamp)
+        const timeTaken = Date.now() - start;
+        const percentageOnTarget = (cycleLength * 500 * 60) / timeTaken;
+        const timePerRoom = (Date.now() - start) / cycleLength
+        await UploadStatus({ cycleDetails: { amount: cycleLength, success: status.processed.length, failed: status.failed.length, successRate: Math.round((status.processed.length / cycleLength) * 100) }, timePerRoom, percentageOnTarget, timeTaken })
       }
-      await UploadStats(stats, timestamp)
-      const timeTaken = Date.now() - start;
-      const percentageOnTarget = (cycleLength * 500 * 60) / timeTaken;
-      const timePerRoom = (Date.now() - start) / cycleLength
-      UploadStatus({ cycleDetails: { amount: cycleLength, success: status.processed.length, failed: status.failed.length, successRate: Math.round((status.processed.length / cycleLength) * 100) }, timePerRoom, percentageOnTarget, timeTaken })
+      await sleep(1000 * 1);
     }
-    await sleep(1000 * 5);
+    else {
+      await sleep(1000 * 60);
+    }
 
     this.executeCycle();
   }

@@ -35,7 +35,7 @@ async function downloadAndUploadProxyStatistics() {
     };
     const response = await axios.get(url, { headers });
     const { data } = response;
-    UploadStatus({ proxyStats: data });
+    await UploadStatus({ proxyStats: data });
   } catch (error) {
     console.error(error);
   }

@@ -13,7 +13,7 @@ export function getLiveTick(shard) {
 }
 
 export function getSyncedTick(shard) {
-  const liveTick = getLiveTick(shard) - 1000;
+  const liveTick = getLiveTick(shard) - 250;
   if (syncedTicks[shard] < liveTick) {
     syncedTicks[shard] += 100;
     UploadStatus({ syncedTicks, liveTicks: lastLiveTicks })
