@@ -1,5 +1,6 @@
 import handleOwnedObjects from "../converter/manage/ownedRoom.js";
 import handleReservedObjects from "../converter/manage/reservedRoom.js";
+import handleUnknownObjects from "../converter/manage/unknownRoom.js";
 
 import prepareObject from "../converter/prepare/object.js";
 import { summarizeObjects } from "../converter/helper.js";
@@ -88,6 +89,9 @@ export default class ProcessDataBroker {
           break;
         case "reserved":
           handleObjects = handleReservedObjects;
+          break;
+        case "unknown":
+          handleObjects = handleUnknownObjects;
           break;
         default:
           break;

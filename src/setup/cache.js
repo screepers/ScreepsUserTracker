@@ -7,7 +7,7 @@ import { cacheLogger as logger } from "../helper/logger.js";
 import { UpdateLocalUsersCache } from "../helper/users.js";
 
 let loginInfo = process.env.SCREEPS_TOKEN;
-const settings = process.env.PRIVATE_SERVER_SETTINGS ? JSON.parse(process.env.PRIVATE_SERVER_SETTINGS) : {};
+const settings = process.env.API_SETTINGS ? JSON.parse(process.env.API_SETTINGS) : {};
 if (process.env.PRIVATE_SERVER_USERNAME) {
   loginInfo = {
     protocol: process.env.PRIVATE_SERVER_PROTOCOL,

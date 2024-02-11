@@ -4,6 +4,7 @@ import getProxy from "../helper/proxy.js";
 import { FixedThreadPool } from "poolifier";
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { GetUsernameById } from "../helper/users.js";
 import ProcessDataBroker from "../data/broker/processData.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -47,6 +48,55 @@ export default async function processData(opts, proxyIndex) {
         opts.data = await pool.execute({ roomData: data, opts });
       }
       else {
+        if (opts.username === "Unknown") {
+          const userIds = {};
+          const tick = Object.values(data.ticks)[0];
+          if (tick) {
+            const tickObjects = Object.values(tick);
+            for (let i = 0; i < tickObjects.length; i += 1) {
+              const tickData = tickObjects[i];
+              if (tickData.controller) {
+                opts.userId = tickData.controller.user;
+                opts.username = await GetUsernameById(opts.userId);
+                opts.type = "owned"
+                break;
+              }
+              if (tickData.reservation) {
+                opts.userId = tickData.reservation.user;
+                opts.username = await GetUsernameById(opts.userId);
+                opts.type = "reserved"
+                break;
+              }
+              if (tickData.user) {
+                userIds[tickData.user] = userIds[tickData.user] || 0;
+                userIds[tickData.user] += 1;
+              }
+            }
+
+            if (opts.username === "Unknown") {
+              let max = 0;
+              let maxId = "Unknown";
+              const userIdsKeys = Object.keys(userIds);
+              for (let u = 0; u < userIdsKeys.length; u += 1) {
+                const id = userIdsKeys[u];
+                if (userIds[id] > max) {
+                  max = userIds[id];
+                  maxId = id;
+                }
+              }
+
+              opts.userId = maxId;
+              opts.username = await GetUsernameById(maxId);
+            }
+          }
+
+          if (!opts.username || opts.username === "Unknown") {
+            return {
+              status: "No user",
+            }
+          }
+        }
+
         opts.data = await ProcessDataBroker.single({ roomData: data, opts });
       }
 
@@ -62,12 +112,11 @@ export default async function processData(opts, proxyIndex) {
         status: "Failed",
       };
     }
-    else {
-      opts.data = validData[`${opts.shard}-${opts.room}`] || {};
-      return {
-        status: "Success",
-      };
-    }
+
+    opts.data = validData[`${opts.shard}-${opts.room}`] || {};
+    return {
+      status: "Success",
+    };
   }
 
   opts.failed = true;

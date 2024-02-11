@@ -14,6 +14,7 @@ async function proxy(cycle, proxyIndex) {
   while (cycle.length > 0) {
     const opts = cycle.pop();
     await processOpts(opts, proxyIndex);
+    console.log(`${cycle.length} left out of ${cycle.length + proxyCycles.length} of cycle ${opts.shard}/${opts.tick}`)
     proxyCycles.push(opts);
   }
 }

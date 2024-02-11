@@ -13,6 +13,7 @@
 
 - owned
 - reserved
+- unknown
 
 ## countByType
 
