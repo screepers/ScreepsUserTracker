@@ -13,7 +13,7 @@ export function getLiveTick(shard) {
 }
 
 export function getSyncedTick(shard) {
-  const liveTick = getLiveTick(shard) - 1000;
+  const liveTick = getLiveTick(shard) - 250;
   if (syncedTicks[shard] < liveTick) {
     syncedTicks[shard] += 100;
     UploadStatus({ syncedTicks, liveTicks: lastLiveTicks })
@@ -21,9 +21,13 @@ export function getSyncedTick(shard) {
   }
   if (!syncedTicks[shard] && lastLiveTicks[shard]) {
     // eslint-disable-next-line no-nested-ternary
-    let tick = process.env.MIN_TICK !== undefined
-      ? Number.parseInt(process.env.MIN_TICK || "-1", 10)
-      : lastLiveTicks[shard] ? lastLiveTicks[shard] - 1000 : 0;
+    let tick;
+
+    if (process.env.MIN_TICK !== undefined) tick = Number.parseInt(process.env.MIN_TICK || "-1", 10)
+    else if (lastLiveTicks[shard]) tick = lastLiveTicks[shard] - 1000;
+    else {
+      return undefined;
+    }
     tick = Math.round(tick / 100) * 100
 
     syncedTicks[shard] = tick;
@@ -73,6 +77,7 @@ export function cycleStatus(cycle) {
     processed: [],
     failed: [],
   };
+
   for (let i = 0; i < cycle.length; i += 1) {
     const opts = cycle[i];
     if (opts.data) {
@@ -82,6 +87,22 @@ export function cycleStatus(cycle) {
       status.failed.push(opts)
     }
   }
+
+  // get usernames in status.failed
+  const usernames = status.failed.map((opts) => opts.username);
+  const uniqueFailedUsernames = [...new Set(usernames)];
+  let actuallyProccessed = [];
+  for (let i = 0; i < status.processed.length; i += 1) {
+    const opts = status.processed[i];
+    if (!uniqueFailedUsernames.includes(opts.username)) {
+      actuallyProccessed.push(opts);
+    }
+    else {
+      status.failed.push(opts);
+    }
+  }
+
+  status.processed = actuallyProccessed;
   return status;
 }
 

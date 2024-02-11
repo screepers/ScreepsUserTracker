@@ -35,7 +35,7 @@ const userByIdCache = cleanSource(baseCache)
 export default class Cache {
   static shouldUpdateCache(type) {
     let cache;
-    const shouldUpdateInterval = 1000 * 60 * 60;
+    const shouldUpdateInterval = 1000 * 60 * 15;
     switch (type) {
       case 'rooms':
         cache = roomsCache;

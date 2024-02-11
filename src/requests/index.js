@@ -24,12 +24,8 @@ export default class Requests {
   static async executeCycle() {
     let cycle = await getCycle();
     const cycleLength = cycle.length;
-    if (cycleLength === 0) {
-      await sleep(1000 * 10);
-    }
-    else {
+    if (cycleLength > 0) {
       const start = Date.now();
-      logger.info(`Executing cycle ${cycleLength}`)
 
       if (useProxy) {
         proxyCycles = [];
@@ -73,7 +69,30 @@ export default class Requests {
       const percentageOnTarget = (cycleLength * 500 * 60) / timeTaken;
       const timePerRoom = (Date.now() - start) / cycleLength
       await UploadStatus({ amountPerCycle: cycleLength, timePerRoom, percentageOnTarget })
+        if (opts.timestamp) timestamp = opts.timestamp;
+      }
+
+      if (timestamp) {
+        const usernames = Object.keys(users);
+        const stats = { users: {} };
+        for (let u = 0; u < usernames.length; u += 1) {
+          const username = usernames[u];
+          const user = users[username];
+          const userData = GetUserData(username)
+          stats.users[username] = handleCombinedRoomStats(user, userData);
+        }
+        await UploadStats(stats, timestamp)
+        const timeTaken = Date.now() - start;
+        const percentageOnTarget = (cycleLength * 500 * 60) / timeTaken;
+        const timePerRoom = (Date.now() - start) / cycleLength
+        await UploadStatus({ cycleDetails: { amount: cycleLength, success: status.processed.length, failed: status.failed.length, successRate: Math.round((status.processed.length / cycleLength) * 100) }, timePerRoom, percentageOnTarget, timeTaken })
+      }
+      await sleep(1000 * 1);
     }
+    else {
+      await sleep(1000 * 60);
+    }
+
     this.executeCycle();
   }
 }

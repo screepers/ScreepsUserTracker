@@ -76,41 +76,48 @@ export default class ProcessDataBroker {
     return data
   }
 
-  static async single(roomData, opts) {
-    this.setTickRate(roomData, opts);
+  static async single(data) {
+    try {
+      const { opts, roomData } = data
+      this.setTickRate(roomData, opts);
 
-    let handleObjects = null;
-    switch (opts.type) {
-      case "owned":
-        handleObjects = handleOwnedObjects;
-        break;
-      case "reserved":
-        handleObjects = handleReservedObjects;
-        break;
-      default:
-        break;
-    }
-
-    let actionsArray = [];
-    const { ticks, uniqueObjects } = await this.prepareObjects(roomData.ticks, opts);
-
-    opts.uniqueObjects = uniqueObjects
-
-    const tickKeys = Object.keys(ticks);
-    for (let t = 0; t < tickKeys.length; t += 1) {
-      const tick = tickKeys[t];
-      opts.isFirstTick = t === 0
-      if (ticks[tick]) {
-        actionsArray = actionsArray.concat(
-          await handleObjects(ticks[tick], opts)
-        );
+      let handleObjects = null;
+      switch (opts.type) {
+        case "owned":
+          handleObjects = handleOwnedObjects;
+          break;
+        case "reserved":
+          handleObjects = handleReservedObjects;
+          break;
+        default:
+          break;
       }
+
+      let actionsArray = [];
+      const { ticks, uniqueObjects } = await this.prepareObjects(roomData.ticks, opts);
+
+      opts.uniqueObjects = uniqueObjects
+
+      const tickKeys = Object.keys(ticks);
+      for (let t = 0; t < tickKeys.length; t += 1) {
+        const tick = tickKeys[t];
+        opts.isFirstTick = t === 0
+        opts.tick = parseInt(tick, 10);
+        if (ticks[tick]) {
+          actionsArray = actionsArray.concat(
+            await handleObjects(ticks[tick], opts)
+          );
+        }
+      }
+
+
+      if (process.env.CHECK_FOR_NEW_ACTIONS === "TRUE")
+        ActionProcessor.FindNewDefaultActions(actionsArray, opts.type);
+
+      return ActionProcessor.getStats(actionsArray);
+    } catch (e) {
+      console.error(e);
+      throw e;
     }
-
-
-    if (process.env.CHECK_FOR_NEW_ACTIONS === "TRUE")
-      ActionProcessor.FindNewDefaultActions(actionsArray, opts.type);
-
-    return ActionProcessor.getStats(actionsArray);
   }
 }
