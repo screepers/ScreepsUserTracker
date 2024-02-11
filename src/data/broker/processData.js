@@ -100,7 +100,6 @@ export default class ProcessDataBroker {
     for (let t = 0; t < tickKeys.length; t += 1) {
       const tick = tickKeys[t];
       opts.isFirstTick = t === 0
-      opts.tick = parseInt(tick, 10);
       if (ticks[tick]) {
         actionsArray = actionsArray.concat(
           await handleObjects(ticks[tick], opts)

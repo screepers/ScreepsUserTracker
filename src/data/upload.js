@@ -1,15 +1,15 @@
 import graphite from "graphite";
+import postgres from 'postgres'
 import { graphiteLogger as logger } from '../helper/logger.js'
-// import postgres from 'postgres'
 
-// let sql = null;
-// if (process.env.POSTGRES_ENABLED === 'TRUE') sql = postgres({
-//   host: process.env.POSTGRES_HOST,
-//   port: process.env.POSTGRES_PORT,
-//   database: 'postgres',
-//   username: process.env.POSTGRES_USER,
-//   password: process.env.POSTGRES_PASSWORD,
-// })
+let sql = null;
+if (process.env.POSTGRES_ENABLED === 'TRUE') sql = postgres({
+  host: process.env.POSTGRES_HOST,
+  port: process.env.POSTGRES_PORT,
+  database: 'screeps',
+  username: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+})
 
 const client = graphite.createClient(
   `plaintext://${process.env.GRAPHITE_HOST}/`
@@ -17,6 +17,7 @@ const client = graphite.createClient(
 
 
 export default function UploadStats(data, timestamp) {
+
   const graphiteQuery = new Promise((resolve) => {
     try {
       if (process.env.GRAPHITE_ONLINE !== "TRUE") resolve();
@@ -46,24 +47,17 @@ export default function UploadStats(data, timestamp) {
     }
   });
   return Promise.all([graphiteQuery]);
+}
 
-  // eslint-disable-next-line
-  // const postgresQuery = new Promise(async (resolve) => {
-  //   try {
-  //     if (process.env.POSTGRES_ENABLED !== 'TRUE') resolve();
-  //     const shards = Object.keys(data.ticks.history);
-  //     if (shards.length !== 1) resolve();
-  //     const tick = Number(data.ticks.history[shards[0]]);
-  //     const username = Object.keys(data.users)[0];
-
-  //     await sql`
-  //     INSERT INTO public.tickData ${sql({ data, tick, username }, 'data', 'tick', 'username')}`
-  //   } catch (err) {
-  //     resolve();
-  //   }
-  // })
-
-  // return Promise.all([graphiteQuery, postgresQuery]);
+export async function UploadCombinedData(data, tick, username) {
+  try {
+    if (process.env.POSTGRES_ENABLED !== 'TRUE') return;
+    await sql`
+      INSERT INTO public.tick_data 
+      ${sql({ data, tick, username }, 'data', 'tick', 'username')}`
+  } catch (error) {
+    logger.error(error)
+  }
 }
 
 export function UploadStatus(data) {

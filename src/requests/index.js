@@ -1,5 +1,5 @@
 import handleCombinedRoomStats from "../data/combineResults.js";
-import UploadStats, { UploadStatus } from "../data/upload.js";
+import UploadStats, { UploadStatus, UploadCombinedData } from "../data/upload.js";
 import { sleep } from "../helper/index.js";
 import { getCycle, cycleStatus } from "../helper/requests.js";
 import processOpts from "../process/index.js";
@@ -48,6 +48,7 @@ export default class Requests {
       const status = cycleStatus(cycle);
       const users = {}
       let timestamp;
+      let tick;
       for (let p = 0; p < status.processed.length; p += 1) {
         const opts = status.processed[p];
         const { username, shard, room, data } = opts;
@@ -55,6 +56,7 @@ export default class Requests {
         users[username][shard] = users[username][shard] || {}
         users[username][shard][room] = data;
         timestamp = opts.timestamp;
+        tick = opts.tick;
       }
 
       const usernames = Object.keys(users);
@@ -64,12 +66,13 @@ export default class Requests {
         const user = users[username];
         const userData = GetUserData(username)
         stats.users[username] = handleCombinedRoomStats(user, userData);
+        await UploadCombinedData(stats.users[username].stats, tick, username)
       }
       await UploadStats(stats, timestamp)
       const timeTaken = Date.now() - start;
       const percentageOnTarget = (cycleLength * 500 * 60) / timeTaken;
       const timePerRoom = (Date.now() - start) / cycleLength
-      UploadStatus({ amountPerCycle: cycleLength, timePerRoom, percentageOnTarget })
+      await UploadStatus({ amountPerCycle: cycleLength, timePerRoom, percentageOnTarget })
     }
     this.executeCycle();
   }

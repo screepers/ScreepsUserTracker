@@ -19,7 +19,7 @@ export function getSyncedTick(shard) {
     UploadStatus({ syncedTicks, liveTicks: lastLiveTicks })
     return syncedTicks[shard];
   }
-  if (!syncedTicks[shard]) {
+  if (!syncedTicks[shard] && lastLiveTicks[shard]) {
     // eslint-disable-next-line no-nested-ternary
     let tick = process.env.MIN_TICK !== undefined
       ? Number.parseInt(process.env.MIN_TICK || "-1", 10)
