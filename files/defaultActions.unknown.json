@@ -323,5 +323,20 @@
     "path": "countByType.intents.rangedHeal",
     "value": 0,
     "type": 0
+  },
+  {
+    "path": "countByType.creepParts.tough",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "countByType.constructionSites.extension",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "countByType.constructionSites.storage",
+    "value": 0,
+    "type": 1
   }
 ]

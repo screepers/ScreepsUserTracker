@@ -33,8 +33,18 @@ function shouldFail(opts) {
   return true;
 }
 
+const lastRequest = {}
+async function waitMax500ms(proxyIndex) {
+  const last = lastRequest[proxyIndex] || 0;
+  const diff = Date.now() - last;
+  if (diff < 500) {
+    return sleep(500 - diff);
+  }
+  return Promise.resolve();
+}
+
 export default async function processData(opts, proxyIndex) {
-  await sleep(500)
+  await waitMax500ms(proxyIndex);
   let proxy = null;
   if (proxyIndex !== undefined) {
     proxy = await getProxy(proxyIndex);

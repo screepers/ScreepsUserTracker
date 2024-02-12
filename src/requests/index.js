@@ -37,6 +37,7 @@ export default class Requests {
         for (let i = cycleLength - 1; i >= 0; i -= 1) {
           const opts = cycle[i];
           console.log(`${cycleLength - i} / ${cycleLength} of cycle ${opts.shard}/${opts.tick}`)
+          await sleep(500)
           await processOpts(opts, undefined);
         }
       }
