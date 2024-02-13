@@ -80,11 +80,11 @@ async function getHistory(proxy, room, tick, shard) {
       return { status: "Success", result: response.data };
     } catch (error) {
       if (error.message && error.message.includes("404 Not Found")) {
-        logger.info(`GetHistory - ${url} / ${error.message}`)
+        // logger.info(`GetHistory - ${url} / ${error.message}`)
         return { status: "Not found", message: error };
       }
 
-      logger.error(`GetHistory - ${url} / ${error.message} / ${error.stack}`)
+      // logger.error(`GetHistory - ${url} / ${error.message} / ${error.stack}`)
       return { status: "Error", message: error };
     }
   }

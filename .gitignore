@@ -10,3 +10,5 @@ ips.json
 users.json
 requests.json
 roomsBeingChecked.json
+newrelic_agent.log
+newrelic.cjs

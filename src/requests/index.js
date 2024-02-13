@@ -14,7 +14,6 @@ async function proxy(cycle, proxyIndex) {
   while (cycle.length > 0) {
     const opts = cycle.pop();
     await processOpts(opts, proxyIndex);
-    console.log(`${cycle.length} left out of ${cycle.length + proxyCycles.length} of cycle ${opts.shard}/${opts.tick}`)
     proxyCycles.push(opts);
   }
 }
@@ -36,8 +35,6 @@ export default class Requests {
       else {
         for (let i = cycleLength - 1; i >= 0; i -= 1) {
           const opts = cycle[i];
-          console.log(`${cycleLength - i} / ${cycleLength} of cycle ${opts.shard}/${opts.tick}`)
-          await sleep(500)
           await processOpts(opts, undefined);
         }
       }
@@ -67,6 +64,7 @@ export default class Requests {
       }
       await UploadStats(stats, timestamp)
       const timeTaken = Date.now() - start;
+
       const percentageOnTarget = (cycleLength * 500 * 60) / timeTaken;
       const timePerRoom = (Date.now() - start) / cycleLength
       await UploadStatus({

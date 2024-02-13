@@ -338,5 +338,40 @@
     "path": "countByType.constructionSites.storage",
     "value": 0,
     "type": 1
+  },
+  {
+    "path": "countByType.constructionSites.rampart",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.energy",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.UH",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.ZH",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.KO",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.GO",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "countByType.intents.upgradeController",
+    "value": 0,
+    "type": 0
   }
 ]
