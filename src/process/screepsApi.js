@@ -63,7 +63,7 @@ export async function GetGameTime(shard) {
     }
     return lastTickCache[shard].tick;
   } catch (error) {
-    logger.error(`GetGameTIme / ${error.message} / ${error.stack}`)
+    logger.error(`GetGameTime / ${error.message} / ${error.stack}`)
     return undefined;
   }
 }
