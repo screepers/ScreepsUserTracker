@@ -6,7 +6,6 @@ import processOpts from "../process/index.js";
 import { GetUserData } from "../helper/users.js"
 
 const useProxy = process.env.WEBSHARE_TOKEN !== undefined;
-const maxProxyIndex = process.env.WEBSHARE_PROXYAMOUNT;
 
 let proxyCycles = [];
 
@@ -28,7 +27,7 @@ export default class Requests {
 
       if (useProxy) {
         proxyCycles = [];
-        const proxies = Array.from({ length: maxProxyIndex }, (_, index) => proxy(cycle, index));
+        const proxies = Array.from({ length: 100 }, (_, index) => proxy(cycle, index));
         await Promise.all(proxies);
         cycle = proxyCycles;
       }

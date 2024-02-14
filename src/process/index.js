@@ -31,6 +31,7 @@ export default async function processData(opts, proxyIndex) {
   if (proxyIndex !== undefined) {
     proxy = await getProxy(proxyIndex);
   }
+
   const dataResult = await GetRoomHistory(proxy, opts.shard, opts.room, opts.tick);
   if (dataResult.status === "Success") {
     const { data } = dataResult;
@@ -105,6 +106,9 @@ export default async function processData(opts, proxyIndex) {
     };
   }
 
-  opts.failed = true;
-  return processData(opts, proxyIndex);
+  return {
+    status: "Failed",
+  };
+  // opts.failed = true;
+  // return processData(opts, proxyIndex);
 }
