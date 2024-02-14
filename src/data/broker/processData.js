@@ -107,6 +107,7 @@ export default class ProcessDataBroker {
         const tick = tickKeys[t];
         opts.isFirstTick = t === 0
         if (ticks[tick]) {
+          opts.currentTick = tick;
           actionsArray = actionsArray.concat(
             await handleObjects(ticks[tick], opts)
           );

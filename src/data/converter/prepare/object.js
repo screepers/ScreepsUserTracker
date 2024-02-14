@@ -39,7 +39,20 @@ export default async function prepareObject(object, originalObject) {
     object.actionLog = {};
     originalObject.actionLog = {};
   }
-  const newActionLogKeys = object ? Object.keys(object.actionLog || {}) : {};
+
+  if (!object.actionLog) object.actionLog = {};
+  const hasMoved = object.x !== originalObject.x || object.y !== originalObject.y;
+  if (hasMoved) {
+    originalObject.x = object.x || originalObject.x;
+    originalObject.y = object.y || originalObject.y;
+    object.actionLog.move = { x: object.x, y: object.y }
+  }
+  else if (originalObject.actionLog.move) {
+    object.actionLog.move = null;
+  }
+
+
+  const newActionLogKeys = Object.keys(object.actionLog);
   if (newActionLogKeys.length > 0) {
     // Remove old intents
     const actionLogKeys = Object.keys(originalObject.actionLog);

@@ -7,10 +7,9 @@ export default async function handleObjects(data, opts) {
   const { intents } = summarize
 
   let actions = [];
-  const currentTick = opts.tick
 
   // #region FirstTick
-  const { isFirstTick } = opts;
+  const { isFirstTick, currentTick } = opts;
 
   const { structures } = summarize;
   const { structuresByType } = summarize;

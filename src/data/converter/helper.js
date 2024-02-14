@@ -129,6 +129,8 @@ export function getIntentEffect(action, originalObject) {
         return { action, damage: originalObject.groupedBody.heal * 12 };
       case "rangedHeal":
         return { action, damage: originalObject.groupedBody.heal * 4 };
+      case "move":
+        return { action };
       default:
         return null;
     }

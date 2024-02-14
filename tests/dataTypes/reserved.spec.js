@@ -120,6 +120,99 @@ describe("Reserved data type process check", () => {
           expect(base.countByType.creepParts[type]).toBe(5)
         }
       })
+      it('should count intent totals correctly', async () => {
+        const types = ['harvest', 'upgradeController', 'repair', 'build'
+          , 'heal', 'attack', 'rangedAttack', 'rangedMassAttack', 'dismantle']
+        const settings = []
+        for (let j = 0; j < 5; j += 1) {
+          settings.push({
+            type: TestHelper.dataTypes.creep, data: {
+              0: {
+                actionLog: {
+                  harvest: {
+                  },
+                  dismantle: {
+                  },
+                  repair: {
+                  },
+                  build: {
+                  },
+                  upgradeController: {
+                  },
+                  attack: {
+                  },
+                  rangedAttack: {
+                  },
+                  rangedMassAttack: {
+                  },
+                  heal: {
+                  },
+                  rangedHeal: {
+                  }
+                },
+                body: [
+                  {
+                    "type": "move",
+                    "hits": 100
+                  },
+                  {
+                    "type": "work",
+                    "hits": 100
+                  },
+                  {
+                    "type": "work",
+                    "hits": 100
+                  },
+                  {
+                    "type": "attack",
+                    "hits": 100
+                  },
+                  {
+                    "type": "ranged_attack",
+                    "hits": 100
+                  },
+                  {
+                    "type": "claim",
+                    "hits": 100
+                  },
+                  {
+                    "type": "heal",
+                    "hits": 100
+                  },
+                ]
+              },
+            }
+          })
+        }
+
+        const data = await testHelper1.process(settings)
+        const base = data.stats.users[data.opts.username].stats.combined.shards[data.opts.shard]
+        for (let i = 0; i < types.length; i += 1) {
+          const type = types[i];
+          expect(base.countByType.intents[type]).toBe(5)
+        }
+      })
+      it('should count move intent totals correctly', async () => {
+        const settings = []
+        for (let j = 0; j < 100; j += 1) {
+          settings.push({
+            type: TestHelper.dataTypes.creep, data: {
+              0: {
+                x: 0,
+                y: 0,
+              },
+              1: {
+                x: 1,
+                y: 1,
+              },
+            }
+          })
+        }
+
+        const data = await testHelper1.process(settings)
+        const base = data.stats.users[data.opts.username].stats.combined.shards[data.opts.shard]
+        expect(base.countByType.intents.move).toBe(99)
+      })
       it('should count structures totals correctly', async () => {
         const types =
           ['road', 'rampart', 'constructedWall', 'spawn', 'extension', 'link', 'storage', 'tower', 'observer',
