@@ -41,7 +41,7 @@ export default async function prepareObject(object, originalObject) {
   }
 
   if (!object.actionLog) object.actionLog = {};
-  const hasMoved = object.x !== originalObject.x || object.y !== originalObject.y;
+  const hasMoved = (object.x && object.x !== originalObject.x) || (object.y && object.y !== originalObject.y);
   if (hasMoved) {
     originalObject.x = object.x || originalObject.x;
     originalObject.y = object.y || originalObject.y;
