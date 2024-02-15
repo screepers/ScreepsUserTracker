@@ -106,9 +106,6 @@ export default async function processData(opts, proxyIndex) {
     };
   }
 
-  return {
-    status: "Failed",
-  };
-  // opts.failed = true;
-  // return processData(opts, proxyIndex);
+  opts.failed = true;
+  return processData(opts, proxyIndex);
 }

@@ -11,9 +11,12 @@ let proxyCycles = [];
 
 async function proxy(cycle, proxyIndex) {
   while (cycle.length > 0) {
+    const start = Date.now();
     const opts = cycle.pop();
     await processOpts(opts, proxyIndex);
     proxyCycles.push(opts);
+    const timeTaken = Date.now() - start;
+    console.log(`Proxy ${proxyIndex} took ${timeTaken}ms to process ${opts.shard}/${opts.room}`);
   }
 }
 
@@ -27,7 +30,7 @@ export default class Requests {
 
       if (useProxy) {
         proxyCycles = [];
-        const proxies = Array.from({ length: 100 }, (_, index) => proxy(cycle, index));
+        const proxies = Array.from({ length: 1 }, (_, index) => proxy(cycle, index));
         await Promise.all(proxies);
         cycle = proxyCycles;
       }

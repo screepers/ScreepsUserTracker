@@ -648,5 +648,20 @@
     "path": "totals.rooms.reserved",
     "value": 0,
     "type": 1
+  },
+  {
+    "path": "countByType.intents.move",
+    "value": 0,
+    "type": 0
+  },
+  {
+    "path": "countByType.constructionSites.extension",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "countByType.constructionSites.storage",
+    "value": 0,
+    "type": 1
   }
 ]
