@@ -898,5 +898,10 @@
     "path": "totals.rooms.owned",
     "value": 0,
     "type": 1
+  },
+  {
+    "path": "countByType.intents.move",
+    "value": 0,
+    "type": 0
   }
 ]
