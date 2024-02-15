@@ -13,7 +13,7 @@ export function getLiveTick(shard) {
 }
 
 export function getSyncedTick(shard) {
-  const liveTick = getLiveTick(shard) - 250;
+  const liveTick = getLiveTick(shard) - 500;
   if (syncedTicks[shard] < liveTick) {
     syncedTicks[shard] += 100;
     UploadStatus({ syncedTicks, liveTicks: lastLiveTicks })
@@ -91,18 +91,18 @@ export function cycleStatus(cycle) {
   // get usernames in status.failed
   const usernames = status.failed.map((opts) => opts.username);
   const uniqueFailedUsernames = [...new Set(usernames)];
-  let actuallyProccessed = [];
+  const actuallyProcessed = [];
   for (let i = 0; i < status.processed.length; i += 1) {
     const opts = status.processed[i];
     if (!uniqueFailedUsernames.includes(opts.username)) {
-      actuallyProccessed.push(opts);
+      actuallyProcessed.push(opts);
     }
     else {
       status.failed.push(opts);
     }
   }
 
-  status.processed = actuallyProccessed;
+  status.processed = actuallyProcessed;
   return status;
 }
 

@@ -648,5 +648,10 @@
     "path": "totals.rooms.reserved",
     "value": 0,
     "type": 1
+  },
+  {
+    "path": "countByType.intents.move",
+    "value": 0,
+    "type": 0
   }
 ]

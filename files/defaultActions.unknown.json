@@ -373,5 +373,445 @@
     "path": "countByType.intents.upgradeController",
     "value": 0,
     "type": 0
+  },
+  {
+    "path": "countByType.intents.move",
+    "value": 0,
+    "type": 0
+  },
+  {
+    "path": "resourcesStored.LO",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.GH",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.LH",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.L",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.battery",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.XGH2O",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.GH2O",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.lemergium_bar",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.U",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.H",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.reductant",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.O",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.G",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.Z",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.K",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.metal",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.power",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.XKHO2",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.LH2O",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.XGHO2",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.XUH2O",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.ops",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.XLHO2",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.OH",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.X",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.UH2O",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.LHO2",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.KHO2",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.UHO2",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.UO",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.ZK",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.zynthium_bar",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.ZO",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.UL",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.KH",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.ZHO2",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.KH2O",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.oxidant",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.keanium_bar",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.utrium_bar",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.XKH2O",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.XUHO2",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.XZHO2",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.XZH2O",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.XLH2O",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.ghodium_melt",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.GHO2",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.ZH2O",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.alloy",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "countByType.constructionSites.spawn",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "countByType.constructionSites.terminal",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "countByType.constructionSites.lab",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.silicon",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.wire",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.frame",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.crystal",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.microchip",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.switch",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.transistor",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.composite",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.liquid",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.purifier",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.biomass",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.cell",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.condensate",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.mist",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "countByType.constructionSites.extractor",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.fixtures",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.tube",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.hydraulics",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.circuit",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.concentrate",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "countByType.constructionSites.constructedWall",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.machine",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.extract",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.spirit",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.emanation",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.essence",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.tissue",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.muscle",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.organoid",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.phlegm",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.organism",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "resourcesStored.device",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "countByType.constructionSites.link",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "countByType.constructionSites.tower",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "countByType.constructionSites.factory",
+    "value": 0,
+    "type": 1
   }
 ]
