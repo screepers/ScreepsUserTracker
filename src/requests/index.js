@@ -11,12 +11,9 @@ let proxyCycles = [];
 
 async function proxy(cycle, proxyIndex) {
   while (cycle.length > 0) {
-    const start = Date.now();
     const opts = cycle.pop();
     await processOpts(opts, proxyIndex);
     proxyCycles.push(opts);
-    const timeTaken = Date.now() - start;
-    console.log(`Proxy ${proxyIndex} took ${timeTaken}ms to process ${opts.shard}/${opts.room}`);
   }
 }
 
