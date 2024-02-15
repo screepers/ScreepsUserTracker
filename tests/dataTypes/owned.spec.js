@@ -224,13 +224,17 @@ describe("Owned data type process check", () => {
                 x: 1,
                 y: 1,
               },
+              5: {
+                x: 2,
+                y: 1,
+              },
             }
           })
         }
 
         const data = await testHelper1.process(settings)
         const base = data.stats.users[data.opts.username].stats.combined.shards[data.opts.shard]
-        expect(base.countByType.intents.move).toBe(99)
+        expect(base.countByType.intents.move).toBe(2)
       })
       it('should count structures totals correctly', async () => {
         const types =
