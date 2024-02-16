@@ -300,8 +300,12 @@ export default async function handleObjects(data, opts) {
   // #region Controller
 
   if (controller) {
-    actions.push(ActionProcessor.CreateAction('controller.rclPerTick', controller._upgraded || 0,
+    actions.push(ActionProcessor.CreateAction('controller.gclPerTick', controller._upgraded || 0,
       ActionProcessor.ActionType.Divide100))
+    if (controller.level < 8) {
+      actions.push(ActionProcessor.CreateAction('controller.rclPerTick', controller._upgraded || 0,
+        ActionProcessor.ActionType.Divide100))
+    }
   }
 
   // #endregion

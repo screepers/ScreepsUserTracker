@@ -15,6 +15,7 @@ export default async function prepareObject(object, originalObject) {
 
   switch (object.type) {
     case 'controller':
+      object.level = originalObject.level;
       if (object._upgraded || object._upgraded === null) {
         originalObject._upgraded = object._upgraded;
         if (object._upgraded === null) object._upgraded = 0;
