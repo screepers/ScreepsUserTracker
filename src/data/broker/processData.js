@@ -4,6 +4,7 @@ import handleUnknownObjects from "../converter/manage/unknownRoom.js";
 
 import prepareObject from "../converter/prepare/object.js";
 import { summarizeObjects } from "../converter/helper.js";
+import { GetUsernameById } from "../../helper/users.js";
 
 import { cleanSource } from "../../helper/index.js";
 import ActionProcessor from "./defaultActions.js"
@@ -49,7 +50,7 @@ export default class ProcessDataBroker {
       }
     }
     const firstTickObjectsPromises = firstTickObjects.map(async ([id, firstTickObject]) => {
-      if (opts.userId === firstTickObject.user) {
+      if (opts.userId === firstTickObject.user || opts.type === "unknown") {
         const uniqueObject = cleanSource(firstTickObject);
         uniqueObjects[id] = uniqueObject;
 
@@ -77,10 +78,59 @@ export default class ProcessDataBroker {
     return data
   }
 
+  static async getType(roomData, opts) {
+    const { ticks } = await this.prepareObjects(roomData.ticks, opts);
+    const tickKeys = Object.keys(ticks);
+
+    const users = {};
+    for (let t = 0; t < tickKeys.length; t += 1) {
+      const tick = tickKeys[t];
+      if (ticks[tick]) {
+        const { summarize } = ticks[tick];
+        const { controller, creeps, structures } = summarize;
+        if (controller && controller.level > 0) {
+          opts.userId = controller.user;
+          opts.username = await GetUsernameById(opts.userId);
+          if (!opts.username) return ""
+          return "owned";
+        }
+        if (controller && controller.reservation) {
+          opts.userId = controller.reservation.user;
+          opts.username = await GetUsernameById(opts.userId);
+          if (!opts.username) return ""
+          return "reserved";
+        }
+
+        for (let c = 0; c < creeps.length; c += 1) {
+          const creep = creeps[c];
+          if (creep.user) users[creep.user] = (users[creep.user] || 0) + 1
+        }
+        for (let s = 0; s < structures.length; s += 1) {
+          const structure = structures[s];
+          if (structure.user) users[structure.user] = (users[structure.user] || 0) + 1
+        }
+      }
+    }
+
+    const userKeys = Object.keys(users);
+    if (userKeys.length === 0) return "";
+    const user = userKeys.reduce((a, b) => users[a] > users[b] ? a : b);
+    opts.userId = user;
+    opts.username = await GetUsernameById(opts.userId);
+    if (!opts.username) return ""
+    return "unknown";
+  }
+
   static async single(data) {
     try {
       const { opts, roomData } = data
+      if (opts.type === "unknown") opts.type = await this.getType(roomData, opts);
+      if (!opts.type) return null;
+
       this.setTickRate(roomData, opts);
+
+      const { ticks, uniqueObjects } = await this.prepareObjects(roomData.ticks, opts);
+      opts.uniqueObjects = uniqueObjects
 
       let handleObjects = null;
       switch (opts.type) {
@@ -91,17 +141,12 @@ export default class ProcessDataBroker {
           handleObjects = handleReservedObjects;
           break;
         case "unknown":
-          handleObjects = handleUnknownObjects;
-          break;
         default:
+          handleObjects = handleUnknownObjects;
           break;
       }
 
       let actionsArray = [];
-      const { ticks, uniqueObjects } = await this.prepareObjects(roomData.ticks, opts);
-
-      opts.uniqueObjects = uniqueObjects
-
       const tickKeys = Object.keys(ticks);
       for (let t = 0; t < tickKeys.length; t += 1) {
         const tick = tickKeys[t];

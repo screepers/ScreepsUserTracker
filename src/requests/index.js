@@ -66,11 +66,29 @@ export default class Requests {
 
       const percentageOnTarget = (cycleLength * 500 * 60) / timeTaken;
       const timePerRoom = (Date.now() - start) / cycleLength
+      const types = {}
+      for (let u = 0; u < status.processed.length; u += 1) {
+        const { type } = status.processed[u];
+        types[type] = types[type] || 0;
+        types[type] += 1;
+      }
+      const roomsUploaded = {};
+      for (let u = 0; u < status.processed.length; u += 1) {
+        const { shard, room } = status.processed[u];
+        roomsUploaded[shard] = roomsUploaded[shard] || {};
+        roomsUploaded[shard][room] = 1;
+      }
+      for (let u = 0; u < status.failed.length; u += 1) {
+        const { shard, room } = status.failed[u];
+        roomsUploaded[shard] = roomsUploaded[shard] || {};
+        roomsUploaded[shard][room] = 1;
+      }
       await UploadStatus({
         cycleDetails:
         {
           amount: cycleLength, success: status.processed.length, failed: status.failed.length,
-          successRate: Math.round((status.processed.length / cycleLength) * 100)
+          successRate: Math.round((status.processed.length / cycleLength) * 100),
+          roomsUploaded
         },
         timePerRoom, percentageOnTarget, timeTaken
       })

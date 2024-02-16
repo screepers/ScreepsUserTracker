@@ -903,5 +903,10 @@
     "path": "countByType.intents.move",
     "value": 0,
     "type": 0
+  },
+  {
+    "path": "controller.gclPerTick",
+    "value": 0,
+    "type": 0
   }
 ]

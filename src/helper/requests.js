@@ -50,7 +50,7 @@ export async function getCycle() {
 
     if (tick) {
       const shardRooms = shards[shardName];
-      const roomNames = Object.keys(shardRooms);
+      const roomNames = Object.keys(shardRooms).sort();
       for (let r = 0; r < roomNames.length; r += 1) {
         const roomName = roomNames[r];
         const room = shardRooms[roomName];

@@ -1,7 +1,6 @@
 import { GetRoomHistory } from "./screepsApi.js";
 import { sleep } from "../helper/index.js";
 import getProxy from "../helper/proxy.js";
-import { GetUsernameById } from "../helper/users.js";
 import ProcessDataBroker from "../data/broker/processData.js";
 
 const validData = {}
@@ -37,56 +36,12 @@ export default async function processData(opts, proxyIndex) {
     const { data } = dataResult;
     if (opts.username) {
       opts.timestamp = data.timestamp;
-      if (opts.username === "Unknown") {
-        const userIds = {};
-        const tick = Object.values(data.ticks)[0];
-        if (tick) {
-          const tickObjects = Object.values(tick);
-          for (let i = 0; i < tickObjects.length; i += 1) {
-            const tickData = tickObjects[i];
-            if (tickData.controller) {
-              opts.userId = tickData.controller.user;
-              opts.username = await GetUsernameById(opts.userId);
-              opts.type = "owned"
-              break;
-            }
-            if (tickData.reservation) {
-              opts.userId = tickData.reservation.user;
-              opts.username = await GetUsernameById(opts.userId);
-              opts.type = "reserved"
-              break;
-            }
-            if (tickData.user) {
-              userIds[tickData.user] = userIds[tickData.user] || 0;
-              userIds[tickData.user] += 1;
-            }
-          }
-
-          if (opts.username === "Unknown") {
-            let max = 0;
-            let maxId = "Unknown";
-            const userIdsKeys = Object.keys(userIds);
-            for (let u = 0; u < userIdsKeys.length; u += 1) {
-              const id = userIdsKeys[u];
-              if (userIds[id] > max) {
-                max = userIds[id];
-                maxId = id;
-              }
-            }
-
-            opts.userId = maxId;
-            opts.username = await GetUsernameById(maxId);
-          }
-        }
-
-        if (!opts.username || opts.username === "Unknown") {
-          return {
-            status: "No user",
-          }
+      opts.data = await ProcessDataBroker.single({ roomData: data, opts });
+      if (!opts.data) {
+        return {
+          status: "No user",
         }
       }
-
-      opts.data = await ProcessDataBroker.single({ roomData: data, opts });
       validData[`${opts.shard}-${opts.room}`] = { data: opts.data, tick: opts.tick }
     }
     return {
