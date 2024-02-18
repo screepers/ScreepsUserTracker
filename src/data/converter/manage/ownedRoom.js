@@ -338,7 +338,7 @@ export default async function handleObjects(data, opts) {
     const intent = intents[c];
     if (intentsCategories.income[intent.action] !== undefined) {
       intentsCategories.income[intent.action].effect += intent.effect;
-      intentsCategories.outcome[intent.action].cost += intent.energy;
+      intentsCategories.income[intent.action].cost += intent.energy;
     } else if (intentsCategories.outcome[intent.action] !== undefined) {
       intentsCategories.outcome[intent.action].effect += intent.effect;
       intentsCategories.outcome[intent.action].cost += intent.energy;

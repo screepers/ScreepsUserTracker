@@ -180,56 +180,6 @@
 		"type": 1
 	},
 	{
-		"path": "intents.income.harvest",
-		"value": 0,
-		"type": 0
-	},
-	{
-		"path": "intents.income.dismantle",
-		"value": 0,
-		"type": 0
-	},
-	{
-		"path": "intents.outcome.repair",
-		"value": 0,
-		"type": 0
-	},
-	{
-		"path": "intents.outcome.build",
-		"value": 0,
-		"type": 0
-	},
-	{
-		"path": "intents.outcome.upgradeController",
-		"value": 0,
-		"type": 0
-	},
-	{
-		"path": "intents.offensive.attack",
-		"value": 0,
-		"type": 0
-	},
-	{
-		"path": "intents.offensive.rangedAttack",
-		"value": 0,
-		"type": 0
-	},
-	{
-		"path": "intents.offensive.rangedMassAttack",
-		"value": 0,
-		"type": 0
-	},
-	{
-		"path": "intents.offensive.heal",
-		"value": 0,
-		"type": 0
-	},
-	{
-		"path": "intents.offensive.rangedHeal",
-		"value": 0,
-		"type": 0
-	},
-	{
 		"path": "countByType.intents.harvest",
 		"value": 0,
 		"type": 0
@@ -661,6 +611,21 @@
 	},
 	{
 		"path": "countByType.constructionSites.storage",
+		"value": 0,
+		"type": 1
+	},
+	{
+		"path": "resourcesStored.cell",
+		"value": 0,
+		"type": 1
+	},
+	{
+		"path": "resourcesStored.phlegm",
+		"value": 0,
+		"type": 1
+	},
+	{
+		"path": "resourcesStored.alloy",
 		"value": 0,
 		"type": 1
 	}

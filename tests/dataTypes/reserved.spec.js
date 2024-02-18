@@ -470,6 +470,8 @@ describe("Reserved data type process check", () => {
               0: {
                 heal: {
                 },
+                repair: {
+                },
               }
             }
           })
@@ -477,18 +479,18 @@ describe("Reserved data type process check", () => {
 
       const data = await testHelper1.process(settings)
       const base = data.stats.users[data.opts.username].stats.combined.shards[data.opts.shard]
-      expect(base.intents.income.harvest).toBe(20 / 2)
-      expect(base.intents.income.dismantle).toBe(2.5 / 2)
+      expect(base.intents.income.harvest.effect).toBe(20 / 2)
+      expect(base.intents.income.dismantle.effect).toBe(2.5 / 2)
 
-      expect(base.intents.outcome.repair).toBe(10 / 2)
-      expect(base.intents.outcome.build).toBe(50 / 2)
-      expect(base.intents.outcome.upgradeController).toBe(10 / 2)
+      expect(base.intents.outcome.repair.effect).toBe(10 / 2)
+      expect(base.intents.outcome.build.effect).toBe(50 / 2)
+      expect(base.intents.outcome.upgradeController.effect).toBe(10 / 2)
 
-      expect(base.intents.offensive.attack).toBe(300 / 2)
-      expect(base.intents.offensive.rangedAttack).toBe(100 / 2)
-      expect(base.intents.offensive.rangedMassAttack).toBe(40 / 2)
-      expect(base.intents.offensive.heal).toBe(120 / 2)
-      expect(base.intents.offensive.rangedHeal).toBe(40 / 2)
+      expect(base.intents.offensive.attack.effect).toBe(300 / 2)
+      expect(base.intents.offensive.rangedAttack.effect).toBe(100 / 2)
+      expect(base.intents.offensive.rangedMassAttack.effect).toBe(40 / 2)
+      expect(base.intents.offensive.heal.effect).toBe(120 / 2)
+      expect(base.intents.offensive.rangedHeal.effect).toBe(40 / 2)
     })
     it('should handle fluctuating values', async () => {
       const settings = []

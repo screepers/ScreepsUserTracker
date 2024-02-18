@@ -1,12 +1,6 @@
 // eslint-disable-next-line import/no-cycle
 import Cache from "../setup/cache.js";
 
-export async function GetUsernameById(id) {
-  const users = await Cache.getUserByIdCache();
-  const user = users[id];
-  if (user) return user.username;
-}
-
 let usersCache = [];
 export function UpdateLocalUsersCache(cache) {
   usersCache = cache;

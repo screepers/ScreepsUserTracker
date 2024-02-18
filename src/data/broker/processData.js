@@ -4,7 +4,6 @@ import handleUnknownObjects from "../converter/manage/unknownRoom.js";
 
 import prepareObject from "../converter/prepare/object.js";
 import { summarizeObjects } from "../converter/helper.js";
-import { GetUsernameById } from "../../helper/users.js";
 
 import { cleanSource } from "../../helper/index.js";
 import ActionProcessor from "./defaultActions.js"
@@ -15,6 +14,8 @@ export default class ProcessDataBroker {
   static lastTickTicks = {};
 
   static tickRates = {};
+
+  static usernamesById = {};
 
   static setTickRate(roomData, opts) {
     const tick = Number(opts.tick);
@@ -90,13 +91,13 @@ export default class ProcessDataBroker {
         const { controller, creeps, structures } = summarize;
         if (controller && controller.level > 0) {
           opts.userId = controller.user;
-          opts.username = await GetUsernameById(opts.userId);
+          opts.username = this.usernamesById[opts.userId];
           if (!opts.username) return ""
           return "owned";
         }
         if (controller && controller.reservation) {
           opts.userId = controller.reservation.user;
-          opts.username = await GetUsernameById(opts.userId);
+          opts.username = this.usernamesById[opts.userId];
           if (!opts.username) return ""
           return "reserved";
         }
@@ -116,7 +117,7 @@ export default class ProcessDataBroker {
     if (userKeys.length === 0) return "";
     const user = userKeys.reduce((a, b) => users[a] > users[b] ? a : b);
     opts.userId = user;
-    opts.username = await GetUsernameById(opts.userId);
+    opts.username = this.usernamesById[opts.userId];
     if (!opts.username) return ""
     return "unknown";
   }

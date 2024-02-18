@@ -5,6 +5,7 @@ import { GetRoomTotal } from "../helper/rooms.js";
 import { cacheLogger as logger } from "../helper/logger.js";
 // eslint-disable-next-line
 import { UpdateLocalUsersCache } from "../helper/users.js";
+import ProcessDataBroker from "../data/broker/processData.js";
 
 let loginInfo = process.env.SCREEPS_TOKEN;
 const settings = process.env.API_SETTINGS ? JSON.parse(process.env.API_SETTINGS) : {};
@@ -171,6 +172,7 @@ export default class Cache {
     for (let u = 0; u < userValues.length; u += 1) {
       const user = userValues[u];
       userById[user.id] = user;
+      ProcessDataBroker.usernamesById[user.id] = user.username;
     }
     userByIdCache.data = userById;
   }

@@ -71,7 +71,6 @@ function getBodyBoostEffect(groupedBodyEffect, part) {
           groupedBodyEffect.upgradeController += 1 * 1
           break;
       }
-
       break;
     case "attack":
       if (!groupedBodyEffect.attack) groupedBodyEffect.attack = 0;

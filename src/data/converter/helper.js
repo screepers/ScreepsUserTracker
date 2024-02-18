@@ -114,23 +114,31 @@ export function getIntentEffect(action, originalObject) {
         };
       case "repair":
         if (originalObject.type === "tower") return { action, energy: 10 };
-        return { action, 
-          energy: originalObject.groupedBody.work * 1, 
-          effect: originalObject.groupedBodyEffect.repair };
-      case "upgradeController":
-        return { action, 
+        return {
+          action,
           energy: originalObject.groupedBody.work * 1,
-          effect: originalObject.groupedBodyEffect.upgradeController };
+          effect: originalObject.groupedBodyEffect.repair
+        };
+      case "upgradeController":
+        return {
+          action,
+          energy: originalObject.groupedBody.work * 1,
+          effect: originalObject.groupedBodyEffect.upgradeController
+        };
       case "dismantle":
-        return { action, 
+        return {
+          action,
           energy: originalObject.groupedBody.work * 0.25,
-          effect: originalObject.groupedBodyEffect.dismantle };
+          effect: originalObject.groupedBodyEffect.dismantle
+        };
       case "attack":
         if (originalObject.type === "tower")
           return { action, energy: 10, damage: 300 };
-        return { action, 
+        return {
+          action,
           damage: originalObject.groupedBody.attack * 30,
-          effect: originalObject.groupedBodyEffect.attack };
+          effect: originalObject.groupedBodyEffect.attack
+        };
       case "rangedAttack":
         return {
           action,
@@ -138,20 +146,26 @@ export function getIntentEffect(action, originalObject) {
           effect: originalObject.groupedBodyEffect.rangedAttack
         };
       case "rangedMassAttack":
-        return { action, 
+        return {
+          action,
           damage: originalObject.groupedBody.ranged_attack * 4,
-          effect: originalObject.groupedBodyEffect.ranged_attack };
+          effect: originalObject.groupedBodyEffect.rangedMassAttack
+        };
       case "heal":
         if (originalObject.type === "tower") {
           return { action, energy: 10, damage: 200 };
         }
-        return { action,
+        return {
+          action,
           damage: originalObject.groupedBody.heal * 12,
-          effect: originalObject.groupedBodyEffect.heal };
+          effect: originalObject.groupedBodyEffect.heal
+        };
       case "rangedHeal":
-        return { action, 
+        return {
+          action,
           damage: originalObject.groupedBody.heal * 4,
-          effect: originalObject.groupedBodyEffect.heal };
+          effect: originalObject.groupedBodyEffect.rangedHeal
+        };
       case "move":
         return { action };
       default:

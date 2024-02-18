@@ -1,4 +1,5 @@
 import ActionProcessor from "../../broker/defaultActions.js"
+import { cleanSource } from "../../../helper/index.js";
 
 export default async function handleObjects(data, opts) {
   const { summarize } = data;
@@ -188,33 +189,39 @@ export default async function handleObjects(data, opts) {
   // #region Divide100
 
   // #region IntentsCategories
+  const base = {
+    cost: 0,
+    effect: 0
+  }
   const intentsCategories = {
     income: {
-      harvest: 0,
-      dismantle: 0,
+      harvest: cleanSource(base),
+      dismantle: cleanSource(base),
     },
     outcome: {
-      repair: 0,
-      build: 0,
-      upgradeController: 0,
+      repair: cleanSource(base),
+      build: cleanSource(base),
+      upgradeController: cleanSource(base),
     },
     offensive: {
-      attack: 0,
-      rangedAttack: 0,
-      rangedMassAttack: 0,
-      heal: 0,
-      rangedHeal: 0,
+      attack: cleanSource(base),
+      rangedAttack: cleanSource(base),
+      rangedMassAttack: cleanSource(base),
+      heal: cleanSource(base),
+      rangedHeal: cleanSource(base),
     },
   };
   for (let c = 0; c < intents.length; c += 1) {
     const intent = intents[c];
     if (intentsCategories.income[intent.action] !== undefined) {
-      intentsCategories.income[intent.action] += intent.energy;
+      intentsCategories.income[intent.action].effect += intent.effect;
+      intentsCategories.income[intent.action].cost += intent.energy;
     } else if (intentsCategories.outcome[intent.action] !== undefined) {
-      intentsCategories.outcome[intent.action] += intent.energy;
+      intentsCategories.outcome[intent.action].effect += intent.effect;
+      intentsCategories.outcome[intent.action].cost += intent.energy;
     }
     if (intentsCategories.offensive[intent.action] !== undefined) {
-      intentsCategories.offensive[intent.action] += intent.damage;
+      intentsCategories.offensive[intent.action].effect += intent.effect;
     }
   }
 
@@ -225,8 +232,15 @@ export default async function handleObjects(data, opts) {
     intentsCategoryKeys.forEach((intent) => {
       actions.push(
         ActionProcessor.CreateAction(
-          `intents.${category}.${intent}`,
-          intentsCategory[intent],
+          `intents.${category}.${intent}.cost`,
+          intentsCategory[intent].cost,
+          ActionProcessor.ActionType.Divide100
+        )
+      );
+      actions.push(
+        ActionProcessor.CreateAction(
+          `intents.${category}.${intent}.effect`,
+          intentsCategory[intent].effect,
           ActionProcessor.ActionType.Divide100
         )
       );
