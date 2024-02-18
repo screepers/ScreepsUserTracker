@@ -47,9 +47,6 @@ export default class Cache {
       case 'userRooms':
         cache = userRoomsCache;
         break;
-      case 'userById':
-        cache = userByIdCache;
-        break;
       default:
         break;
     }
@@ -96,19 +93,6 @@ export default class Cache {
     return userRoomsCache.data;
   }
 
-  static async getUserByIdCache() {
-    if (Cache.shouldUpdateCache('userById')) {
-      if (userByIdCache.isUpdating) return userByIdCache.data;
-      userByIdCache.isUpdating = true;
-      logger.info('Updating userById cache');
-      await Cache.updateUserByIdCache();
-      userByIdCache.lastUpdate = Date.now();
-      userByIdCache.isUpdating = false;
-    }
-    logger.info('Returning userById cache');
-    return userByIdCache.data;
-  }
-
   static async updateRoomsCache() {
     const userRooms = await Cache.getUserRoomsCache();
     const shards = {};
@@ -147,7 +131,12 @@ export default class Cache {
     let users = await advancedScreepsApi.getAllUsers()
     users = users.filter(forcedUsers.length > 0 ? (user) => forcedUsers.includes(user.username) : () => true);
     users.sort((a, b) => GetRoomTotal(b.shards, 'type') - GetRoomTotal(a.shards, 'type'));
+    const userValues = Object.values(users);
 
+    for (let u = 0; u < userValues.length; u += 1) {
+      const user = userValues[u];
+      ProcessDataBroker.usernamesById[user.id] = user.username;
+    }
     fs.writeFileSync("./files/users.json", JSON.stringify(users, null, 2));
     UpdateLocalUsersCache(users);
     usersCache.data = users;
@@ -162,18 +151,5 @@ export default class Cache {
     }
 
     userRoomsCache.data = userRooms;
-  }
-
-  static async updateUserByIdCache() {
-    const userById = {};
-
-    const users = await this.getUsersCache();
-    const userValues = Object.values(users);
-    for (let u = 0; u < userValues.length; u += 1) {
-      const user = userValues[u];
-      userById[user.id] = user;
-      ProcessDataBroker.usernamesById[user.id] = user.username;
-    }
-    userByIdCache.data = userById;
   }
 }
