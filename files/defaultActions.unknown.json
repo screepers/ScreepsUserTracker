@@ -185,56 +185,6 @@
     "type": 1
   },
   {
-    "path": "intents.income.harvest",
-    "value": 0,
-    "type": 0
-  },
-  {
-    "path": "intents.income.dismantle",
-    "value": 0,
-    "type": 0
-  },
-  {
-    "path": "intents.outcome.repair",
-    "value": 0,
-    "type": 0
-  },
-  {
-    "path": "intents.outcome.build",
-    "value": 0,
-    "type": 0
-  },
-  {
-    "path": "intents.outcome.upgradeController",
-    "value": 0,
-    "type": 0
-  },
-  {
-    "path": "intents.offensive.attack",
-    "value": 0,
-    "type": 0
-  },
-  {
-    "path": "intents.offensive.rangedAttack",
-    "value": 0,
-    "type": 0
-  },
-  {
-    "path": "intents.offensive.rangedMassAttack",
-    "value": 0,
-    "type": 0
-  },
-  {
-    "path": "intents.offensive.heal",
-    "value": 0,
-    "type": 0
-  },
-  {
-    "path": "intents.offensive.rangedHeal",
-    "value": 0,
-    "type": 0
-  },
-  {
     "path": "totals.intents",
     "value": 0,
     "type": 0
@@ -813,5 +763,105 @@
     "path": "countByType.constructionSites.factory",
     "value": 0,
     "type": 1
+  },
+  {
+    "path": "intents.income.harvest.cost",
+    "value": 0,
+    "type": 0
+  },
+  {
+    "path": "intents.income.harvest.effect",
+    "value": 0,
+    "type": 0
+  },
+  {
+    "path": "intents.income.dismantle.cost",
+    "value": 0,
+    "type": 0
+  },
+  {
+    "path": "intents.income.dismantle.effect",
+    "value": 0,
+    "type": 0
+  },
+  {
+    "path": "intents.outcome.repair.cost",
+    "value": 0,
+    "type": 0
+  },
+  {
+    "path": "intents.outcome.repair.effect",
+    "value": 0,
+    "type": 0
+  },
+  {
+    "path": "intents.outcome.build.cost",
+    "value": 0,
+    "type": 0
+  },
+  {
+    "path": "intents.outcome.build.effect",
+    "value": 0,
+    "type": 0
+  },
+  {
+    "path": "intents.outcome.upgradeController.cost",
+    "value": 0,
+    "type": 0
+  },
+  {
+    "path": "intents.outcome.upgradeController.effect",
+    "value": 0,
+    "type": 0
+  },
+  {
+    "path": "intents.offensive.attack.cost",
+    "value": 0,
+    "type": 0
+  },
+  {
+    "path": "intents.offensive.attack.effect",
+    "value": 0,
+    "type": 0
+  },
+  {
+    "path": "intents.offensive.rangedAttack.cost",
+    "value": 0,
+    "type": 0
+  },
+  {
+    "path": "intents.offensive.rangedAttack.effect",
+    "value": 0,
+    "type": 0
+  },
+  {
+    "path": "intents.offensive.rangedMassAttack.cost",
+    "value": 0,
+    "type": 0
+  },
+  {
+    "path": "intents.offensive.rangedMassAttack.effect",
+    "value": 0,
+    "type": 0
+  },
+  {
+    "path": "intents.offensive.heal.cost",
+    "value": 0,
+    "type": 0
+  },
+  {
+    "path": "intents.offensive.heal.effect",
+    "value": 0,
+    "type": 0
+  },
+  {
+    "path": "intents.offensive.rangedHeal.cost",
+    "value": 0,
+    "type": 0
+  },
+  {
+    "path": "intents.offensive.rangedHeal.effect",
+    "value": 0,
+    "type": 0
   }
 ]
