@@ -78,10 +78,11 @@ class ActionProcessor {
         return !isFirstTick ? getDivide100Data(cached.data) : cached.data;
     }
 
+    const folderName = `./files`;
     const fileName = `./files/defaultActions.${type}.json`;
     let data = [];
     if (fs.existsSync(fileName)) data = JSON.parse(fs.readFileSync(fileName));
-    else fs.writeFileSync(fileName, JSON.stringify([], null, 2));
+    else if (fs.existsSync(folderName)) fs.writeFileSync(fileName, JSON.stringify([], null, 2));
 
     this.defaultActionsPerType[type] = { data, time };
     return !isFirstTick ? getDivide100Data(data) : data;

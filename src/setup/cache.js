@@ -31,7 +31,6 @@ const baseCache = {
 const roomsCache = cleanSource(baseCache)
 const usersCache = cleanSource(baseCache)
 const userRoomsCache = cleanSource(baseCache)
-const userByIdCache = cleanSource(baseCache)
 
 export default class Cache {
   static shouldUpdateCache(type) {
