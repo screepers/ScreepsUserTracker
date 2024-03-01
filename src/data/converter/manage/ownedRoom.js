@@ -297,20 +297,6 @@ export default async function handleObjects(data, opts) {
 
   // #endregion
 
-
-  // #region Controller
-
-  if (controller) {
-    actions.push(ActionProcessor.CreateAction('controller.gclPerTick', controller._upgraded || 0,
-      ActionProcessor.ActionType.Divide100))
-    if (controller.level < 8) {
-      actions.push(ActionProcessor.CreateAction('controller.rclPerTick', controller._upgraded || 0,
-        ActionProcessor.ActionType.Divide100))
-    }
-  }
-
-  // #endregion
-
   // #region IntentsCategories
   const base = {
     cost: 0,
@@ -345,6 +331,17 @@ export default async function handleObjects(data, opts) {
     }
     if (intentsCategories.offensive[intent.action] !== undefined) {
       intentsCategories.offensive[intent.action].effect += intent.effect;
+    }
+  }
+
+  if (controller) {
+    actions.push(ActionProcessor.CreateAction('controller.gclPerTick',
+      intentsCategories.outcome.upgradeController.effect,
+      ActionProcessor.ActionType.Divide100))
+    if (controller.level < 8) {
+      actions.push(ActionProcessor.CreateAction('controller.rclPerTick',
+        intentsCategories.outcome.upgradeController.effect,
+        ActionProcessor.ActionType.Divide100))
     }
   }
 
