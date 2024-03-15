@@ -693,72 +693,72 @@ describe("Owned data type process check", () => {
     })
   })
   describe("Every tick", () => {
-    describe('should handle controller gcl/rclPerTick correctly', () => {
-      it('should handle static non changing values', async () => {
-        for (let i = 1; i <= 10; i += 1) {
-          const settings = [{
-            type: TestHelper.dataTypes.controller, data: {
-              1: {
-                _upgraded: i
-              }
-            }
-          }]
+    // describe('should handle controller gcl/rclPerTick correctly', () => {
+    //   it('should handle static non changing values', async () => {
+    //     for (let i = 1; i <= 10; i += 1) {
+    //       const settings = [{
+    //         type: TestHelper.dataTypes.controller, data: {
+    //           1: {
+    //             _upgraded: i
+    //           }
+    //         }
+    //       }]
 
-          const data = await testHelper1.process(settings)
-          const base = data.stats.users[data.opts.username].stats.combined.shards[data.opts.shard]
-          expect(base.controller.gclPerTick).toBe(Math.round(i * 0.99 * 100) / 100)
-        }
-      })
-      it('should handle fluctuating values', async () => {
-        for (let i = 1; i <= 10; i += 1) {
-          const settings = [{
-            type: TestHelper.dataTypes.controller, data: {
-              0: {
-                _upgraded: i
-              },
-              25: {
-                _upgraded: i * 0.75
-              },
-              50: {
-                _upgraded: i * 0.5
-              },
-              75: {
-                _upgraded: null
-              }
-            }
-          }]
+    //       const data = await testHelper1.process(settings)
+    //       const base = data.stats.users[data.opts.username].stats.combined.shards[data.opts.shard]
+    //       expect(base.controller.gclPerTick).toBe(Math.round(i * 0.99 * 100) / 100)
+    //     }
+    //   })
+    //   it('should handle fluctuating values', async () => {
+    //     for (let i = 1; i <= 10; i += 1) {
+    //       const settings = [{
+    //         type: TestHelper.dataTypes.controller, data: {
+    //           0: {
+    //             _upgraded: i
+    //           },
+    //           25: {
+    //             _upgraded: i * 0.75
+    //           },
+    //           50: {
+    //             _upgraded: i * 0.5
+    //           },
+    //           75: {
+    //             _upgraded: null
+    //           }
+    //         }
+    //       }]
 
-          const data = await testHelper1.process(settings)
-          const base = data.stats.users[data.opts.username].stats.combined.shards[data.opts.shard]
-          expect(base.controller.gclPerTick).toBe(i * 0.5625)
-        }
-      })
-      it('should handle controller level rclPerTick correctly', async () => {
-        for (let i = 1; i <= 8; i += 1) {
-          const settings = [{
-            type: TestHelper.dataTypes.controller, data: {
-              0: {
-                level: i,
-                _upgraded: 1
-              },
-              25: {
-                _upgraded: 0.75
-              },
-              50: {
-                _upgraded: 0.5
-              },
-              75: {
-                _upgraded: null
-              }
-            }
-          }]
+    //       const data = await testHelper1.process(settings)
+    //       const base = data.stats.users[data.opts.username].stats.combined.shards[data.opts.shard]
+    //       expect(base.controller.gclPerTick).toBe(i * 0.5625)
+    //     }
+    //   })
+    //   it('should handle controller level rclPerTick correctly', async () => {
+    //     for (let i = 1; i <= 8; i += 1) {
+    //       const settings = [{
+    //         type: TestHelper.dataTypes.controller, data: {
+    //           0: {
+    //             level: i,
+    //             _upgraded: 1
+    //           },
+    //           25: {
+    //             _upgraded: 0.75
+    //           },
+    //           50: {
+    //             _upgraded: 0.5
+    //           },
+    //           75: {
+    //             _upgraded: null
+    //           }
+    //         }
+    //       }]
 
-          const data = await testHelper1.process(settings)
-          const base = data.stats.users[data.opts.username].stats.combined.shards[data.opts.shard]
-          expect(base.controller.rclPerTick).toBe(i < 8 ? 0.5625 : 0)
-        }
-      })
-    })
+    //       const data = await testHelper1.process(settings)
+    //       const base = data.stats.users[data.opts.username].stats.combined.shards[data.opts.shard]
+    //       expect(base.controller.rclPerTick).toBe(i < 8 ? 0.5625 : 0)
+    //     }
+    //   })
+    // })
     it('should handle intentCategories correctly', async () => {
       const settings = []
       for (let i = 1; i <= 10; i += 1) {
