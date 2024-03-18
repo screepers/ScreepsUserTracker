@@ -100,37 +100,47 @@ export function summarizeObjects(objects) {
 export function getIntentEffect(action, originalObject) {
   try {
     switch (action) {
-      case "harvest":
+      case "harvest": {
+        const usableParts = Math.max(Math.floor(originalObject.store.energy / 2), originalObject.groupedBody.work);
         return {
           action,
-          energy: originalObject.groupedBody.work * 2,
-          effect: originalObject.groupedBodyEffect.harvest
+          energy: usableParts * 2,
+          effect: (originalObject.groupedBodyEffect.harvest / originalObject.groupedBody.work) * usableParts
         };
-      case "build":
+      }
+      case "build": {
+        const usableParts = Math.max(Math.floor(originalObject.store.energy / 5), originalObject.groupedBody.work);
         return {
           action,
-          energy: originalObject.groupedBody.work * 5,
-          effect: originalObject.groupedBodyEffect.build
+          energy: usableParts * 5,
+          effect: (originalObject.groupedBodyEffect.build / originalObject.groupedBody.work) * usableParts
         };
-      case "repair":
+      }
+      case "repair": {
         if (originalObject.type === "tower") return { action, energy: 10 };
+        const usableParts = Math.max(originalObject.store.energy, originalObject.groupedBody.work);
         return {
           action,
-          energy: originalObject.groupedBody.work * 1,
-          effect: originalObject.groupedBodyEffect.repair
+          energy: usableParts * 1,
+          effect: (originalObject.groupedBodyEffect.repair / originalObject.groupedBody.work) * usableParts
         };
-      case "upgradeController":
+      }
+      case "upgradeController": {
+        const usableParts = Math.max(originalObject.store.energy, originalObject.groupedBody.work);
         return {
           action,
-          energy: originalObject.groupedBody.work * 1,
-          effect: originalObject.groupedBodyEffect.upgradeController
+          energy: usableParts * 1,
+          effect: (originalObject.groupedBodyEffect.upgradeController / originalObject.groupedBody.work) * usableParts
         };
-      case "dismantle":
+      }
+      case "dismantle": {
+        const usableParts = originalObject.groupedBody.work;
         return {
           action,
           energy: originalObject.groupedBody.work * 0.25,
-          effect: originalObject.groupedBodyEffect.dismantle
+          effect: (originalObject.groupedBodyEffect.dismantle / originalObject.groupedBody.work) * usableParts
         };
+      }
       case "attack":
         if (originalObject.type === "tower")
           return { action, energy: 10, damage: 300 };

@@ -158,6 +158,15 @@ export default async function prepareObject(object, originalObject) {
   object.groupedBody = originalObject.groupedBody || {}
   object.groupedBodyEffect = originalObject.groupedBodyEffect || {}
 
+  if (!object.store) object.store = {}
+  if (!originalObject.store) originalObject.store = {}
+  const changedStore = Object.entries(object.store);
+  for (let i = 0; i < changedStore.length; i += 1) {
+    const [resourceType, amount] = changedStore[i];
+    originalObject.store[resourceType] = amount;
+  }
+  if (!originalObject.store.energy) originalObject.store.energy = 0;
+
   object.type = originalObject.type;
   switch (object.type) {
     case 'controller':
