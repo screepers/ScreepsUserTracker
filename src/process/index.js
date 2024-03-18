@@ -20,7 +20,7 @@ async function waitMax500ms(proxyIndex = -1) {
   const diff = Date.now() - last;
   lastRequest[proxyIndex] = Date.now();
   const sleepTime = Math.min(500 - diff, 500);
-  if (sleepTime < 0) Promise.resolve();
+  if (sleepTime < 0) return Promise.resolve();
   return sleep(sleepTime);
 }
 
