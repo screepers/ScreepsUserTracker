@@ -100,14 +100,12 @@ export function summarizeObjects(objects) {
 export function getIntentEffect(action, originalObject) {
   try {
     switch (action) {
-      case "harvest": {
-        const usableParts = Math.min(Math.floor(originalObject.store.energy / 2), originalObject.groupedBody.work);
+      case "harvest":
         return {
           action,
-          energy: usableParts * 2,
-          effect: (originalObject.groupedBodyEffect.harvest / originalObject.groupedBody.work) * usableParts
-        };
-      }
+          energy: originalObject.groupedBody.work * 2,
+          effect: originalObject.groupedBodyEffect.harvest
+        }
       case "build": {
         const usableParts = Math.min(Math.floor(originalObject.store.energy / 5), originalObject.groupedBody.work);
         return {

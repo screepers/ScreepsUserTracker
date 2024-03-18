@@ -765,6 +765,9 @@ describe("Owned data type process check", () => {
         settings.push({
           type: TestHelper.dataTypes.creep, data: {
             0: {
+              store: {
+                energy: 1000,
+              },
               actionLog: {
                 harvest: {
                 },
