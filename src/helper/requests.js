@@ -22,7 +22,7 @@ export function getSyncedTick(shard) {
     }
     else if (syncedNearCurrentLiveTick < liveTick - 1000) {
       syncedNearCurrentLiveTick[shard] += 1000;
-      return syncedNearCurrentLiveTick[shard] - 1000;
+      return syncedNearCurrentLiveTick[shard];
     }
     syncedTicks[shard] += 100;
     UploadStatus({ syncedTicks, liveTicks: lastLiveTicks })
