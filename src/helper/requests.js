@@ -17,12 +17,12 @@ export function getSyncedTick(shard) {
   const liveTick = getLiveTick(shard) - 500;
   if (syncedTicks[shard] < liveTick) {
     if (!syncedNearCurrentLiveTick[shard]) {
-      const tick = Math.round((lastLiveTicks[shard] - 5000) / 1000) * 1000;
+      const tick = Math.round((lastLiveTicks[shard] - 1000) / 1000) * 1000;
       syncedNearCurrentLiveTick[shard] = tick;
     }
-    else if (syncedNearCurrentLiveTick < liveTick - 5000) {
+    else if (syncedNearCurrentLiveTick < liveTick - 1000) {
       syncedNearCurrentLiveTick[shard] += 1000;
-      return syncedNearCurrentLiveTick[shard];
+      return syncedNearCurrentLiveTick[shard] - 1000;
     }
     syncedTicks[shard] += 100;
     UploadStatus({ syncedTicks, liveTicks: lastLiveTicks })
