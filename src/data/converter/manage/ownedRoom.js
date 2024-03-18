@@ -334,15 +334,13 @@ export default async function handleObjects(data, opts) {
     }
   }
 
-  if (controller) {
-    actions.push(ActionProcessor.CreateAction('controller.gclPerTick',
+  actions.push(ActionProcessor.CreateAction('controller.gclPerTick',
+    intentsCategories.outcome.upgradeController.effect,
+    ActionProcessor.ActionType.Divide100))
+  if (controller && controller.level < 8) {
+    actions.push(ActionProcessor.CreateAction('controller.rclPerTick',
       intentsCategories.outcome.upgradeController.effect,
       ActionProcessor.ActionType.Divide100))
-    if (controller.level < 8) {
-      actions.push(ActionProcessor.CreateAction('controller.rclPerTick',
-        intentsCategories.outcome.upgradeController.effect,
-        ActionProcessor.ActionType.Divide100))
-    }
   }
 
   const intentsCategoriesKeys = Object.keys(intentsCategories);

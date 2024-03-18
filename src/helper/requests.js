@@ -6,6 +6,7 @@ import { GetUserData } from "./users.js";
 import { UploadStatus } from "../data/upload.js";
 
 const syncedTicks = {}
+const syncedNearCurrentLiveTick = {}
 const lastLiveTicks = {}
 
 export function getLiveTick(shard) {
@@ -15,6 +16,14 @@ export function getLiveTick(shard) {
 export function getSyncedTick(shard) {
   const liveTick = getLiveTick(shard) - 500;
   if (syncedTicks[shard] < liveTick) {
+    if (!syncedNearCurrentLiveTick[shard]) {
+      const tick = Math.round((lastLiveTicks[shard] - 5000) / 1000) * 1000;
+      syncedNearCurrentLiveTick[shard] = tick;
+    }
+    else if (syncedNearCurrentLiveTick < liveTick - 5000) {
+      syncedNearCurrentLiveTick[shard] += 1000;
+      return syncedNearCurrentLiveTick[shard];
+    }
     syncedTicks[shard] += 100;
     UploadStatus({ syncedTicks, liveTicks: lastLiveTicks })
     return syncedTicks[shard];

@@ -183,8 +183,8 @@ export default async function prepareObject(object, originalObject) {
     object.cachedIntentsEffect = originalObject.cachedIntentsEffect;
   }
   if (!originalObject.actionLog) {
-    object.actionLog = {};
-    originalObject.actionLog = {};
+    object.actionLog = {}
+    originalObject.actionLog = {}
   }
 
   if (!object.actionLog) object.actionLog = {};
