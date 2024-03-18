@@ -1,4 +1,5 @@
 const WEBSHARE_TOKEN = process.env.WEBSHARE_TOKEN;
+const WEBSHARE_PROXYAMOUNT = process.env.WEBSHARE_PROXYAMOUNT;
 import { UploadStatus } from "../data/upload.js";
 import { CronJob } from "cron";
 import axios from "axios";
@@ -18,7 +19,12 @@ async function getProxies(page) {
   }
 }
 
-const proxyList = await getProxies(1)
+let proxyList = []
+for (let i = 1; i <= Math.ceil(Number(WEBSHARE_PROXYAMOUNT) / 100); i += 1) {
+  getProxies(i).then((proxies) => {
+    proxyList = proxyList.concat(proxies);
+  });
+}
 
 export default function getProxy(index) {
   return proxyList[index];
