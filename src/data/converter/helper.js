@@ -101,7 +101,7 @@ export function getIntentEffect(action, originalObject) {
   try {
     switch (action) {
       case "harvest": {
-        const usableParts = Math.max(Math.floor(originalObject.store.energy / 2), originalObject.groupedBody.work);
+        const usableParts = Math.min(Math.floor(originalObject.store.energy / 2), originalObject.groupedBody.work);
         return {
           action,
           energy: usableParts * 2,
@@ -109,7 +109,7 @@ export function getIntentEffect(action, originalObject) {
         };
       }
       case "build": {
-        const usableParts = Math.max(Math.floor(originalObject.store.energy / 5), originalObject.groupedBody.work);
+        const usableParts = Math.min(Math.floor(originalObject.store.energy / 5), originalObject.groupedBody.work);
         return {
           action,
           energy: usableParts * 5,
@@ -118,7 +118,7 @@ export function getIntentEffect(action, originalObject) {
       }
       case "repair": {
         if (originalObject.type === "tower") return { action, energy: 10 };
-        const usableParts = Math.max(originalObject.store.energy, originalObject.groupedBody.work);
+        const usableParts = Math.min(originalObject.store.energy, originalObject.groupedBody.work);
         return {
           action,
           energy: usableParts * 1,
@@ -126,7 +126,7 @@ export function getIntentEffect(action, originalObject) {
         };
       }
       case "upgradeController": {
-        const usableParts = Math.max(originalObject.store.energy, originalObject.groupedBody.work);
+        const usableParts = Math.min(originalObject.store.energy, originalObject.groupedBody.work);
         return {
           action,
           energy: usableParts * 1,
