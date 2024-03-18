@@ -27,7 +27,7 @@ export default class Requests {
 
       if (useProxy) {
         proxyCycles = [];
-        const proxies = Array.from({ length: 100 }, (_, index) => proxy(cycle, index));
+        const proxies = Array.from({ length: Number(process.env.WEBSHARE_PROXYAMOUNT) }, (_, index) => proxy(cycle, index));
         await Promise.all(proxies);
         cycle = proxyCycles;
       }
