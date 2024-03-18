@@ -34,7 +34,7 @@ function groupBy(acc, value) {
   }
 }
 
-export default function handleCombinedRoomStats(shardsData, userDataShards) {
+export default function handleCombinedRoomStats(shardsData, userData) {
   const stats = {};
   function getStatsObject() {
     return {
@@ -42,6 +42,7 @@ export default function handleCombinedRoomStats(shardsData, userDataShards) {
       combined: {
         shards: {},
       },
+      userData
     };
   }
 
@@ -86,7 +87,7 @@ export default function handleCombinedRoomStats(shardsData, userDataShards) {
     userStats.averaged.shards[shardName] = getAveragedStatsObject();
 
     const roomNames = Object.keys(shardData);
-    const ownedRoomCount = GetRoomTotal(userDataShards, 'owned');
+    const ownedRoomCount = GetRoomTotal(userData.shards, 'owned');
     for (let r = 0; r < roomNames.length; r += 1) {
       const roomName = roomNames[r];
 
