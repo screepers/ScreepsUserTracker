@@ -58,8 +58,8 @@ export default class Requests {
         const username = usernames[u];
         const user = users[username];
         const userData = GetUserData(username)
-        stats.users[username] = handleCombinedRoomStats(user, userData);
-        await UploadStats({ users: { [username]: { stats: userData } } })
+        stats.users[username] = handleCombinedRoomStats(user, userData.shards);
+        await UploadStats({ users: { [username]: { stats: userData } } }, Date.now())
         await UploadCombinedData(stats.users[username].stats, tick, username)
       }
       await UploadStats(stats, timestamp)
