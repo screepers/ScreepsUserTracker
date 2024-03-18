@@ -19,12 +19,22 @@ async function getProxies(page) {
   }
 }
 
-let proxyList = []
+let proxyList = [];
+let promises = [];
+
 for (let i = 1; i <= Math.ceil(Number(WEBSHARE_PROXYAMOUNT) / 100); i += 1) {
-  getProxies(i).then((proxies) => {
+  promises.push(getProxies(i));
+}
+
+Promise.all(promises).then((results) => {
+  results.forEach((proxies) => {
     proxyList = proxyList.concat(proxies);
   });
-}
+  // Now you can use the proxyList
+  console.log(`Loaded ${proxyList.length} proxies from Webshare`);
+}).catch((error) => {
+  console.error(error);
+});
 
 export default function getProxy(index) {
   return proxyList[index];
