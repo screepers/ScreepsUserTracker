@@ -183,51 +183,61 @@ export default async function prepareObject(object, originalObject) {
       break;
   }
 
+  // Store intents in array
   const intents = [];
+
+  // If OriginalObject has no cached intent effect assign it to original and object
   if (!originalObject.cachedIntentsEffect) {
     object.cachedIntentsEffect = [];
     originalObject.cachedIntentsEffect = [];
   }
+  // Else use cache on object
   else {
     object.cachedIntentsEffect = originalObject.cachedIntentsEffect;
   }
+
+  // If OriginalObject has no actionLog assign it to original and object
   if (!originalObject.actionLog) {
     object.actionLog = {}
     originalObject.actionLog = {}
   }
+  // Else if object is missing only actionLog
+  else if (!object.actionLog) object.actionLog = {};
 
-  if (!object.actionLog) object.actionLog = {};
+
+  // Check if object has moved
   const hasMoved = (object.x && object.x !== originalObject.x) || (object.y && object.y !== originalObject.y);
+  // Assign move intent
   if (hasMoved) {
     originalObject.x = object.x || originalObject.x;
     originalObject.y = object.y || originalObject.y;
     object.actionLog.move = { x: object.x, y: object.y }
   }
+  // If object has not moved again remove move intent
   else if (originalObject.actionLog.move) {
     object.actionLog.move = null;
   }
 
-
-  const newActionLogKeys = Object.keys(object.actionLog);
-  if (newActionLogKeys.length > 0) {
-    // Remove old intents
-    const actionLogKeys = Object.keys(originalObject.actionLog);
-    for (let i = 0; i < actionLogKeys.length; i += 1) {
-      const intentName = actionLogKeys[i];
-      if (object && object.actionLog && object.actionLog[intentName] !== undefined)
+  // Changed intents in current tick
+  const actionLogKeys = Object.keys(object.actionLog);
+  // If has changed intents
+  if (actionLogKeys.length > 0) {
+    const originalOjectActionLogKeys = Object.keys(originalObject.actionLog);
+    for (let i = 0; i < originalOjectActionLogKeys.length; i += 1) {
+      const intentName = originalOjectActionLogKeys[i];
+      // If object has already reported intent, keep it
+      if (object.actionLog[intentName])
         originalObject.actionLog[intentName] = object.actionLog[intentName];
-
-      if (!originalObject.actionLog[intentName])
+      // If intent is maybe null, remove it
+      else if (!originalObject.actionLog[intentName] || object.actionLog[intentName] === null)
         delete originalObject.actionLog[intentName];
     }
 
     // Add new intents
-    if (object && object.actionLog) {
-      for (let i = 0; i < newActionLogKeys.length; i += 1) {
-        const intentName = newActionLogKeys[i];
-        if (object.actionLog[intentName]) {
-          originalObject.actionLog[intentName] = object.actionLog[intentName];
-        }
+    for (let i = 0; i < actionLogKeys.length; i += 1) {
+      const intentName = actionLogKeys[i];
+      if (object.actionLog[intentName]) {
+        originalObject.actionLog[intentName] = object.actionLog[intentName];
       }
     }
 
