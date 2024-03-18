@@ -37,7 +37,7 @@ async function downloadAndUploadProxyStatistics() {
     const { data } = response;
     await UploadStatus({ proxyStats: data });
   } catch (error) {
-    console.error(error);
+    // console.error(error);
   }
 }
 
