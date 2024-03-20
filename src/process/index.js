@@ -9,7 +9,7 @@ function shouldFail(opts) {
   const data = validData[key]
   if (!data) return false;
 
-  if (data.tick + 1000 > opts.tick) return false
+  if (data.tick + 500 > opts.tick) return false
   delete validData[key]
   return true;
 }
@@ -42,7 +42,7 @@ export default async function processData(opts, proxyIndex) {
           status: "No user",
         }
       }
-      validData[`${opts.shard}-${opts.room}`] = { data: opts.data, tick: opts.tick }
+      validData[`${opts.shard}-${opts.room}`] = opts;
     }
     return {
       status: "Success",
@@ -55,7 +55,7 @@ export default async function processData(opts, proxyIndex) {
       };
     }
 
-    opts.data = validData[`${opts.shard}-${opts.room}`] || {};
+    opts.data = validData[`${opts.shard}-${opts.room}`];
     return {
       status: "Success",
     };

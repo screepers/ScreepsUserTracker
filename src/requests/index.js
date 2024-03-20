@@ -75,14 +75,16 @@ export default class Requests {
       }
       const roomsUploaded = {};
       for (let u = 0; u < status.processed.length; u += 1) {
-        const { shard, room } = status.processed[u];
-        roomsUploaded[shard] = roomsUploaded[shard] || {};
-        roomsUploaded[shard][room] = 1;
+        const { shard, room, username } = status.processed[u];
+        roomsUploaded[username] = roomsUploaded[username] || {};
+        roomsUploaded[username][shard] = roomsUploaded[username][shard] || {};
+        roomsUploaded[username][shard][room] = 1;
       }
       for (let u = 0; u < status.failed.length; u += 1) {
-        const { shard, room } = status.failed[u];
-        roomsUploaded[shard] = roomsUploaded[shard] || {};
-        roomsUploaded[shard][room] = 1;
+        const { shard, room, username } = status.failed[u];
+        roomsUploaded[username] = roomsUploaded[username] || {};
+        roomsUploaded[username][shard] = roomsUploaded[username][shard] || {};
+        roomsUploaded[username][shard][room] = 0;
       }
       await UploadStatus({
         cycleDetails:

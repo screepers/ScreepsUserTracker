@@ -184,13 +184,6 @@ export default async function handleObjects(data, opts) {
     if (controller) {
       actions.push(
         ActionProcessor.CreateAction(
-          `controller.upgrader`,
-          controller._upgraded,
-          ActionProcessor.ActionType.FirstTickOnly
-        )
-      );
-      actions.push(
-        ActionProcessor.CreateAction(
           `controller.level`,
           controller.level,
           ActionProcessor.ActionType.FirstTickOnly
