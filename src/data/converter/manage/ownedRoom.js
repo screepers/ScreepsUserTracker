@@ -334,19 +334,17 @@ export default async function handleObjects(data, opts) {
     }
   }
 
-  actions.push(ActionProcessor.CreateAction('controller.gclPerTick',
-    Math.max(intentsCategories.outcome.upgradeController.effect, controller._upgraded || 0),
-    ActionProcessor.ActionType.Divide100))
-  if (controller && controller.level < 8) {
-    actions.push(ActionProcessor.CreateAction('controller.rclPerTick',
-      Math.max(intentsCategories.outcome.upgradeController.effect, controller._upgraded || 0),
-      ActionProcessor.ActionType.Divide100))
-  }
   if (controller) {
     actions.push(ActionProcessor.CreateAction('controller.gclPerTick_upgraded', controller._upgraded || 0,
       ActionProcessor.ActionType.Divide100))
+    actions.push(ActionProcessor.CreateAction('controller.gclPerTick',
+      Math.max(intentsCategories.outcome.upgradeController.effect, controller._upgraded || 0),
+      ActionProcessor.ActionType.Divide100))
     if (controller.level < 8) {
       actions.push(ActionProcessor.CreateAction('controller.rclPerTick_upgraded', controller._upgraded || 0,
+        ActionProcessor.ActionType.Divide100))
+      actions.push(ActionProcessor.CreateAction('controller.rclPerTick',
+        Math.max(intentsCategories.outcome.upgradeController.effect, controller._upgraded || 0),
         ActionProcessor.ActionType.Divide100))
     }
   }
