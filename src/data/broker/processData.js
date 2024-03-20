@@ -50,7 +50,10 @@ export default class ProcessDataBroker {
         objects: {}
       }
     }
-    const firstTickObjectsPromises = firstTickObjects.map(async ([id, firstTickObject]) => {
+
+    for (let o = 0; o < firstTickObjects.length; o += 1) {
+      const id = firstTickObjects[o][0];
+      const firstTickObject = firstTickObjects[o][1];
       if (opts.userId === firstTickObject.user || opts.type === "unknown") {
         const uniqueObject = cleanSource(firstTickObject);
         uniqueObjects[id] = uniqueObject;
@@ -65,15 +68,12 @@ export default class ProcessDataBroker {
           data.ticks[tick].objects[id] = object;
         }
       }
-    })
-    await Promise.all(firstTickObjectsPromises);
+    }
 
-    const summarizeObjectPromises = Array.from({ length: 100 }, (_, t) => {
+    for (let t = 0; t < 100; t += 1) {
       const tick = tickKeys[t];
       if (tick) data.ticks[tick].summarize = summarizeObjects(data.ticks[tick].objects);
-      return Promise.resolve();
-    });
-    await Promise.all(summarizeObjectPromises);
+    }
 
     data.uniqueObjects = uniqueObjects
     return data
