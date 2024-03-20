@@ -184,6 +184,13 @@ export default async function handleObjects(data, opts) {
     if (controller) {
       actions.push(
         ActionProcessor.CreateAction(
+          `controller.upgrader`,
+          controller._upgraded,
+          ActionProcessor.ActionType.FirstTickOnly
+        )
+      );
+      actions.push(
+        ActionProcessor.CreateAction(
           `controller.level`,
           controller.level,
           ActionProcessor.ActionType.FirstTickOnly
@@ -341,6 +348,14 @@ export default async function handleObjects(data, opts) {
     actions.push(ActionProcessor.CreateAction('controller.rclPerTick',
       intentsCategories.outcome.upgradeController.effect,
       ActionProcessor.ActionType.Divide100))
+  }
+  if (controller) {
+    actions.push(ActionProcessor.CreateAction('controller.gclPerTick_upgraded', controller._upgraded || 0,
+      ActionProcessor.ActionType.Divide100))
+    if (controller.level < 8) {
+      actions.push(ActionProcessor.CreateAction('controller.rclPerTick_upgraded', controller._upgraded || 0,
+        ActionProcessor.ActionType.Divide100))
+    }
   }
 
   const intentsCategoriesKeys = Object.keys(intentsCategories);
