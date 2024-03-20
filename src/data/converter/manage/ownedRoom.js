@@ -335,11 +335,11 @@ export default async function handleObjects(data, opts) {
   }
 
   actions.push(ActionProcessor.CreateAction('controller.gclPerTick',
-    Math.min(intentsCategories.outcome.upgradeController.effect, controller._upgraded || 0),
+    Math.max(intentsCategories.outcome.upgradeController.effect, controller._upgraded || 0),
     ActionProcessor.ActionType.Divide100))
   if (controller && controller.level < 8) {
     actions.push(ActionProcessor.CreateAction('controller.rclPerTick',
-      Math.min(intentsCategories.outcome.upgradeController.effect, controller._upgraded || 0),
+      Math.max(intentsCategories.outcome.upgradeController.effect, controller._upgraded || 0),
       ActionProcessor.ActionType.Divide100))
   }
   if (controller) {
