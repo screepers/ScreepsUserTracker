@@ -61,11 +61,11 @@ export default class Requests {
         const userData = GetUserData(username)
         userData.tick = tick;
         stats.users[username] = handleCombinedRoomStats(user, userData);
-        userDataStats.users[username] = { stats: { userData: userData } };
-        await UploadCombinedData(stats.users[username].stats, tick, username)
+        userDataStats.users[username] = { stats: { userData } };
+        UploadCombinedData(stats.users[username].stats, tick, username)
       }
-      await UploadStats(stats, timestamp)
-      await UploadUserData(userDataStats)
+      UploadStats(stats, timestamp)
+      UploadUserData(userDataStats)
       const timeTaken = Date.now() - start;
 
       const percentageOnTarget = (cycleLength * 300 * 60) / timeTaken;
@@ -91,7 +91,7 @@ export default class Requests {
         roomsUploaded[username][type][shard] = roomsUploaded[username][type][shard] || {};
         roomsUploaded[username][type][shard][room] = 0;
       }
-      await UploadStatus({
+      UploadStatus({
         cycleDetails:
         {
           amount: cycleLength, success: status.processed.length, failed: status.failed.length,

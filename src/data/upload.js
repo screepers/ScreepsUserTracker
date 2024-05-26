@@ -92,6 +92,7 @@ export function UploadStatus(data) {
 export function UploadUserData(data) {
   const graphiteQuery = new Promise((resolve) => {
     try {
+      const timestamp = Date.now();
       if (process.env.GRAPHITE_ONLINE !== "TRUE") resolve();
       else {
         client.write(
@@ -100,12 +101,12 @@ export function UploadUserData(data) {
               userTracker: { [process.env.SERVER_TYPE]: data },
             },
           },
-          Date.now(),
+          timestamp,
           (err) => {
             if (err) {
               logger.error(err);
             } else logger.info(
-              `Written user data at ${new Date(_timestamp)}`
+              `Written user data at ${new Date(timestamp)}`
             );
 
             resolve();
