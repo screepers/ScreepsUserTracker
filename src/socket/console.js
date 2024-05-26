@@ -22,8 +22,9 @@ if (process.env.PRIVATE_SERVER_USERNAME) {
     console.log('Connected to socket')
   })
 
-  api.socket.subscribe('console')
-  api.socket.on('console', async (event) => {
+  const roomName = process.env.ROOM_NAME
+  api.socket.subscribe(`room:${roomName}`)
+  api.socket.on(`room:${roomName}`, async (event) => {
     try {
       const { data } = await axios.get(`${url}/stats`);
 
