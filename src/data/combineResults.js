@@ -98,7 +98,7 @@ export default function handleCombinedRoomStats(shardsData) {
     }
   }
 
-  if (process.env.ONLY_COMBINED_DATA_UPLOAD === "true")
+  if (process.env.ONLY_COMBINED_DATA_UPLOAD.toLowerCase() === "true")
     delete userStats.shards;
 
   return { stats: userStats }
