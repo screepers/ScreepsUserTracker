@@ -1,5 +1,5 @@
 import "dotenv/config";
 import Requests from "./requests/index.js";
-import "./socket/console.js";
+import "./adminUtils.js";
 
 Requests.executeCycle();

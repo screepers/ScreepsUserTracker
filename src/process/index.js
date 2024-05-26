@@ -9,7 +9,7 @@ function shouldFail(opts) {
   const data = validData[key]
   if (!data) return false;
 
-  if (data.tick + 500 > opts.tick) return false
+  if (data.tick + 2500 > opts.tick) return false
   delete validData[key]
   return true;
 }
@@ -32,35 +32,34 @@ export default async function processData(opts, proxyIndex) {
   }
 
   const dataResult = await GetRoomHistory(proxy, opts.shard, opts.room, opts.tick);
-  if (dataResult.status === "Success") {
-    const { data } = dataResult;
-    if (opts.username) {
-      opts.timestamp = data.timestamp;
-      opts.data = await ProcessDataBroker.single({ roomData: data, opts });
-      if (!opts.data) {
-        return {
-          status: "No user",
+  switch (dataResult.status) {
+    case "Success": {
+      const { data } = dataResult;
+      if (opts.username) {
+        opts.timestamp = data.timestamp;
+        opts.data = await ProcessDataBroker.single({ roomData: data, opts });
+        if (!opts.data) {
+          return {
+            status: "No user",
+          }
         }
+        validData[`${opts.shard}-${opts.room}`] = opts;
       }
-      validData[`${opts.shard}-${opts.room}`] = opts;
-    }
-    return {
-      status: "Success",
-    }
-  }
-  if (opts.failed) {
-    if (shouldFail(opts)) {
       return {
-        status: "Failed",
-      };
+        status: "Success",
+      }
     }
+    default: {
+      if (shouldFail(opts)) {
+        return {
+          status: "Failed",
+        };
+      }
 
-    opts.data = validData[`${opts.shard}-${opts.room}`];
-    return {
-      status: "Success",
-    };
+      opts.data = validData[`${opts.shard}-${opts.room}`];
+      return {
+        status: "Success"
+      }
+    }
   }
-
-  opts.failed = true;
-  return processData(opts, proxyIndex);
 }
