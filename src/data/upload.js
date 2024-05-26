@@ -17,7 +17,6 @@ const client = graphite.createClient(
 
 
 export default function UploadStats(data, timestamp) {
-
   const graphiteQuery = new Promise((resolve) => {
     try {
       if (process.env.GRAPHITE_ONLINE !== "TRUE") resolve();
@@ -77,6 +76,36 @@ export function UploadStatus(data) {
               logger.error(err);
             } else logger.info(
               `Written status`
+            );
+
+            resolve();
+          }
+        );
+      }
+    } catch {
+      resolve();
+    }
+  });
+  return Promise.all([graphiteQuery]);
+}
+
+export function UploadUserData(data) {
+  const graphiteQuery = new Promise((resolve) => {
+    try {
+      if (process.env.GRAPHITE_ONLINE !== "TRUE") resolve();
+      else {
+        client.write(
+          {
+            [process.env.GRAPHITE_PREFIX || '']: {
+              userTracker: { [process.env.SERVER_TYPE]: data },
+            },
+          },
+          Date.now(),
+          (err) => {
+            if (err) {
+              logger.error(err);
+            } else logger.info(
+              `Written user data at ${new Date(_timestamp)}`
             );
 
             resolve();

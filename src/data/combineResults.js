@@ -34,7 +34,7 @@ function groupBy(acc, value) {
   }
 }
 
-export default function handleCombinedRoomStats(shardsData, userData) {
+export default function handleCombinedRoomStats(shardsData) {
   const stats = {};
   function getStatsObject() {
     return {
@@ -42,7 +42,6 @@ export default function handleCombinedRoomStats(shardsData, userData) {
       combined: {
         shards: {},
       },
-      userData
     };
   }
 

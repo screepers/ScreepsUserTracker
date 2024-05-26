@@ -1,5 +1,5 @@
 import handleCombinedRoomStats from "../data/combineResults.js";
-import UploadStats, { UploadStatus, UploadCombinedData } from "../data/upload.js";
+import UploadStats, { UploadStatus, UploadCombinedData, UploadUserData } from "../data/upload.js";
 import { sleep } from "../helper/index.js";
 import { getCycle, cycleStatus } from "../helper/requests.js";
 import processOpts from "../process/index.js";
@@ -54,18 +54,21 @@ export default class Requests {
 
       const usernames = Object.keys(users);
       const stats = { users: {} };
+      const userDataStats = { users: {} };
       for (let u = 0; u < usernames.length; u += 1) {
         const username = usernames[u];
         const user = users[username];
         const userData = GetUserData(username)
         userData.tick = tick;
         stats.users[username] = handleCombinedRoomStats(user, userData);
+        userDataStats.users[username] = { stats: { userData: userData } };
         await UploadCombinedData(stats.users[username].stats, tick, username)
       }
       await UploadStats(stats, timestamp)
+      await UploadUserData(userDataStats)
       const timeTaken = Date.now() - start;
 
-      const percentageOnTarget = (cycleLength * 500 * 60) / timeTaken;
+      const percentageOnTarget = (cycleLength * 300 * 60) / timeTaken;
       const timePerRoom = (Date.now() - start) / cycleLength
       const types = {}
       for (let u = 0; u < status.processed.length; u += 1) {
