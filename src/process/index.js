@@ -1,6 +1,6 @@
 import { GetRoomHistory } from "./screepsApi.js";
 import { sleep } from "../helper/index.js";
-import getProxy from "../helper/proxy.js";
+import getProxy from "../helper/proxies/index.js";
 import ProcessDataBroker from "../data/broker/processData.js";
 
 const validData = {}

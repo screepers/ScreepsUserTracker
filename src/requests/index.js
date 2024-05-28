@@ -5,7 +5,7 @@ import { getCycle, cycleStatus } from "../helper/requests.js";
 import processOpts from "../process/index.js";
 import { GetUserData } from "../helper/users.js"
 
-const useProxy = process.env.WEBSHARE_TOKEN !== undefined;
+const useProxy = process.env.WEBSHARE_TOKEN !== undefined || process.env.PROXYSCRAPE_TOKEN !== undefined;
 
 let proxyCycles = [];
 
@@ -27,7 +27,11 @@ export default class Requests {
 
       if (useProxy) {
         proxyCycles = [];
-        const proxies = Array.from({ length: Number(process.env.WEBSHARE_PROXYAMOUNT) }, (_, index) => proxy(cycle, index));
+        let proxyAmount = Number(process.env.WEBSHARE_PROXYAMOUNT);
+        if (!proxyAmount) {
+          proxyAmount = Number(process.env.PROXYSCRAPE_PROXYAMOUNT);
+        }
+        const proxies = Array.from({ length: proxyAmount }, (_, index) => proxy(cycle, index));
         await Promise.all(proxies);
         cycle = proxyCycles;
       }

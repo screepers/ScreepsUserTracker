@@ -1,6 +1,6 @@
 const WEBSHARE_TOKEN = process.env.WEBSHARE_TOKEN;
 const WEBSHARE_PROXYAMOUNT = process.env.WEBSHARE_PROXYAMOUNT;
-import { UploadStatus } from "../data/upload.js";
+import { UploadStatus } from "../../data/upload.js";
 import { CronJob } from "cron";
 import axios from "axios";
 
@@ -19,25 +19,19 @@ async function getProxies(page) {
   }
 }
 
-let proxyList = [];
-let promises = [];
+export async function getProxiesList() {
+  let promises = [];
+  for (let i = 1; i <= Math.ceil(Number(WEBSHARE_PROXYAMOUNT) / 100); i += 1) {
+    promises.push(getProxies(i));
+  }
 
-for (let i = 1; i <= Math.ceil(Number(WEBSHARE_PROXYAMOUNT) / 100); i += 1) {
-  promises.push(getProxies(i));
-}
-
-Promise.all(promises).then((results) => {
+  let proxyList = [];
+  const results = await Promise.all(promises)
   results.forEach((proxies) => {
     proxyList = proxyList.concat(proxies);
   });
-  // Now you can use the proxyList
-  console.log(`Loaded ${proxyList.length} proxies from Webshare`);
-}).catch((error) => {
-  console.error(error);
-});
 
-export default function getProxy(index) {
-  return proxyList[index];
+  return proxyList;
 }
 
 async function downloadAndUploadProxyStatistics() {

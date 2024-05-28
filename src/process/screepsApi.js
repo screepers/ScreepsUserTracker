@@ -47,8 +47,7 @@ const lastTickCache = {
 }
 export async function GetGameTime(shard) {
   try {
-    if (lastTickCache[shard] && lastTickCache[shard].lastUpdate + 10 * 1000 > Date.now()) {
-      logger.info(`GetGameTime: ${shard}/${lastTickCache[shard].tick}`);
+    if (lastTickCache[shard] && lastTickCache[shard].lastUpdate + 600 * 1000 > Date.now()) {
       return lastTickCache[shard].tick;
     }
     await sleep(500);
@@ -79,7 +78,7 @@ async function getHistory(proxy, room, tick, shard) {
       logger.info(`GetHistory - Success: ${url}`);
       return { status: "Success", result: response.data };
     } catch (error) {
-      if (error.message && error.message.includes("404 Not Found")) {
+      if (error.response && error.response.status === 404) {
         // logger.info(`GetHistory - ${url} / ${error.message}`)
         return { status: "Not found", message: error };
       }
@@ -92,7 +91,7 @@ async function getHistory(proxy, room, tick, shard) {
   const proxySettings = proxy;
 
   const timeoutPromise = new Promise((resolve) => {
-    setTimeout(resolve, 10 * 1000, () => {
+    setTimeout(resolve, 15 * 1000, () => {
       logger.info('Failed: Proxy Timeout')
       return { status: "Timeout" }
     });
@@ -101,7 +100,13 @@ async function getHistory(proxy, room, tick, shard) {
   const getHistoryPromise = new Promise((resolve) => {
 
     // eslint-disable-next-line max-len
-    const proxyUrl = `http://${proxySettings.username}:${proxySettings.password}@${proxySettings.proxy_address}:${proxySettings.ports.http}`;
+    let proxyUrl = "";
+    if (proxySettings.username && proxySettings.password) {
+      proxyUrl = `http://${proxySettings.username}:${proxySettings.password}@${proxySettings.proxy_address}:${proxySettings.ports.http}`;
+    }
+    if (proxySettings.ip) {
+      proxyUrl = `http://${proxySettings.ip}:${proxySettings.port}`;
+    }
     const agent = new HttpsProxyAgent(
       proxyUrl
     );
@@ -114,7 +119,7 @@ async function getHistory(proxy, room, tick, shard) {
         resolve({ status: "Success", result: response.data });
       })
       .catch((error) => {
-        if (error.message && error.message.includes("404 Not Found")) {
+        if (error.response && error.response.status === 404) {
           // apiLogger.info(`${url} / ${error.message}`)
           resolve({ status: "Not found", message: error });
         }
