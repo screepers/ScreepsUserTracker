@@ -2,6 +2,9 @@ node_modules
 logs
 .env
 coverage
+config.ini
+
+__pycache__
 
 docker-compose.override.yml
 
