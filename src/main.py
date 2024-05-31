@@ -3,11 +3,10 @@
 from dotenv import load_dotenv
 load_dotenv()
 from proxy_handler import get_proxies, make_screeps_history_request
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from queue import Queue
-from itertools import cycle
-import math
+from multiprocessing.dummy import Pool
 import time
+import asyncio
+
 
 import os
 MAX_THREADS  = os.getenv('MAX_THREADS')
@@ -16,85 +15,62 @@ if not MAX_THREADS:
 MAX_THREADS = int(MAX_THREADS)
 
 # 119KB
+proxies = get_proxies()
 urls = []
 url = "https://screeps.com/room-history/shard0/E67N17/61400100.json"
 for i in range(0, 1000):
     urls.append(url)
 
-resultDict = {}
+results = []
+proxies_per_thread = {}
+urls_per_thread = {}
 
-proxies = get_proxies()
 
+for i, proxy in enumerate(proxies):
+    thread = i % MAX_THREADS
+    proxies_per_thread[thread] = proxies_per_thread.get(thread, []) + [proxy]
+for i, url in enumerate(urls):
+    thread = i % MAX_THREADS
+    urls_per_thread[thread] = urls_per_thread.get(thread, []) + [url]
 
-# pool = ThreadPool(MAX_THREADS)
-# results = pool.map(lambda proxy: make_screeps_history_request(url, proxy), proxies)
-
-def process_proxy(proxy, urls):
-    results = []
-    for url in urls:
-        # Your logic here, e.g., fetch url using proxy
-        result = (proxy, url)  # Replace with actual result
+async def proxy_worker(proxy, urls, results):
+    for index, url in enumerate(urls):
+        result = await make_screeps_history_request(url, proxy)
         results.append(result)
+        print(f"{index}: Processed {url} via {proxy} with result {result['status_code']}")
     return results
 
-def execute_thread(data):
-    proxies, urls = data
-    results = []
-    proxy_count = len(proxies)
+def worker(data):
+    thread_proxies = data['thread_proxies']
+    thread_urls = data['thread_urls']
     
     urls_per_proxy = {}
-    for i, url in enumerate(urls):
-        proxy = proxies[i % proxy_count]
+    proxy_count = len(thread_proxies)
+    for i, url in enumerate(thread_urls):
+        proxy = i % proxy_count
         urls_per_proxy[proxy] = urls_per_proxy.get(proxy, []) + [url]
-        
-    for proxy, urls in urls_per_proxy.items():
-        for url in urls:
-            status_code, result = make_screeps_history_request(url, proxy)
-            if status_code == 200:
-                results.append(result)
-    return results
-
-def fetch_with_proxies(urls, proxies):
+    
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+      
     results = []
-    proxies_per_thread = {}
-    urls_per_thread = {}
-    for i, proxy in enumerate(proxies):
-        thread = i % MAX_THREADS + 1
-        proxies_per_thread[thread] = proxies_per_thread.get(thread, []) + [proxy]
-    for i, url in enumerate(urls):
-        thread = i % MAX_THREADS + 1
-        urls_per_thread[thread] = urls_per_thread.get(thread, []) + [url]
-
-    pool = ThreadPool(MAX_THREADS)
-    thread_data = [(proxies_per_thread.get(thread, []), urls_per_thread.get(thread, [])) for thread in range(1, MAX_THREADS + 1)]
-    results = pool.map(execute_thread, thread_data)
+    tasks = [loop.create_task(proxy_worker(proxy, urls_per_proxy[index], results)) for index, proxy in enumerate(thread_proxies)]
+    loop.run_until_complete(asyncio.wait(tasks))
+    loop.close()
     
     return results
 
-t0 = time.time()
-results = fetch_with_proxies(urls, proxies)
-t1 = time.time()
-total = t1-t0
-for status_code in results:
-    print(f"Status Code: {status_code}")
+pool = Pool(MAX_THREADS)
 
-while True:
-    # took ... ms
-    t0 = time.time()
-    status_code, result = make_screeps_history_request(url)
-    t1 = time.time()
+  
+start_time = time.time()
 
-    total = t1-t0
+thread_results = pool.map(worker, [{'thread_proxies': proxies_per_thread[i], 'thread_urls': urls_per_thread[i]} for i in range(MAX_THREADS)])
 
-    status_code_str = str(status_code)
-    resultDict[status_code_str] = resultDict.get(status_code_str, 0) + 1
+results = [result for thread_result in thread_results for result in thread_result]
 
-    print(total)    
-    for key, value in resultDict.items():
-        print(key, value)
-        
-result = make_screeps_history_request(url)
+end_time = time.time()
 
-# try:
-# except Exception as e:
-#     print(e)
+total_execution_time = end_time - start_time
+
+print(f"Total execution time: {total_execution_time} seconds")
