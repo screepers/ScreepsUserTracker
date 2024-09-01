@@ -15,3 +15,7 @@ requests.json
 roomsBeingChecked.json
 newrelic_agent.log
 newrelic.cjs
+
+bin
+obj
+.vs
