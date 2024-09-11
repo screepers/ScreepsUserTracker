@@ -5,47 +5,41 @@ import { requestLogger as logger } from "./logger.js"
 import { GetUserData } from "./users.js";
 import { UploadStatus } from "../data/upload.js";
 
-const syncedTicks = {}
-const syncedNearCurrentLiveTick = {}
+const syncTickBacklog = {}
+const lastSyncedTicks = {}
 const lastLiveTicks = {}
 
 export function getLiveTick(shard) {
   return lastLiveTicks[shard] || 0;
 }
 
+function syncToBeListUntilTick(shard, end) {
+  if (!syncTickBacklog[shard]) syncTickBacklog[shard] = []
+  while (lastSyncedTicks[shard] < end) {
+    lastSyncedTicks[shard] += 100
+    syncTickBacklog[shard].unshift(lastSyncedTicks[shard])
+  }
+}
+
 export function getSyncedTick(shard) {
   const liveTick = getLiveTick(shard) - 500;
-  if (syncedTicks[shard] < liveTick) {
-    if (!syncedNearCurrentLiveTick[shard]) {
-      const tick = Math.round((lastLiveTicks[shard] - 1000) / 1000) * 1000;
-      syncedNearCurrentLiveTick[shard] = tick;
-    }
-    else if (syncedNearCurrentLiveTick < liveTick - 1000) {
-      syncedNearCurrentLiveTick[shard] += 1000;
-      return syncedNearCurrentLiveTick[shard];
-    }
-    syncedTicks[shard] += 100;
-    UploadStatus({ syncedTicks, liveTicks: lastLiveTicks })
-    return syncedTicks[shard];
-  }
-  if (!syncedTicks[shard] && lastLiveTicks[shard]) {
-    // eslint-disable-next-line no-nested-ternary
-    let tick;
+  const lastLiveTick = lastLiveTicks[shard];
+  let lastSyncedTick = lastSyncedTicks[shard];
 
-    if (process.env.MIN_TICK !== undefined) tick = Number.parseInt(process.env.MIN_TICK || "-1", 10)
-    else if (lastLiveTicks[shard]) tick = lastLiveTicks[shard] - 1000;
-    else {
-      return undefined;
-    }
-    tick = Math.round(tick / 100) * 100
+  if (!lastLiveTick) return undefined;
+  if (!lastSyncedTick) {
+    if (process.env.MIN_TICK !== undefined) lastSyncedTicks[shard] = Number.parseInt(process.env.MIN_TICK || "-1", 10)
+    else lastSyncedTicks[shard] = lastLiveTicks - 1000;
 
-    syncedTicks[shard] = tick;
-
-    UploadStatus({ syncedTicks, liveTicks: lastLiveTicks })
-    return tick;
+    lastSyncedTick = lastSyncedTicks[shard];
   }
 
-  return undefined;
+  syncToBeListUntilTick(shard, liveTick)
+
+  const syncTickBacklogLength = syncTickBacklog[shard].length;
+  const oldestNonSyncedTick = syncTickBacklogLength > 0 ? syncTickBacklog[shard][syncTickBacklogLength - 1] : lastLiveTick
+  UploadStatus({ [`oldestNonSyncedTicks.${shard}`]: oldestNonSyncedTick, [`liveTicks.${shard}`]: lastLiveTick })
+  return syncTickBacklog[shard].shift();
 }
 
 export async function getCycle() {
@@ -120,7 +114,7 @@ async function liveTickUpdater() {
   const shardNames = Object.keys(shards);
   for (let s = 0; s < shardNames.length; s += 1) {
     const shardName = shardNames[s];
-    lastLiveTicks[shardName] = await GetGameTime(shardName);
+    lastLiveTicks[shardName] = Math.round((await GetGameTime(shardName)) / 100) * 100;
   }
 }
 
