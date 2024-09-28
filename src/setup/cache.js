@@ -126,7 +126,7 @@ export default class Cache {
 
   static async updateUsersCache() {
     const forcedUsers = process.env.USERNAMES && process.env.USERNAMES.length > 0
-      ? process.env.USERNAMES.split(",") : [];
+      ? ("Unknown," + process.env.USERNAMES).split(",") : [];
     let users = await advancedScreepsApi.getAllUsers()
     users = users.filter(forcedUsers.length > 0 ? (user) => forcedUsers.includes(user.username) : () => true);
     users.sort((a, b) => GetRoomTotal(b.shards, 'type') - GetRoomTotal(a.shards, 'type'));
