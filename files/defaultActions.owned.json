@@ -973,5 +973,20 @@
     "path": "spawning.spawnUptimePercentage",
     "value": 0,
     "type": 0
+  },
+  {
+    "path": "resourcesStored.score",
+    "value": 0,
+    "type": 1
+  },
+  {
+    "path": "controller.gclPerTick_upgraded",
+    "value": 0,
+    "type": 0
+  },
+  {
+    "path": "controller.rclPerTick_upgraded",
+    "value": 0,
+    "type": 0
   }
 ]

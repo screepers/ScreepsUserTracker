@@ -35,7 +35,7 @@ const userRoomsCache = cleanSource(baseCache)
 export default class Cache {
   static shouldUpdateCache(type) {
     let cache;
-    const shouldUpdateInterval = 1000 * 60 * 30;
+    const shouldUpdateInterval = 1000 * 60 * 10;
     switch (type) {
       case 'rooms':
         cache = roomsCache;
@@ -122,6 +122,23 @@ export default class Cache {
     }
 
     roomsCache.data = shards;
+  }
+
+  static async updateUserLeaderboardCache() {
+    const forcedUsers = process.env.USERNAMES && process.env.USERNAMES.length > 0
+      ? ("Unknown," + process.env.USERNAMES).split(",") : [];
+    let users = await advancedScreepsApi.getAllUsers()
+    users = users.filter(forcedUsers.length > 0 ? (user) => forcedUsers.includes(user.username) : () => true);
+    users.sort((a, b) => GetRoomTotal(b.shards, 'type') - GetRoomTotal(a.shards, 'type'));
+    const userValues = Object.values(users);
+
+    for (let u = 0; u < userValues.length; u += 1) {
+      const user = userValues[u];
+      ProcessDataBroker.usernamesById[user.id] = user.username;
+    }
+    fs.writeFileSync("./files/users.json", JSON.stringify(users, null, 2));
+    UpdateLocalUsersCache(users);
+    usersCache.data = users;
   }
 
   static async updateUsersCache() {
