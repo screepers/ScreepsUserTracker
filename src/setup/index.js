@@ -20,3 +20,12 @@ const initialRoomUpdaterJob = new CronJob(
   "Europe/Amsterdam"
 );
 initialRoomUpdaterJob.start();
+
+const userLeaderboardSyncer = new CronJob(
+  "* * * * *",
+  Cache.updateUserLeaderboardCache,
+  null,
+  false,
+  "Europe/Amsterdam"
+);
+userLeaderboardSyncer.start();

@@ -35,7 +35,7 @@ const userRoomsCache = cleanSource(baseCache)
 export default class Cache {
   static shouldUpdateCache(type) {
     let cache;
-    const shouldUpdateInterval = 1000 * 60 * 10;
+    let shouldUpdateInterval = 1000 * 60 * 10;
     switch (type) {
       case 'rooms':
         cache = roomsCache;
@@ -124,23 +124,6 @@ export default class Cache {
     roomsCache.data = shards;
   }
 
-  static async updateUserLeaderboardCache() {
-    const forcedUsers = process.env.USERNAMES && process.env.USERNAMES.length > 0
-      ? ("Unknown," + process.env.USERNAMES).split(",") : [];
-    let users = await advancedScreepsApi.getAllUsers()
-    users = users.filter(forcedUsers.length > 0 ? (user) => forcedUsers.includes(user.username) : () => true);
-    users.sort((a, b) => GetRoomTotal(b.shards, 'type') - GetRoomTotal(a.shards, 'type'));
-    const userValues = Object.values(users);
-
-    for (let u = 0; u < userValues.length; u += 1) {
-      const user = userValues[u];
-      ProcessDataBroker.usernamesById[user.id] = user.username;
-    }
-    fs.writeFileSync("./files/users.json", JSON.stringify(users, null, 2));
-    UpdateLocalUsersCache(users);
-    usersCache.data = users;
-  }
-
   static async updateUsersCache() {
     const forcedUsers = process.env.USERNAMES && process.env.USERNAMES.length > 0
       ? ("Unknown," + process.env.USERNAMES).split(",") : [];
@@ -167,5 +150,22 @@ export default class Cache {
     }
 
     userRoomsCache.data = userRooms;
+  }
+
+  static async updateUserLeaderboardCache() {
+    const users = await Cache.getUsersCache();
+    const leaderboards = await advancedScreepsApi.getAllLeaderboard();
+    const leaderboardKeys = Object.keys(leaderboards);
+
+    for (let u = 0; u < users.length; u += 1) {
+      const user = users[u];
+      const username = user.username
+
+      for (let l = 0; l < leaderboardKeys.length; l += 1) {
+        const leaderboardName = leaderboardKeys[l];
+        const leaderboard = leaderboards[leaderboardName];
+        user[leaderboardName] = leaderboard[username];
+      }
+    }
   }
 }
